@@ -59,3 +59,7 @@ RSpec/DescribeClass:
 
 Metrics/ParameterLists:
   CountKeywordArgs: false
+
+# Спеки лежат плоско в spec/ (spec/loader_spec.rb для Forge::Loader) — так задано карточками.
+RSpec/SpecFilePathFormat:
+  Enabled: false

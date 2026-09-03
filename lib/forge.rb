@@ -2,3 +2,4 @@
 
 require_relative 'forge/version'
 require_relative 'forge/errors'
+require_relative 'forge/loader'
