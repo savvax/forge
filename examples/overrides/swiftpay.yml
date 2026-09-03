@@ -1,0 +1,14 @@
+# examples/overrides/swiftpay.yml — закрывает WARN спеки SwiftPay, которые можно закрыть настройкой.
+# Остаётся: WARN one_of_first_variant (выбор варианта beneficiary) и 3 UNSUPPORTED
+# (внешний $ref, подпись с timestamp, oauth2 как альтернативная схема) — они требуют ручного кода.
+
+statuses:
+  PENDING_APPROVAL: in_progress
+  RETURNED: rejected
+
+fields:
+  beneficiary.address:
+    source: "{ country: operation.payout_requisite.dig('bank_account', 'country') }.compact"
+
+# endpoints:
+#   cancelOutboundPayment: other                # если не хотим генерировать cancel_request через DELETE

@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'thor'
+require_relative '../lib/forge'
+
+# Thor-обёртка. Команды analyze/generate/mock подключаются в T07/T12/T15 (lib/forge/cli.rb).
+class ForgeCLI < Thor
+  def self.exit_on_failure? = true
+
+  desc 'analyze --spec FILE', 'Разобрать OpenAPI-спеку и напечатать отчёт'
+  option :spec, required: true
+  def analyze = not_implemented
+
+  desc 'generate --spec FILE [--out DIR]', 'Сгенерировать интеграцию провайдера'
+  option :spec, required: true
+  option :provider
+  option :out, default: 'output'
+  def generate = not_implemented
+
+  desc 'mock --spec FILE', 'Поднять мок-сервер провайдера из спеки'
+  option :spec, required: true
+  def mock = not_implemented
+
+  desc 'version', 'Версия forge'
+  def version = puts("forge #{Forge::VERSION}")
+
+  private
+
+  def not_implemented
+    warn 'error: not implemented'
+    exit Forge::GenerationError.exit_code
+  end
+end
+
+ForgeCLI.start(ARGV)

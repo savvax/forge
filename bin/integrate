@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Обёртка с флагами из ТЗ: --spec FILE --provider NAME [--lang ruby] → bin/forge generate --out ./output
+require 'optparse'
+
+opts = { lang: 'ruby' }
+OptionParser.new do |o|
+  o.banner = 'usage: bin/integrate --spec FILE --provider NAME [--lang ruby]'
+  o.on('--spec FILE') { |v| opts[:spec] = v }
+  o.on('--provider NAME') { |v| opts[:provider] = v }
+  o.on('--lang LANG') { |v| opts[:lang] = v }
+end.parse!
+
+unless opts[:lang] == 'ruby'
+  warn "error: only ruby is supported (got --lang #{opts[:lang]})"
+  exit 1
+end
+abort 'error: --spec and --provider are required' unless opts[:spec] && opts[:provider]
+
+forge = File.expand_path('forge', __dir__)
+exec(forge, 'generate', '--spec', opts[:spec], '--provider', opts[:provider], '--out', './output')

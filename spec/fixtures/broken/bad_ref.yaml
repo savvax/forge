@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info: { title: Bad Ref, version: '1.0' }
+paths:
+  /payouts:
+    post:
+      operationId: createPayout
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Missing'
+      responses:
+        '201': { description: Created }
+components:
+  schemas:
+    Present: { type: object }

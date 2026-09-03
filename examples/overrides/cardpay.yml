@@ -1,0 +1,16 @@
+# examples/overrides/cardpay.yml — закрывает все 5 WARN спеки CardPay.
+# bin/forge generate --spec examples/specs/cardpay.yaml --overrides examples/overrides/cardpay.yml --strict → exit 0
+
+base_url:
+  default: https://sandbox.cardpay.example/v2   # в спеке только production → WARN production_default
+  production: https://api.cardpay.example/v2
+
+statuses:
+  ON_HOLD: in_progress                          # WARN unmapped_status + unmapped_event (transfer.on_hold)
+
+fields:
+  destination.card.expiry:                      # WARN unmapped_field: формат MM/YY не выводится из реквизитов автоматически
+    source: "format('%02d/%02d', operation.payout_requisite.dig('card', 'expiry_month'), operation.payout_requisite.dig('card', 'expiry_year') % 100)"
+
+webhook:
+  signature_payload: raw_body                   # WARN signature_payload_assumed: что именно подписано, в спеке не сказано

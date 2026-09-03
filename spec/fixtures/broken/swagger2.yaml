@@ -1,0 +1,7 @@
+swagger: '2.0'
+info: { title: Legacy Payouts, version: '1.0' }
+paths:
+  /payouts:
+    post:
+      responses:
+        '201': { description: Created }

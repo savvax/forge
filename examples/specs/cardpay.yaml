@@ -1,0 +1,353 @@
+openapi: 3.0.3
+info:
+  title: CardPay Transfers API
+  description: |
+    Mock API провайдера карточных выплат CardPay (тестовая спека forge).
+    Отличия от NovaPay: bearer-авторизация, сумма строкой с двумя знаками, статусы в поле `state`,
+    ответ обёрнут в `data`, webhook описан через `callbacks`, подпись HMAC-SHA512 в base64, нет отмены.
+  version: 2.3.0
+
+servers:
+  - url: https://api.cardpay.example/v2
+    description: Production
+
+security:
+  - bearerAuth: []
+
+paths:
+  /transfers:
+    post:
+      tags: [Transfers]
+      summary: Create card transfer
+      description: Initiates a payout to a bank card. Amount is a decimal string with two decimals.
+      operationId: createTransfer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferRequest'
+            example:
+              merchant_id: "m_10042"
+              reference: "op_abc123"
+              amount: "1500.00"
+              currency: RUB
+              description: "Payout op_abc123"
+              callback_url: "https://spacepayments.example/webhooks/cardpay"
+              destination:
+                card:
+                  pan: "4111111111111111"
+                  holder: "IVAN IVANOV"
+                  expiry: "12/29"
+      responses:
+        '201':
+          description: Transfer accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEnvelope'
+              example:
+                data:
+                  transfer_id: "tr_9c1e4f"
+                  reference: "op_abc123"
+                  state: NEW
+                  amount: "1500.00"
+                  currency: RUB
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Merchant is not allowed to use transfers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorList'
+              example:
+                errors:
+                  - code: forbidden
+                    message: "Transfers are disabled for this merchant"
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorList'
+              example:
+                errors:
+                  - code: validation_error
+                    message: "destination.card.pan is invalid"
+        '500':
+          $ref: '#/components/responses/InternalError'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      callbacks:
+        onStateChange:
+          '{$request.body#/callback_url}':
+            post:
+              summary: State change notification
+              description: |
+                CardPay POSTs a notification to callback_url on every state change.
+                The X-Signature header carries an HMAC-SHA512 signature encoded as base64.
+              parameters:
+                - name: X-Signature
+                  in: header
+                  required: true
+                  schema:
+                    type: string
+                  description: HMAC-SHA512 signature, base64 encoded
+              requestBody:
+                required: true
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/Notification'
+                    examples:
+                      settled:
+                        value:
+                          type: transfer.settled
+                          data:
+                            transfer_id: "tr_9c1e4f"
+                            reference: "op_abc123"
+                            state: SUCCESS
+                      declined:
+                        value:
+                          type: transfer.declined
+                          data:
+                            transfer_id: "tr_9c1e4f"
+                            reference: "op_abc123"
+                            state: DECLINED
+                            error:
+                              code: card_declined
+                              message: "Issuer declined the transfer"
+                      on_hold:
+                        value:
+                          type: transfer.on_hold
+                          data:
+                            transfer_id: "tr_9c1e4f"
+                            reference: "op_abc123"
+                            state: ON_HOLD
+              responses:
+                '200':
+                  description: Acknowledged
+    get:
+      tags: [Transfers]
+      summary: List transfers
+      operationId: listTransfers
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Page of transfers
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transfer'
+
+  /transfers/{transfer_id}:
+    get:
+      tags: [Transfers]
+      summary: Get transfer
+      operationId: getTransfer
+      parameters:
+        - name: transfer_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transfer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEnvelope'
+              example:
+                data:
+                  transfer_id: "tr_9c1e4f"
+                  reference: "op_abc123"
+                  state: SUCCESS
+                  amount: "1500.00"
+                  currency: RUB
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Transfer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorList'
+              example:
+                errors:
+                  - code: not_found
+                    message: "Transfer not found"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: opaque
+      description: Merchant API token issued in the dashboard
+
+  schemas:
+    TransferRequest:
+      type: object
+      required: [merchant_id, reference, amount, currency, callback_url, destination]
+      properties:
+        merchant_id:
+          type: string
+          description: Your merchant identifier
+        reference:
+          type: string
+          maxLength: 40
+          description: Unique transfer reference on the merchant side
+        amount:
+          type: string
+          pattern: '^\d+\.\d{2}$'
+          description: Amount as a decimal string with two decimals (major units), e.g. "1500.00"
+        currency:
+          type: string
+          enum: [RUB, USD]
+        description:
+          type: string
+          maxLength: 140
+        callback_url:
+          type: string
+          format: uri
+          description: URL for state change notifications
+        destination:
+          $ref: '#/components/schemas/Destination'
+
+    Destination:
+      type: object
+      required: [card]
+      properties:
+        card:
+          $ref: '#/components/schemas/Card'
+
+    Card:
+      type: object
+      required: [pan, holder]
+      properties:
+        pan:
+          type: string
+          pattern: '^\d{13,19}$'
+          description: Card number
+        holder:
+          type: string
+          description: Cardholder name as printed on the card
+        expiry:
+          type: string
+          pattern: '^(0[1-9]|1[0-2])/\d{2}$'
+          description: Expiry in MM/YY format
+
+    TransferEnvelope:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Transfer'
+
+    Transfer:
+      type: object
+      properties:
+        transfer_id:
+          type: string
+        reference:
+          type: string
+        state:
+          type: string
+          enum: [NEW, PROCESSING, SUCCESS, DECLINED, ON_HOLD]
+        amount:
+          type: string
+        currency:
+          type: string
+        error:
+          $ref: '#/components/schemas/Error'
+
+    Notification:
+      type: object
+      required: [type, data]
+      properties:
+        type:
+          type: string
+          enum: [transfer.settled, transfer.declined, transfer.on_hold]
+        data:
+          $ref: '#/components/schemas/Transfer'
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          enum: [validation_error, forbidden, not_found, card_declined, issuer_unavailable, limit_exceeded, internal_error]
+        message:
+          type: string
+
+    ErrorList:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+
+  responses:
+    BadRequest:
+      description: Malformed request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+          example:
+            errors:
+              - code: validation_error
+                message: "amount must match ^\\d+\\.\\d{2}$"
+    Unauthorized:
+      description: Invalid or expired token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+          example:
+            errors:
+              - code: unauthorized
+                message: "Invalid token"
+    InternalError:
+      description: Internal error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+          example:
+            errors:
+              - code: internal_error
+                message: "Unexpected error"
+    Unavailable:
+      description: Service temporarily unavailable
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorList'
+          example:
+            errors:
+              - code: issuer_unavailable
+                message: "Try again later"

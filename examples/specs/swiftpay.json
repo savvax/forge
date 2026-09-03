@@ -1,0 +1,372 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "SwiftPay Outbound Payments",
+    "version": "3.0.1",
+    "description": "Mock API of a bank-transfer payout provider (forge test spec). OpenAPI 3.1 in JSON, HTTP Basic auth, IBAN/account beneficiaries (oneOf), RFC 7807 problem+json errors, top-level webhooks with a timestamped signature."
+  },
+  "servers": [
+    {
+      "url": "https://{env}.swiftpay.example/api",
+      "description": "Environment: sandbox or api (production)",
+      "variables": {
+        "env": {
+          "default": "sandbox",
+          "enum": ["sandbox", "api"]
+        }
+      }
+    }
+  ],
+  "security": [
+    { "basicAuth": [] },
+    { "oauth2": ["payments:write", "payments:read"] }
+  ],
+  "paths": {
+    "/v1/payments/outbound": {
+      "post": {
+        "operationId": "initiateOutboundPayment",
+        "summary": "Initiate an outbound payment",
+        "description": "Sends money to a bank account. Amount is in major units (e.g. 100.50).",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": { "type": "string", "maxLength": 64 },
+            "description": "Client-generated key to make retries safe"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  { "$ref": "#/components/schemas/BasePayment" },
+                  {
+                    "type": "object",
+                    "required": ["beneficiary"],
+                    "properties": {
+                      "beneficiary": {
+                        "oneOf": [
+                          { "$ref": "#/components/schemas/IbanBeneficiary" },
+                          { "$ref": "#/components/schemas/AccountBeneficiary" }
+                        ]
+                      },
+                      "purpose": {
+                        "type": ["string", "null"],
+                        "maxLength": 140,
+                        "description": "Payment purpose shown to the beneficiary"
+                      }
+                    }
+                  }
+                ]
+              },
+              "examples": {
+                "iban": {
+                  "value": {
+                    "reference": "op_abc123",
+                    "amount": 1500.5,
+                    "currency": "EUR",
+                    "purpose": "Payout op_abc123",
+                    "beneficiary": {
+                      "name": "Ivan Ivanov",
+                      "iban": "DE89370400440532013000",
+                      "bic": "COBADEFFXXX",
+                      "address": { "country": "DE", "city": "Berlin", "line1": "Unter den Linden 1" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Payment created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Payment" },
+                "example": {
+                  "payment_id": "pay_01H9",
+                  "reference": "op_abc123",
+                  "status": "CREATED",
+                  "amount": 1500.5,
+                  "currency": "EUR"
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/Problem400" },
+          "401": { "$ref": "#/components/responses/Problem401" },
+          "409": {
+            "description": "Duplicate idempotency key with a different body",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" },
+                "example": { "type": "https://swiftpay.example/problems/duplicate", "title": "Duplicate", "status": 409, "code": "duplicate_request" }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation failed",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" },
+                "example": { "type": "https://swiftpay.example/problems/validation", "title": "Validation failed", "status": 422, "code": "validation_error", "detail": "beneficiary.iban is invalid" }
+              }
+            }
+          },
+          "500": { "$ref": "#/components/responses/Problem500" }
+        }
+      }
+    },
+    "/v1/payments/outbound/{payment_id}": {
+      "parameters": [
+        { "name": "payment_id", "in": "path", "required": true, "schema": { "type": "string" } }
+      ],
+      "get": {
+        "operationId": "getOutboundPayment",
+        "summary": "Retrieve an outbound payment",
+        "responses": {
+          "200": {
+            "description": "Payment",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Payment" },
+                "example": { "payment_id": "pay_01H9", "reference": "op_abc123", "status": "SETTLED", "amount": 1500.5, "currency": "EUR" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Problem401" },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" },
+                "example": { "type": "https://swiftpay.example/problems/not-found", "title": "Not found", "status": 404, "code": "not_found" }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "operationId": "cancelOutboundPayment",
+        "summary": "Cancel a payment that has not been sent yet",
+        "responses": {
+          "200": {
+            "description": "Cancelled",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Payment" },
+                "example": { "payment_id": "pay_01H9", "reference": "op_abc123", "status": "REJECTED", "amount": 1500.5, "currency": "EUR" }
+              }
+            }
+          },
+          "409": {
+            "description": "Payment already sent",
+            "content": {
+              "application/problem+json": {
+                "schema": { "$ref": "#/components/schemas/Problem" },
+                "example": { "type": "https://swiftpay.example/problems/invalid-state", "title": "Invalid state", "status": 409, "code": "invalid_status" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/accounts/balance": {
+      "get": {
+        "operationId": "getAccountBalance",
+        "summary": "Available balance",
+        "responses": {
+          "200": {
+            "description": "Balance",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "available": { "$ref": "https://schemas.swiftpay.example/common/Money.json" },
+                    "reserved": { "$ref": "https://schemas.swiftpay.example/common/Money.json" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "paymentStatusChanged": {
+      "post": {
+        "operationId": "paymentStatusChanged",
+        "summary": "Payment status changed",
+        "description": "Sent on every status change. Signature header Swift-Signature has the form t=<unix timestamp>,v1=<hex HMAC-SHA256 of \"<t>.<raw body>\">.",
+        "parameters": [
+          {
+            "name": "Swift-Signature",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "t=<timestamp>,v1=<signature>"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PaymentEvent" },
+              "examples": {
+                "settled": {
+                  "value": {
+                    "id": "evt_5f1",
+                    "type": "payment.status_changed",
+                    "occurred_at": "2026-07-30T10:05:00Z",
+                    "data": { "payment_id": "pay_01H9", "reference": "op_abc123", "status": "SETTLED" }
+                  }
+                },
+                "rejected": {
+                  "value": {
+                    "id": "evt_5f2",
+                    "type": "payment.status_changed",
+                    "occurred_at": "2026-07-30T10:06:00Z",
+                    "data": { "payment_id": "pay_01H9", "reference": "op_abc123", "status": "REJECTED", "reason": { "code": "account_closed", "detail": "Beneficiary account is closed" } }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Received" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic",
+        "description": "API login and password"
+      },
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "clientCredentials": {
+            "tokenUrl": "https://auth.swiftpay.example/oauth/token",
+            "scopes": { "payments:write": "Create payments", "payments:read": "Read payments" }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "BasePayment": {
+        "type": "object",
+        "required": ["reference", "amount", "currency"],
+        "properties": {
+          "reference": { "type": "string", "maxLength": 35, "description": "Merchant reference" },
+          "amount": { "type": "number", "multipleOf": 0.01, "minimum": 1, "description": "Amount in major units (e.g. 100.50)" },
+          "currency": { "type": "string", "enum": ["EUR", "USD", "GBP"] }
+        }
+      },
+      "IbanBeneficiary": {
+        "type": "object",
+        "required": ["name", "iban"],
+        "properties": {
+          "name": { "type": "string" },
+          "iban": { "type": "string", "pattern": "^[A-Z]{2}\\d{2}[A-Z0-9]{11,30}$" },
+          "bic": { "type": "string" },
+          "address": { "$ref": "#/components/schemas/Address" }
+        }
+      },
+      "AccountBeneficiary": {
+        "type": "object",
+        "required": ["name", "account_number", "sort_code"],
+        "properties": {
+          "name": { "type": "string" },
+          "account_number": { "type": "string" },
+          "sort_code": { "type": "string" },
+          "address": { "$ref": "#/components/schemas/Address" }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "country": { "type": "string" },
+          "city": { "type": "string" },
+          "line1": { "type": "string" }
+        }
+      },
+      "Payment": {
+        "type": "object",
+        "properties": {
+          "payment_id": { "type": "string" },
+          "reference": { "type": "string" },
+          "status": { "type": "string", "enum": ["CREATED", "PENDING_APPROVAL", "SENT", "SETTLED", "RETURNED", "REJECTED"] },
+          "amount": { "type": "number" },
+          "currency": { "type": "string" },
+          "reason": { "$ref": "#/components/schemas/Reason" }
+        }
+      },
+      "Reason": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string", "enum": ["account_closed", "invalid_iban", "compliance_rejected", "returned_by_bank"] },
+          "detail": { "type": "string" }
+        }
+      },
+      "PaymentEvent": {
+        "type": "object",
+        "required": ["id", "type", "data"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": { "type": "string" },
+          "occurred_at": { "type": "string", "format": "date-time" },
+          "data": { "$ref": "#/components/schemas/Payment" }
+        }
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "format": "uri" },
+          "title": { "type": "string" },
+          "status": { "type": "integer" },
+          "detail": { "type": "string" },
+          "code": { "type": "string", "enum": ["validation_error", "unauthorized", "duplicate_request", "not_found", "invalid_status", "insufficient_funds", "internal_error"] }
+        }
+      }
+    },
+    "responses": {
+      "Problem400": {
+        "description": "Bad request",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" },
+            "example": { "type": "https://swiftpay.example/problems/bad-request", "title": "Bad request", "status": 400, "code": "validation_error" }
+          }
+        }
+      },
+      "Problem401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" },
+            "example": { "type": "https://swiftpay.example/problems/unauthorized", "title": "Unauthorized", "status": 401, "code": "unauthorized" }
+          }
+        }
+      },
+      "Problem500": {
+        "description": "Internal error",
+        "content": {
+          "application/problem+json": {
+            "schema": { "$ref": "#/components/schemas/Problem" },
+            "example": { "type": "https://swiftpay.example/problems/internal", "title": "Internal error", "status": 500, "code": "internal_error" }
+          }
+        }
+      }
+    }
+  }
+}

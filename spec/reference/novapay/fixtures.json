@@ -1,0 +1,23 @@
+{
+  "create_request": {
+    "request": {
+      "amount": 1500000,
+      "currency": "RUB",
+      "external_id": "op_abc123",
+      "recipient": { "type": "sbp", "phone": "79001234567", "bank_code": "044525225" }
+    },
+    "response_201": { "id": "np_7f3a9b2c", "status": "pending" },
+    "response_422": { "error": { "code": "validation_error", "message": "Amount must be at least 100000 kopecks" } }
+  },
+  "fetch_status": {
+    "response_200": { "id": "np_7f3a9b2c", "status": "completed" }
+  },
+  "callback": {
+    "payload": { "event": "payout.completed", "payout_id": "np_7f3a9b2c", "status": "completed" },
+    "expected_operation_status": "approved"
+  },
+  "callback_failed": {
+    "payload": { "event": "payout.failed", "payout_id": "np_7f3a9b2c", "status": "failed", "error": { "code": "recipient_not_found" } },
+    "expected_operation_status": "rejected"
+  }
+}

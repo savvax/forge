@@ -1,0 +1,30 @@
+openapi: 3.0.3
+info: { title: Read Only Payouts, version: '1.0' }
+servers:
+  - url: https://api.readonly.example/v1
+components:
+  securitySchemes:
+    ApiKeyAuth: { type: apiKey, in: header, name: X-API-Key }
+paths:
+  /payouts/{payout_id}:
+    get:
+      operationId: getPayout
+      security: [ { ApiKeyAuth: [] } ]
+      parameters:
+        - { name: payout_id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200':
+          description: Payout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string }
+                  status: { type: string, enum: [pending, completed, failed] }
+  /balance:
+    get:
+      operationId: getBalance
+      security: [ { ApiKeyAuth: [] } ]
+      responses:
+        '200': { description: Balance }

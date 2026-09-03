@@ -1,0 +1,198 @@
+# forge — генератор интеграций с платёжными провайдерами из OpenAPI
+
+> Хакатон Space Payments, задача 1. Вход — OpenAPI 3.0/3.1 спецификация провайдера выплат
+> (YAML или JSON). Выход — готовый Ruby-сервис по контракту `Provider::BaseService`, гайд
+> интеграции, тестовые фикстуры, RSpec-тесты сервиса, мок-сервер провайдера и отчёт о том,
+> что и с какой уверенностью распознано. Без нейросетей: правила, словари, детерминизм.
+
+Зачем читать: это вход для жюри и экспертов. Пять минут — и вы знаете, как запустить,
+что получается, где в коде каждый критерий и что мы сознательно не делаем.
+
+> Статус: строки с пометкой **(план)** — ещё не реализовано; пометки снимаются по мере
+> закрытия этапов (`docs/PLAN.md`). К CP3 пометок быть не должно.
+
+## Быстрый старт
+
+Без Docker (Ruby ≥ 3.3):
+
+```bash
+bundle install
+bin/forge analyze  --spec examples/specs/novapay.yaml
+bin/forge generate --spec examples/specs/novapay.yaml --out tmp/out/novapay --force
+bundle exec rspec -I lib -I tmp/out/novapay tmp/out/novapay/novapay_service_spec.rb
+```
+
+Команда из условия задачи (обёртка над `generate`, вывод в `./output/`):
+
+```bash
+bin/integrate --spec provider_api.yaml --provider novapay --lang ruby
+```
+
+Docker:
+
+```bash
+docker build -t forge .
+docker run --rm -v "$PWD/examples:/app/examples" -v "$PWD/output:/app/output" forge \
+  generate --spec examples/specs/novapay.yaml --out output/novapay --force
+```
+
+Полная проверка (то же, что CI): `bundle exec rake ci`. Быстрая: `bundle exec rake check`.
+
+## Что получается
+
+```
+output/novapay/
+├── novapay_service.rb        # Provider::NovapayService < BaseService: check_conditions, create_request,
+│                             #   fetch_status, process_callback (+ хелперы cancel_request, fetch_balance)
+├── novapay_service_spec.rb   # RSpec на WebMock и fixtures.json — доказательство, что сервис работает
+├── INTEGRATION.md            # авторизация, методы, маппинг статусов, ошибки, подпись webhook, ДОПУЩЕНИЯ
+├── fixtures.json             # примеры запросов/ответов/уведомлений и ожидаемые статусы операции
+├── mock_server.rb            # Sinatra-мок провайдера из той же спеки (demo и e2e)
+└── report.txt                # что распознано, confidence, WARN / UNSUPPORTED с подсказками
+```
+
+Пример вывода `analyze` для NovaPay (первые строки — дословно как в ТЗ):
+
+```
+Parsing spec... ok (openapi 3.0.3, NovaPay Payout API 1.0.0)
+Found 5 endpoints: POST /payouts, GET /payouts/{payout_id}, POST /payouts/{payout_id}/cancel,
+                  POST /webhooks/payout, GET /balance
+  create   POST /payouts                      createPayout      confidence 0.95
+  status   GET /payouts/{payout_id}           getPayoutStatus   confidence 0.90
+  cancel   POST /payouts/{payout_id}/cancel   cancelPayout      confidence 0.95   (outside contract → cancel_request)
+  webhook  POST /webhooks/payout              payoutWebhook     confidence 0.90
+  balance  GET /balance                       getBalance        confidence 0.85   (outside contract → fetch_balance)
+Auth: ApiKeyAuth (header: X-API-Key) → credentials.api_key
+Statuses (PayoutResponse.status): pending, processing → in_progress; completed → approved; failed, cancelled → rejected
+Webhook signature: X-NovaPay-Signature (HMAC-SHA256, raw body, hex) → credentials.callback_secret
+Amount: integer, minor units (×100), min 1000 RUB — source: description "в копейках", minimum 100000
+Warnings (3): …   Info (3): …
+```
+
+Полный эталон — `docs/OUTPUT_FORMAT.md` § 6. **(план)**: после T07 сюда вставляется реальный вывод.
+
+## Как это работает
+
+```
+                 rules/*.yml                overrides.yml
+                     │                           │
+provider_api.yaml ─▶ Load ─▶ IR ─▶ Analyze ─▶ Plan ─▶ Render ─▶ Verify ─▶ Report
+                      │             │           │        │         │
+                  SpecError     Findings  IntegrationPlan  files  ruby -c / rspec
+```
+
+| Стадия | Что делает | Где |
+|---|---|---|
+| Load | YAML/JSON → hash, проверка `openapi: 3.x`, резолв локальных `$ref`, ошибки с JSON-pointer и подсказкой | `lib/forge/loader.rb`, `ref_resolver.rb` |
+| IR | неизменяемые `Data.define`: Spec, Endpoint, Schema… — ничего не знает о платежах | `lib/forge/ir/` |
+| Analyze | 7 анализаторов (роли эндпоинтов, auth, статусы, ошибки, webhook, единицы суммы, поля) → `Finding(value, confidence, source, warnings)` | `lib/forge/analyzers/`, словари `rules/*.yml` |
+| Plan | findings → `IntegrationPlan`; наложение `overrides.yml`; валидации из схемы; фикстуры | `lib/forge/plan/` |
+| Render | ERB-шаблоны получают только план, никогда сырой OpenAPI | `lib/forge/renderers/`, `templates/*.erb` |
+| Verify | `ruby -c` + запуск сгенерированного spec | `lib/forge/verifier.rb` |
+| Report | текст как в ТЗ + WARN / UNSUPPORTED / INFO с подсказками; `--format json` | `lib/forge/report.rb` |
+
+Ключевые принципы:
+
+- **Знание о провайдере не живёт в коде.** Всё специфичное — в `rules/*.yml` (синонимы статусов,
+  веса сигналов ролей, алиасы полей, маркеры единиц суммы) или в пользовательском `overrides.yml`.
+  `rake guard:vendor` падает, если в `lib/` встречается имя провайдера.
+- **Неоднозначное не угадываем молча.** Из структуры спеки — автоматически. То, что лежит текстом в
+  `description` (единицы суммы, условная обязательность, кодировка подписи), — WARN в отчёте,
+  `# TODO(forge)` в коде, раздел «Допущения» в `INTEGRATION.md` и ключ в `overrides.yml`.
+  Подход подтверждён организаторами письменно (`docs/QA_SESSION_1.md` § 7).
+- **Детерминизм.** Одинаковый вход → байт-в-байт одинаковый выход (`rake determinism`). Никаких
+  сетевых вызовов и LLM во время генерации.
+- **Падаем только когда генерировать нечего** (нет create-эндпоинта → exit 2 с подсказкой, как указать
+  его в overrides). Всё остальное — WARN/UNSUPPORTED, а не молчание и не крэш.
+
+## Как переопределить решение (overrides)
+
+```yaml
+# overrides.yml — общий механизм, не привязка к провайдеру
+amount_unit: minor                       # minor (копейки) | major (рубли)
+statuses:
+  ON_HOLD: in_progress                   # статус провайдера → статус Space Payments
+fields:
+  recipient.bank_code:
+    required_if: { field: type, equals: sbp }
+  destination.card.expiry:
+    source: operation.payout_requisite.dig('card', 'expiry')
+webhook:
+  signature_encoding: hex                # hex | base64
+  signature_payload: raw_body            # raw_body | fields
+endpoints:
+  createTransfer: create                 # роль эндпоинта, если эвристика ошиблась
+paths:
+  include: ['/v1/payouts*']              # ограничить анализ большой спеки
+```
+
+`bin/forge generate --spec … --overrides overrides.yml`. Каждое применённое переопределение
+попадает в отчёт как `INFO override_applied`. Полная схема — `docs/RULES.md` § 9, примеры с
+комментариями — `examples/overrides/`.
+
+## Универсальность: три спеки и семь реальных API
+
+| Спека | Что отличается от NovaPay | Результат без overrides | С overrides |
+|---|---|---|---|
+| `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 3 INFO, exit 0 | не нужны |
+| `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
+| `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 1 WARN |
+
+Все три покрыты golden-тестами байт-в-байт (`spec/golden/`). **(план)** T13–T14.
+
+Реальные спецификации (Stripe, Adyen Payout и Transfers, PayPal Payouts, Paystack, Square, Plaid):
+`bundle exec rake real` скачивает их и прогоняет `analyze`; отчёты — `examples/real/reports/`.
+Ожидания и найденные ограничения — `docs/REAL_SPECS.md`. **WARN на чужой спеке — это честность
+инструмента, а не сбой.** **(план)** T18.
+
+## Критерий → где смотреть
+
+| Критерий (жюри/эксперты) | Где в репозитории |
+|---|---|
+| Разбор спецификации: методы, параметры, auth, статусы, ошибки, webhook | `lib/forge/analyzers/*.rb`, `rules/*.yml`, `bin/forge analyze`, `spec/analyzers/`, `spec/snapshots/` |
+| Сервис по контракту `Provider::BaseService`, запросы, статус, ошибки, уведомления, конфигурация | `templates/service.rb.erb`, `lib/provider/base_service.rb` (контракт — `docs/CONTRACT.md`), `output/<p>/<p>_service.rb`, `BASE_URL`/`credentials` |
+| Преобразование данных: статусы, поля, единицы, обязательность | `rules/status_map.yml`, `rules/field_aliases.yml`, `rules/amount_units.yml`, `lib/forge/analyzers/fields.rb`, `.compact` и `required_if` в шаблоне |
+| Универсальность | три спеки + golden, `examples/overrides/`, `--templates-dir`, `rake guard:vendor`, секция UNSUPPORTED |
+| Документация и тестовые материалы | `output/<p>/INTEGRATION.md` (с «Допущениями»), `fixtures.json`, генерируемый `*_service_spec.rb` |
+| Удобство и демонстрация | этот README, `bin/integrate`, коды выхода 0–4, ошибки с pointer + hint, `bin/e2e`, `bin/demo` |
+| Качество реализации | шесть стадий по каталогам, `rubocop` 0, покрытие ≥ 90 %, обработка ошибок разбора/генерации (`spec/fixtures/broken/`, `spec/cli_spec.rb`), CI |
+| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved`; отчёт с confidence; overrides как рекомендованный механизм; прогон на реальных API; детерминизм |
+
+Подробная разбалловка — `docs/CRITERIA.md`.
+
+## Ограничения (честно)
+
+- Только OpenAPI 3.0/3.1 (Swagger 2.0 → понятная ошибка exit 1). Только выплаты (payout); pay-in —
+  «что дальше».
+- Внешние `$ref` (`other.yaml#/…`, `http…`): в критичном месте — ошибка, иначе UNSUPPORTED + заглушка.
+- OAuth2-флоу не генерируется (bearer с `TODO`), `oneOf` — берётся первый вариант + WARN
+  (выбор — через overrides, резерв R2). Подпись с timestamp (`t=…,v1=…`) → `NotImplementedError` в
+  `verify_signature!` с пояснением.
+- Статус-запрос только через GET с id в path (POST с id в теле — резерв R3, вскрыт на Plaid).
+- Секреты (API-ключ, HMAC secret) в документации нет — генерируются как `credentials.*` с пометкой
+  для ручного заполнения.
+
+## Почему без нейросети
+
+По условию инструмент не может вызывать LLM. Это оказалось преимуществом: каждое решение
+генератора объяснимо (`source: "operationId 'createPayout' matches /payout/; POST without path param"`),
+воспроизводимо и проверяемо тестами. Словари в `rules/` расширяются без изменения кода — это и есть
+«предусмотрено добавление новых правил».
+
+## Разработка
+
+- Контекст для агентов и людей — `CLAUDE.md`; процесс — `docs/PROCESS.md`; бэклог — `docs/AGENT_TASKS.md`.
+- Ruby 3.3: `.mise.toml` в корне, `mise install && bundle install`.
+- `bundle exec rake check` — lint + тесты + guard. `bundle exec rake ci` — всё, что делает CI.
+- Golden обновляются осознанно: `UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb`, затем diff.
+- Решения и обратная связь экспертов — `NOTES.md`.
+
+## Что дальше
+
+Pay-in (депозиты) тем же пайплайном; Swagger 2.0 через конвертацию; выбор варианта `oneOf` в
+overrides; статус-запрос POST-ом; валидация фикстур по JSON Schema (`json_schemer`); интеграция с
+CI Space Payments как шаг «новый провайдер → PR с сервисом и тестами».
+
+## Лицензия
+
+MIT. Все зависимости — MIT/Apache/BSD (`bundle exec rake licenses`).

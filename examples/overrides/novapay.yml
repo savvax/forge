@@ -1,0 +1,16 @@
+# examples/overrides/novapay.yml — пример overrides для NovaPay.
+# NovaPay генерируется корректно и без этого файла: здесь показаны ключи, которыми можно
+# закрыть три WARN из отчёта. Каждое применённое переопределение → INFO override_applied.
+# Полная схема ключей — docs/RULES.md § 9.
+
+fields:
+  recipient.bank_code:
+    required_if: { field: type, equals: sbp }   # подтверждаем допущение из description
+  recipient.card_number:
+    required_if: { field: type, equals: card }
+
+webhook:
+  signature_encoding: hex                       # в спеке не указано; hex подтверждён организаторами
+
+# errors:
+#   409: { action: reject }                     # если 409 на create не считать идемпотентным повтором

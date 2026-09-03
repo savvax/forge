@@ -1,0 +1,1 @@
+{ "info": { "title": "No Version", "version": "1.0" }, "paths": { "/payouts": { "post": { "responses": { "201": { "description": "Created" } } } } } }

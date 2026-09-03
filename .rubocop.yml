@@ -1,0 +1,61 @@
+plugins:
+  - rubocop-rspec
+  - rubocop-rake
+
+AllCops:
+  TargetRubyVersion: 3.3
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - 'output/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
+    - 'spec/golden/**/*'
+    - 'spec/reference/**/*'
+    - 'examples/**/*'
+    - 'coverage/**/*'
+
+Layout/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 20
+
+Metrics/ClassLength:
+  Max: 200
+
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'Rakefile'
+    - '*.gemspec'
+
+Metrics/AbcSize:
+  Max: 25
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+RSpec/ExampleLength:
+  Max: 15
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/DescribeClass:
+  Exclude:
+    - 'spec/golden_spec.rb'
+    - 'spec/reference_spec.rb'
+    - 'spec/cli_spec.rb'
+    - 'spec/determinism_spec.rb'
+    - 'spec/real_specs_spec.rb'
+    - 'spec/rules/**/*'
+
+Metrics/ParameterLists:
+  CountKeywordArgs: false

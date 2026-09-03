@@ -1,0 +1,105 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *'   # ежедневно: job real-specs
+
+env:
+  RUBY_VERSION: '3.3'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rubocop
+      - run: bundle exec rake guard:vendor
+      - run: bundle exec rake licenses
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rspec
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: coverage, path: coverage/, retention-days: 7 }
+
+  generate:
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      matrix:
+        provider: [novapay, cardpay, swiftpay]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rake generate:${{ matrix.provider }}
+      - run: |
+          for spec in tmp/out/${{ matrix.provider }}*/*_service_spec.rb; do
+            bundle exec rspec -I lib -I "$(dirname "$spec")" "$spec"
+          done
+      - uses: actions/upload-artifact@v4
+        with: { name: output-${{ matrix.provider }}, path: tmp/out/, retention-days: 7 }
+
+  determinism:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rake determinism
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: generate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rake e2e
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t forge .
+      - run: docker run --rm forge help
+      - run: |
+          docker run --rm -v "$PWD/examples:/app/examples" -v "$PWD/tmp:/app/tmp" forge \
+            generate --spec examples/specs/novapay.yaml --out tmp/docker-out --force
+
+  readme:
+    runs-on: ubuntu-latest
+    needs: generate
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rake readme:check
+
+  real-specs:
+    # Реальные спеки провайдеров: сеть + большие файлы, поэтому не блокирует основной CI.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with: { ruby-version: '3.3', bundler-cache: true }
+      - run: bundle exec rake real
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: real-spec-reports, path: examples/real/reports/, retention-days: 14 }
