@@ -8,3 +8,6 @@ require_relative 'forge/loader'
 end
 require_relative 'forge/rules'
 require_relative 'forge/analyzers/endpoint_roles'
+require_relative 'forge/analyzers/auth'
+require_relative 'forge/analyzers/statuses'
+require_relative 'forge/analyzers/errors'

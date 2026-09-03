@@ -7,12 +7,14 @@ module Forge
   module Analyzers
     # Общее для анализаторов: доступ к spec/rules, пороги, накопление предупреждений, нормализация.
     class Base
-      attr_reader :spec, :rules, :warnings
+      attr_reader :spec, :rules, :warnings, :roles
 
-      def initialize(spec, rules, include_paths: [])
+      # roles: значение Finding из EndpointRoles (для анализаторов, которым нужен create/status/...).
+      def initialize(spec, rules, include_paths: [], roles: nil)
         @spec = spec
         @rules = rules
         @include_paths = include_paths
+        @roles = roles || {}
         @warnings = []
       end
 
@@ -45,6 +47,18 @@ module Forge
       def tokens(text) = Rules.normalize(text).split('_').reject(&:empty?)
 
       def word_in?(words, *texts) = texts.flatten.compact.any? { |t| tokens(t).intersect?(words) }
+
+      def role(name) = roles[name]
+
+      # Схема успешного ответа (2xx) эндпоинта.
+      def success_response(endpoint)
+        endpoint&.responses&.find { |r| r.status.start_with?('2') }
+      end
+
+      # Свойство по пути внутри Schema: dig_schema(schema, %w[data state]).
+      def dig_schema(schema, path)
+        path.reduce(schema) { |node, key| node&.properties&.[](key) }
+      end
 
       # Эндпоинты с учётом --include-paths (glob по path).
       def endpoints

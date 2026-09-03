@@ -1,0 +1,12 @@
+# Внутренние статусы Space Payments: in_progress | approved | rejected (docs/RULES.md § 3).
+in_progress: [pending, processing, in_progress, new, created, accepted, queued, submitted, initiated,
+              sent, scheduled, authorized, authorised, in_transit, booked, awaiting, received, started]
+approved:    [completed, complete, success, succeeded, successful, approved, done, paid, settled,
+              captured, confirmed, executed, finished, ok, credited]
+rejected:    [failed, failure, fail, error, rejected, declined, cancelled, canceled, expired, refused,
+              denied, void, voided, aborted, blocked, timeout, unsuccessful]
+# Намеренно НЕ в словаре (неоднозначно → WARN unmapped_status → overrides):
+#   on_hold, manual_review, returned, reversed, refunded, unclaimed, unknown, pending_approval, approval_pending
+status_fields: [status, state, payout_status, transfer_status, payment_status, transaction_status, result, batch_status]
+id_fields:     [id, payout_id, transfer_id, payment_id, transaction_id, reference_id, uuid, code]
+wrappers:      [data, result, payout, transfer, payment, response, transaction]

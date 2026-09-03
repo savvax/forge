@@ -1,0 +1,35 @@
+# action: reject | retry | retry_backoff | alert | alert_block | treat_as_success (docs/RULES.md § 4)
+http:
+  400: { internal_code: validation_error,    action: reject }
+  401: { internal_code: invalid_credentials, action: alert_block }
+  402: { internal_code: insufficient_balance, action: retry }
+  403: { internal_code: forbidden,           action: alert_block }
+  404: { internal_code: not_found,           action: reject }
+  409: { internal_code: conflict,            action: reject }
+  422: { internal_code: validation_error,    action: reject }
+  429: { internal_code: rate_limit,          action: retry_backoff }
+  500: { internal_code: internal_error,      action: retry }
+  502: { internal_code: internal_error,      action: retry }
+  503: { internal_code: unavailable,         action: retry_backoff }
+  504: { internal_code: internal_error,      action: retry }
+codes:   # код провайдера (нормализованный) → уточнение
+  validation_error:      { internal_code: validation_error,    action: reject }
+  invalid_request:       { internal_code: validation_error,    action: reject }
+  unauthorized:          { internal_code: invalid_credentials, action: alert_block }
+  invalid_api_key:       { internal_code: invalid_credentials, action: alert_block }
+  insufficient_balance:  { internal_code: insufficient_balance, action: retry }
+  insufficient_funds:    { internal_code: insufficient_balance, action: retry }
+  recipient_not_found:   { internal_code: recipient_invalid,   action: reject }
+  invalid_recipient:     { internal_code: recipient_invalid,   action: reject }
+  bank_unavailable:      { internal_code: bank_unavailable,    action: retry }
+  amount_limit_exceeded: { internal_code: limit_exceeded,      action: reject }
+  rate_limit_exceeded:   { internal_code: rate_limit,          action: retry_backoff }
+  duplicate:             { internal_code: duplicate,           action: treat_as_success }
+  duplicate_request:     { internal_code: duplicate,           action: treat_as_success }
+  invalid_status:        { internal_code: invalid_status,      action: reject }
+  not_found:             { internal_code: not_found,           action: reject }
+  forbidden:             { internal_code: forbidden,           action: alert_block }
+  unavailable:           { internal_code: unavailable,         action: retry_backoff }
+  internal_error:        { internal_code: internal_error,      action: retry }
+error_code_paths: [error.code, code, errors.0.code, error_code, type, title]
+retry_after_headers: [Retry-After, X-RateLimit-Reset, RateLimit-Reset]
