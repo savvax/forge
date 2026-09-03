@@ -36,6 +36,7 @@ roles:
     requires: { any: [has_path_param, has_request_body] }
     signals:
       method_post_or_delete: 0.25
+      method_delete: 0.20            # REST: DELETE /resource/{id} — отмена без слова cancel в пути
       payout_word_in_path: 0.20
       cancel_word_in_path: 0.30
       cancel_word_in_operation: 0.10

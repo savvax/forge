@@ -52,8 +52,9 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       expect(finding).to have_warning(:webhook_source_webhooks, level: :info)
     end
 
-    it 'warns about the low-confidence cancel' do
-      expect(finding).to have_warning(:low_confidence, level: :warn, message: /cancel/)
+    it 'accepts DELETE as cancel with 0.85 (method_delete signal)' do
+      expect(finding.value[:confidences][:cancel]).to eq(0.85)
+      expect(finding.warnings.map(&:level)).to eq([:info])
     end
   end
 

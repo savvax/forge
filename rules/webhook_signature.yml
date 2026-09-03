@@ -1,0 +1,18 @@
+# Подпись и события webhook (docs/RULES.md § 8).
+header_markers:  [sign, signature, hmac, digest, x-hub-signature]
+algorithm_regex: "HMAC[-_ ]?(SHA[-_]?(256|512|1))"
+encoding:
+  hex:    [hex, hexdigest, hexadecimal, hex-encoded]
+  base64: [base64, b64, base-64]
+payload:
+  raw_body: [body, тела, тело, payload, raw, request body]
+  fields:   [concatenat, конкатен, joined, fields, параметров, "+"]
+timestamp_markers: ["t=", timestamp, "v1=", nonce, signed_payload]
+secret_credential_key: callback_secret
+event_fields:  [event, type, event_type, name, action, topic]
+defaults: { algorithm: sha256, encoding: hex, payload: raw_body }
+signals:
+  header_found: 0.40
+  algorithm_in_description: 0.30
+  encoding_in_description: 0.15
+  payload_in_description: 0.15

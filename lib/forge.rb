@@ -7,7 +7,4 @@ require_relative 'forge/loader'
   require_relative "forge/ir/#{f}"
 end
 require_relative 'forge/rules'
-require_relative 'forge/analyzers/endpoint_roles'
-require_relative 'forge/analyzers/auth'
-require_relative 'forge/analyzers/statuses'
-require_relative 'forge/analyzers/errors'
+require_relative 'forge/analyzers/runner'

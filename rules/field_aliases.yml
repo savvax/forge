@@ -1,0 +1,35 @@
+# Поля запроса create → выражения на стороне operation (docs/RULES.md § 7).
+aliases:
+  amount:        { names: [amount, sum, total, value, money.amount, amount.value, money.value],
+                   expr: "%{amount_expr}", transform: amount }
+  currency:      { names: [currency, currency_code, ccy, amount.currency, money.currency], expr: "operation.currency" }
+  external_id:   { names: [external_id, merchant_order_id, order_id, reference, client_reference, request_id,
+                           tx_id, transaction_id, merchant_reference, merchant_tx_id, external_reference, client_id],
+                   expr: "operation.id.to_s", transform: to_s }
+  description:   { names: [description, purpose, comment, narrative, note, memo, statement_descriptor, reason],
+                   expr: "operation.description || \"Payout #{operation.id}\"" }
+  idempotency:   { names: [idempotency_key, idempotence_key, nonce], expr: "operation.idempotency_key" }
+  callback_url:  { names: [callback_url, webhook_url, notify_url, notification_url, ipn_url], expr: "callback_url" }
+  credential:    { names: [merchant_id, shop_id, account_id, terminal_id, partner_id, seller_id, source],
+                   expr: "credentials.fetch('%{name}')", info: credential_field }
+  email:         { names: [email, customer_email, payer_email], expr: "operation.customer&.dig('email')" }
+  ip:            { names: [ip, ip_address, customer_ip], expr: "operation.customer&.dig('ip')" }
+requisite_container: [recipient, receiver, beneficiary, destination, payee, account, target, details, card, bank, bank_account]
+requisite_types: [sbp, card, bank_account, wallet]
+requisite_type:  { names: [type, method, payout_method, payment_method, channel, kind, destination_type] }
+requisite_fields:    # хвост пути → поле реквизита; types — к каким типам реквизитов относится
+  phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone }
+  bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code], field: bank_code }
+  bank_name:      { names: [bank_name, bank], field: bank_name }
+  number:         { names: [card_number, pan, number, card, card_pan], field: number, types: [card] }
+  holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name], field: holder }
+  expiry_month:   { names: [expiry_month, exp_month, month], field: expiry_month, types: [card] }
+  expiry_year:    { names: [expiry_year, exp_year, year], field: expiry_year, types: [card] }
+  account_number: { names: [account_number, account, account_no, acct], field: account_number, types: [bank_account] }
+  iban:           { names: [iban], field: iban, types: [bank_account] }
+  bic:            { names: [bic, swift, swift_code, swift_bic], field: bic, types: [bank_account] }
+  country:        { names: [country, country_code], field: country }
+  wallet_id:      { names: [wallet_id, wallet, account_id], field: id, types: [wallet] }
+conditional_required_patterns:   # regex по description → required_if
+  - "(?:for|when|if|при|для)\\s+(?<field>\\w+)\\s*=\\s*(?<value>\\w+)"
+  - "required\\s+(?:only\\s+)?(?:for|when)\\s+(?<field>\\w+)\\s+(?:is|=)\\s*(?<value>\\w+)"

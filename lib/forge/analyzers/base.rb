@@ -7,14 +7,15 @@ module Forge
   module Analyzers
     # Общее для анализаторов: доступ к spec/rules, пороги, накопление предупреждений, нормализация.
     class Base
-      attr_reader :spec, :rules, :warnings, :roles
+      attr_reader :spec, :rules, :warnings, :roles, :findings
 
-      # roles: значение Finding из EndpointRoles (для анализаторов, которым нужен create/status/...).
-      def initialize(spec, rules, include_paths: [], roles: nil)
+      # roles: значение Finding из EndpointRoles; findings: результаты предыдущих анализаторов ({key => Finding}).
+      def initialize(spec, rules, include_paths: [], roles: nil, findings: {})
         @spec = spec
         @rules = rules
         @include_paths = include_paths
-        @roles = roles || {}
+        @findings = findings
+        @roles = roles || findings[:endpoint_roles]&.value || {}
         @warnings = []
       end
 

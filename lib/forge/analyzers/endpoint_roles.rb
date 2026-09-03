@@ -101,6 +101,7 @@ module Forge
         SIMPLE = {
           'method_post' => ->(f) { f.method == 'post' },
           'method_get' => ->(f) { f.method == 'get' },
+          'method_delete' => ->(f) { f.method == 'delete' },
           'method_post_or_delete' => ->(f) { %w[post delete].include?(f.method) },
           'has_request_body' => ->(f) { !f.endpoint.request_body.nil? },
           'has_path_param' => lambda(&:path_param?),

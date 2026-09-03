@@ -1,0 +1,13 @@
+# Единицы суммы (docs/RULES.md § 5). Маркеры — подстроки description (без учёта регистра).
+minor_markers: [копейк, копеек, коп., cents, cent, minor unit, minor_unit, minor units, smallest unit,
+                subunit, kopeck, kopecks, kobo, pence, centavo, öre, ore, tiyn, тиын, "x100", "×100", "1/100"]
+major_markers: [рубл, rubles, major unit, major units, in dollars, two decimals, decimal, "100.50", "10.00", формат 0.00]
+signals:
+  minor_marker_in_description: 0.70
+  integer_type: 0.10
+  integer_with_minimum_ge_1000: 0.20
+  major_marker_in_description: 0.60
+  decimal_pattern: 0.80
+  multiple_of_cent: 0.60
+  number_type: 0.20
+default: { unit: major, confidence: 0.4, warning: amount_unit_assumed }
