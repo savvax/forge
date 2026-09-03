@@ -1,0 +1,33 @@
+Parsing spec... ok (openapi 3.0.3, CardPay Transfers API 2.3.0)
+Found 3 endpoints: GET /transfers, POST /transfers, GET /transfers/{transfer_id}
+  create   POST /transfers                            createTransfer           confidence 0.95
+  status   GET /transfers/{transfer_id}               getTransfer              confidence 0.90
+  webhook  POST {$request.body#/callback_url}                                  confidence 0.95
+Auth: bearerAuth (bearer, header: Authorization) → credentials.token
+Statuses (data.state): NEW, PROCESSING → in_progress; SUCCESS → approved; DECLINED → rejected; unmapped: ON_HOLD
+Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_block;
+        401 (status) unauthorized → alert_block; 403 forbidden → alert_block; 404 not_found → reject;
+        422 validation_error → reject; 500 internal_error → retry;
+        503 issuer_unavailable → retry_backoff (Retry-After)
+Webhook signature: X-Signature (HMAC-SHA512, raw body, base64) → credentials.callback_secret
+Webhook events: transfer.settled → approved; transfer.declined → rejected
+Amount: string, major units (×100) — source: amount (string) → major units: 'Amount as a decimal string with two decimals (major units), e.g. "1500.00"'
+Fields: 9 request fields, 1 unmapped (destination: card)
+Warnings (5):
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.cardpay.example/v2)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         unmapped_status            status 'ON_HOLD' (on_hold) of data.state is unknown
+        hint: statuses.ON_HOLD: in_progress|approved|rejected  (overrides.yml)
+  WARN         signature_payload_assumed  X-Signature: payload not stated; raw_body assumed
+        hint: webhook.signature_payload: raw_body|fields  (overrides.yml)
+  WARN         unmapped_event             webhook event 'transfer.on_hold' → status 'on_hold' unknown
+        hint: events.transfer.on_hold: in_progress|approved|rejected  (overrides.yml)
+  WARN         unmapped_field             destination.card.expiry (string, Expiry in MM/YY format) has no source
+        hint: fields.destination.card.expiry.source: "…"  (overrides.yml)
+Info (4):
+  INFO         webhook_source_callbacks   webhook taken from callbacks: POST {$request.body#/callback_url}
+  INFO         outside_contract           GET /transfers (listTransfers) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+  INFO         credential_field           merchant_id → credentials.merchant_id
+        hint: fill it in credentials
+Done: 5 warnings, 0 unsupported. Exit 0.

@@ -1,0 +1,32 @@
+Parsing spec... ok (openapi 3.0.3, NovaPay Payout API 1.0.0)
+Found 5 endpoints: POST /payouts, GET /payouts/{payout_id}, POST /payouts/{payout_id}/cancel,
+                   POST /webhooks/payout, GET /balance
+  create   POST /payouts                              createPayout             confidence 0.95
+  status   GET /payouts/{payout_id}                   getPayoutStatus          confidence 0.90
+  cancel   POST /payouts/{payout_id}/cancel           cancelPayout             confidence 0.95   (outside contract → cancel_request)
+  webhook  POST /webhooks/payout                      payoutWebhook            confidence 0.90
+  balance  GET /balance                               getBalance               confidence 0.85   (outside contract → fetch_balance)
+Auth: ApiKeyAuth (api_key, header: X-API-Key) → credentials.api_key
+Statuses (status): pending, processing → in_progress; completed → approved; failed, cancelled → rejected
+Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_block;
+        401 (status) unauthorized → alert_block; 402 insufficient_balance → retry;
+        404 not_found → reject; 409 (create) duplicate → treat_as_success;
+        409 (cancel) invalid_status → reject; 422 validation_error → reject;
+        429 rate_limit_exceeded → retry_backoff (Retry-After); 500 internal_error → retry
+Webhook signature: X-NovaPay-Signature (HMAC-SHA256, raw body, hex) → credentials.callback_secret
+Webhook events: payout.completed → approved; payout.failed → rejected; payout.processing → in_progress; payout.cancelled → rejected
+Amount: integer, minor units (×100), min 1000 RUB — source: amount (integer, min 100000) → minor units: 'Сумма в копейках'
+Fields: 8 request fields, 0 unmapped (recipient: sbp, card)
+Warnings (3):
+  WARN         signature_encoding_assumed X-NovaPay-Signature: encoding not stated; hex assumed
+        hint: webhook.signature_encoding: hex|base64  (overrides.yml)
+  WARN         conditional_required       recipient.bank_code: required only for type=sbp (from description)
+        hint: fields.recipient.bank_code.required_if: { field: type, equals: sbp }  applied; verify
+  WARN         conditional_required       recipient.card_number: required only for type=card (from description)
+        hint: fields.recipient.card_number.required_if: { field: type, equals: card }  applied; verify
+Info (3):
+  INFO         outside_contract           POST /payouts/{payout_id}/cancel (cancelPayout) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /balance (getBalance) — generated as `fetch_balance` helper
+  INFO         duplicate_as_success       HTTP 409 returns the success schema (PayoutResponse); treated as success
+        hint: the service reads the payout from the body
+Done: 3 warnings, 0 unsupported. Exit 0.

@@ -102,15 +102,20 @@ module Forge
       end
 
       def status_for(event)
-        tokens = Rules.normalize(event).split('_')
-        prefixes = rules.fetch(:endpoint_roles)['payout_words'] + %w[event]
-        tokens.shift while tokens.size > 1 && prefixes.include?(tokens.first)
-        key = tokens.join('_')
+        key = event_status(event)
         %w[in_progress approved rejected].find { |k| status_dict[k].include?(key) }
       end
 
+      # 'payout.completed' → 'completed', 'transfer.on_hold' → 'on_hold' (срезаем префиксы-слова выплат).
+      def event_status(event)
+        tokens = Rules.normalize(event).split('_')
+        prefixes = rules.fetch(:endpoint_roles)['payout_words'] + %w[event]
+        tokens.shift while tokens.size > 1 && prefixes.include?(tokens.first)
+        tokens.join('_')
+      end
+
       def unmapped_event(event)
-        warn(:unmapped_event, "webhook event '#{event}' → status '#{Rules.normalize(event).split('_').last}' unknown",
+        warn(:unmapped_event, "webhook event '#{event}' → status '#{event_status(event)}' unknown",
              hint: "events.#{event}: in_progress|approved|rejected  (overrides.yml)")
       end
 

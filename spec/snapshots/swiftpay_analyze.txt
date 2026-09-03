@@ -1,0 +1,39 @@
+Parsing spec... ok (openapi 3.1.0, SwiftPay Outbound Payments 3.0.1)
+Found 4 endpoints: POST /v1/payments/outbound, GET /v1/payments/outbound/{payment_id},
+                   DELETE /v1/payments/outbound/{payment_id}, GET /v1/accounts/balance
+  create   POST /v1/payments/outbound                 initiateOutboundPayment  confidence 0.95
+  status   GET /v1/payments/outbound/{payment_id}     getOutboundPayment       confidence 0.90
+  cancel   DELETE /v1/payments/outbound/{payment_id}  cancelOutboundPayment    confidence 0.85   (outside contract → cancel_request)
+  webhook  POST paymentStatusChanged                  paymentStatusChanged     confidence 0.95
+  balance  GET /v1/accounts/balance                   getAccountBalance        confidence 0.85   (outside contract → fetch_balance)
+Auth: basicAuth (basic, header: Authorization) → credentials.login/password
+Statuses (status): CREATED, SENT → in_progress; SETTLED → approved; REJECTED → rejected; unmapped: PENDING_APPROVAL, RETURNED
+Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_block;
+        401 (status) unauthorized → alert_block; 404 not_found → reject;
+        409 (create) duplicate_request → treat_as_success; 409 (cancel) invalid_status → reject;
+        422 validation_error → reject; 500 internal_error → retry
+Webhook signature: Swift-Signature (HMAC-SHA256, raw body, hex) → credentials.callback_secret
+Webhook events: type → status from data.status
+Amount: number, major units (×100), min 1 EUR — source: amount (number, min 1) → major units: 'Amount in major units (e.g. 100.50)'
+Fields: 8 request fields, 1 unmapped (beneficiary: bank_account)
+Warnings (4):
+  WARN         unmapped_status            status 'PENDING_APPROVAL' (pending_approval) of status is unknown
+        hint: statuses.PENDING_APPROVAL: in_progress|approved|rejected  (overrides.yml)
+  WARN         unmapped_status            status 'RETURNED' (returned) of status is unknown
+        hint: statuses.RETURNED: in_progress|approved|rejected  (overrides.yml)
+  WARN         one_of_first_variant       beneficiary: 2 variants (IbanBeneficiary, AccountBeneficiary); first (IbanBeneficiary) is used
+        hint: fields.beneficiary.variant: <SchemaName>  (overrides.yml, not implemented yet)
+  WARN         unmapped_field             beneficiary.address (object) has no source
+        hint: fields.beneficiary.address.source: "…"  (overrides.yml)
+Unsupported (3):
+  UNSUPPORTED  oauth2_alternative         alternative security scheme 'oauth2' (oauth2) is ignored
+        hint: the first supported scheme is used
+  UNSUPPORTED  signature_with_timestamp   Swift-Signature: signature includes a timestamp/nonce; verify is a TODO
+        hint: implement verify_signature! by hand following the provider docs
+  UNSUPPORTED  external_ref               GET /v1/accounts/balance: external $ref → {} (available → https://schemas.swiftpay.example/common/Money.json, reserved → https://schemas.swiftpay.example/common/Money.json)
+        hint: inline the schema if this response matters
+Info (3):
+  INFO         webhook_source_webhooks    webhook taken from webhooks: POST paymentStatusChanged (paymentStatusChanged)
+  INFO         outside_contract           DELETE /v1/payments/outbound/{payment_id} (cancelOutboundPayment) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /v1/accounts/balance (getAccountBalance) — generated as `fetch_balance` helper
+Done: 4 warnings, 3 unsupported. Exit 0.
