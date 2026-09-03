@@ -1,0 +1,4 @@
+# Пороги confidence (docs/RULES.md § 0): ≥ accept — без WARN; ≥ warn — принято + WARN low_confidence;
+# ниже — не принято, WARN needs_override.
+accept: 0.8
+warn: 0.5

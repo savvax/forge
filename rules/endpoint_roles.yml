@@ -1,0 +1,54 @@
+# Роли эндпоинтов (docs/RULES.md § 2). Слова ищутся в path-сегментах, operationId, summary, tags
+# после нормализации (camelCase/-/. → snake_case, затем разбиение на токены по `_`).
+payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, transfers, disburse,
+               disbursement, disbursements, payment, payments, send, remittance, outbound]
+negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
+                 invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
+                 recipients, otp, export, bulk, search, resend, finalize]
+negative_penalty: 0.4
+
+words:
+  create: [create, new, submit, send, initiate, make, register, request, post]
+  status: [status, get, retrieve, fetch, info, details, show, verify, check]
+  cancel: [cancel, void, revoke, abort, stop]
+  webhook: [webhook, webhooks, callback, callbacks, notify, notification, notifications, ipn, events]
+  balance: [balance, balances, account, wallet, funds]
+  signature: [sign, signature, hmac, digest]
+  id: [id, code, reference]
+
+roles:
+  create:
+    requires: { all: [has_request_body] }
+    signals:
+      method_post: 0.30
+      payout_word_in_path: 0.25
+      create_word: 0.20
+      no_path_param: 0.10
+      has_request_body: 0.10
+  status:
+    requires: { any: [has_path_param, id_query_param] }
+    signals:
+      method_get: 0.30
+      payout_word_in_path: 0.25
+      has_path_param: 0.20
+      status_word: 0.15
+  cancel:
+    requires: { any: [has_path_param, has_request_body] }
+    signals:
+      method_post_or_delete: 0.25
+      payout_word_in_path: 0.20
+      cancel_word_in_path: 0.30
+      cancel_word_in_operation: 0.10
+      has_path_param: 0.10
+  webhook:
+    signals:
+      webhook_word_in_path: 0.40
+      security_explicitly_empty: 0.20
+      signature_header_param: 0.20
+      method_post: 0.10
+    explicit_sources_confidence: 0.95
+  balance:
+    signals:
+      balance_word_in_path: 0.50
+      method_get: 0.25
+      no_path_param: 0.10
