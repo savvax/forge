@@ -8,17 +8,17 @@ require_relative '../lib/forge'
 class ForgeCLI < Thor
   def self.exit_on_failure? = true
 
-  desc 'analyze --spec FILE', 'Разобрать OpenAPI-спеку и напечатать отчёт'
+  desc 'analyze', 'Разобрать OpenAPI-спеку и напечатать отчёт'
   option :spec, required: true
   def analyze = not_implemented
 
-  desc 'generate --spec FILE [--out DIR]', 'Сгенерировать интеграцию провайдера'
+  desc 'generate', 'Сгенерировать интеграцию провайдера'
   option :spec, required: true
   option :provider
   option :out, default: 'output'
   def generate = not_implemented
 
-  desc 'mock --spec FILE', 'Поднять мок-сервер провайдера из спеки'
+  desc 'mock', 'Поднять мок-сервер провайдера из спеки'
   option :spec, required: true
   def mock = not_implemented
 
