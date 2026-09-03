@@ -9,3 +9,4 @@ end
 require_relative 'forge/rules'
 require_relative 'forge/analyzers/runner'
 require_relative 'forge/report'
+require_relative 'forge/plan/builder'
