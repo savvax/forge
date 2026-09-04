@@ -81,8 +81,8 @@ HMAC-SHA256(body, callback_secret) → hex → X-NovaPay-Signature
 
 ## Вне контракта
 
-- `POST /payouts/{payout_id}/cancel` — сгенерирован как хелпер `cancel_request`
-- `GET /balance` — сгенерирован как хелпер `fetch_balance`
+- `POST /payouts/{payout_id}/cancel` — хелпер `cancel_request` в `novapay_extras.rb` (класс `NovapayExtras`, вне контракта)
+- `GET /balance` — хелпер `fetch_balance` в `novapay_extras.rb` (класс `NovapayExtras`, вне контракта)
 
 ## Допущения
 

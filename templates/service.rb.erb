@@ -128,33 +128,8 @@ module Provider
 <% end -%>
 <% if view.op(:cancel) || view.op(:balance) -%>
 
-    # --- Outside BaseService contract (optional helpers found in the spec) ---
-<% end -%>
-<% if view.op(:cancel) -%>
-
-    def cancel_request(operation)
-      response = <%= view.paths.cancel_client_call %>
-<% if view.paths.cancel_has_status? -%>
-      return apply_status(operation, <%= view.paths.body(view.op(:cancel).response_status_path) %>) if response.status == <%= view.op(:cancel).success_statuses.first %>
-<% else -%>
-      return success(response.body) if response.status == <%= view.op(:cancel).success_statuses.first %>
-<% end -%>
-
-      failure(http_symbol(response.status), "provider.#{error_code_for(response)}")
-    end
-<% end -%>
-<% if view.op(:balance) -%>
-
-    def fetch_balance
-      response = client.get(<%= view.paths.url(:balance) %>, headers: auth_headers)
-      return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == <%= view.op(:balance).success_statuses.first %>
-
-<% if view.paths.balance_keys.empty? -%>
-      success(response.body)
-<% else -%>
-      success(<%= view.paths.balance_keys.map { |k| "#{k}: response.body['#{k}']" }.join(', ') %>)
-<% end -%>
-    end
+    # Endpoints outside the BaseService contract (<%= [view.op(:cancel) && 'cancel', view.op(:balance) && 'balance'].compact.join(', ') %>)
+    # are generated as optional helpers in <%= plan.provider[:name] %>_extras.rb (<%= plan.provider[:class_name].delete_suffix('Service') %>Extras < <%= plan.provider[:class_name] %>).
 <% end -%>
 
     private

@@ -66,8 +66,11 @@ RSpec.describe Forge::Renderers::Service do
     cardpay = render(plan_for('examples/specs/cardpay.yaml'))
     expect(cardpay).to include("Base64.strict_encode64(OpenSSL::HMAC.digest('SHA512'",
                                "expiry: nil, # TODO(forge): map 'destination.card.expiry'")
-    swiftpay = render(plan_for('examples/specs/swiftpay.json'))
-    expect(swiftpay).to include('raise NotImplementedError', 'client.delete(', 'operation.amount.to_f.round(2)')
+    swiftpay_plan = plan_for('examples/specs/swiftpay.json')
+    expect(render(swiftpay_plan)).to include('raise NotImplementedError', 'operation.amount.to_f.round(2)')
+    expect(render(swiftpay_plan)).not_to include('def cancel_request')
+    expect(Forge::Renderers::Extras.new(swiftpay_plan).render).to include('class SwiftpayExtras < SwiftpayService',
+                                                                          'client.delete(')
   end
 
   it 'raises VerificationError with compiler output for a broken template' do

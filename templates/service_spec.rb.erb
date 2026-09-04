@@ -170,13 +170,15 @@ RSpec.describe Provider::<%= class_name %> do
   end
 <% if op(:cancel) && cancel_expected -%>
 
-  describe '#cancel_request' do
+  describe '<%= class_name.delete_suffix('Service') %>Extras#cancel_request' do
     it 'cancels a pending payout' do
+      require_relative '<%= plan.provider[:name] %>_extras'
+      extras = Provider::<%= class_name.delete_suffix('Service') %>Extras.new(provider: build_record('<%= plan.provider[:name] %>'), operations: operations)
       operation.provider_operation_id = provider_id
       stub_request(:<%= op(:cancel).method == 'delete' ? 'delete' : 'post' %>, <%= url(:cancel) %>)
         .to_return(status: <%= op(:cancel).success_statuses.first %>, body: fixtures.dig('cancel', 'response_<%= op(:cancel).success_statuses.first %>').to_json,
                    headers: { 'Content-Type' => 'application/json' })
-      expect(service.cancel_request(operation).data[:status]).to eq('<%= cancel_expected %>')
+      expect(extras.cancel_request(operation).data[:status]).to eq('<%= cancel_expected %>')
     end
   end
 <% end -%>

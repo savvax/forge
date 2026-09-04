@@ -74,7 +74,10 @@ module Forge
     def done(generation)
       counts = warnings.group_by(&:level).transform_values(&:size)
       files = generation ? "#{generation[:outputs].size} files, " : ''
-      "Done: #{files}#{counts.fetch(:warn, 0)} warnings, #{counts.fetch(:unsupported, 0)} unsupported. Exit 0."
+      code = generation&.fetch(:exit_code, 0) || 0
+      strict = code.zero? ? '' : ' (--strict: warnings present, output still generated)'
+      totals = "#{counts.fetch(:warn, 0)} warnings, #{counts.fetch(:unsupported, 0)} unsupported"
+      "Done: #{files}#{totals}. Exit #{code}.#{strict}"
     end
 
     # Data/Symbol/Endpoint/Schema → JSON-дружественные структуры.

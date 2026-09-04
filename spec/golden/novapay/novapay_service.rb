@@ -101,21 +101,8 @@ module Provider
       failure(:unauthorized, 'invalid_signature')
     end
 
-    # --- Outside BaseService contract (optional helpers found in the spec) ---
-
-    def cancel_request(operation)
-      response = client.post("#{BASE_URL}/payouts/#{operation.provider_operation_id}/cancel", headers: auth_headers)
-      return apply_status(operation, response.body['status']) if response.status == 200
-
-      failure(http_symbol(response.status), "provider.#{error_code_for(response)}")
-    end
-
-    def fetch_balance
-      response = client.get("#{BASE_URL}/balance", headers: auth_headers)
-      return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
-
-      success(balance: response.body['balance'], currency: response.body['currency'], hold: response.body['hold'])
-    end
+    # Endpoints outside the BaseService contract (cancel, balance)
+    # are generated as optional helpers in novapay_extras.rb (NovapayExtras < NovapayService).
 
     private
 

@@ -16,7 +16,7 @@
 | R3 | Выход: `INTEGRATION.md` (авторизация, методы, статусы, ошибки, ProviderGateway config, подпись webhook) | `templates/integration.md.erb`, `spec/renderers/outputs_spec.rb` (все строки эталона `spec/reference/novapay/INTEGRATION.md` присутствуют) |
 | R4 | Выход: `fixtures.json` с ключами ТЗ и `expected_operation_status` | `lib/forge/plan/fixtures.rb`, тест `deep_include` эталона `spec/reference/novapay/fixtures.json` |
 | R5 | CLI `./integrate --spec … --provider … --lang ruby` с прогресс-выводом («Parsing spec… Found N endpoints… Auth… Webhook signature… Generating… Output:») | `bin/integrate`, `lib/forge/report.rb`, `spec/cli_spec.rb`, `spec/snapshots/*_analyze.txt` |
-| R6 | Доп. эндпоинты (balance, cancel, list) — «найдено, вне контракта», как необязательные хелперы | `INFO outside_contract` в отчёте, `cancel_request`/`fetch_balance` под комментарием `# --- Outside BaseService contract` |
+| R6 | Доп. эндпоинты (balance, cancel, list) — «найдено, вне контракта», как необязательные хелперы | `INFO outside_contract` в отчёте, `cancel_request`/`fetch_balance` в отдельном классе `<P>Extras` (`<p>_extras.rb`, D-15) |
 
 ### 1.2 Уточнения организаторов (`docs/QA_SESSION_1.md`, приоритет над догадками)
 
@@ -79,7 +79,7 @@ CLI: `lib/forge/cli.rb` (Thor) → `lib/forge/generate_command.rb` (конвей
 | Команда | Назначение |
 |---|---|
 | `bin/forge analyze --spec F [--overrides F] [--include-paths G]… [--format text\|json] [--debug]` | отчёт без генерации |
-| `bin/forge generate --spec F [--provider N] [--out D] [--overrides F] [--include-paths G]… [--templates-dir D] [--lang ruby] [--format] [--strict] [--no-verify] [--force]` | 6 файлов + верификация |
+| `bin/forge generate --spec F [--provider N] [--out D] [--overrides F] [--include-paths G]… [--templates-dir D] [--lang ruby] [--format] [--strict] [--no-verify] [--force]` | 6–7 файлов + верификация |
 | `bin/forge mock --spec F [--port P] [--webhook-url U] [--overrides F]` | рендер + запуск Sinatra-мока |
 | `bin/integrate --spec F --provider N [--lang ruby]` | обёртка ТЗ → `generate --out ./output/<provider> --force`; `--lang` ≠ ruby → exit 1 |
 | `bin/e2e SPEC [--overrides F]` | мок + сервис + приёмник webhook → `operation approved ✓`, exit 0 |
@@ -96,8 +96,8 @@ CLI: `lib/forge/cli.rb` (Thor) → `lib/forge/generate_command.rb` (конвей
 ### 2.4 Сгенерированный вывод (`spec/golden/<provider>/`)
 
 Для `novapay`, `cardpay`, `cardpay_overrides`, `swiftpay`, `swiftpay_overrides`: `<p>_service.rb`,
-`<p>_service_spec.rb`, `generated_spec_helper.rb`, `INTEGRATION.md`, `fixtures.json`, `mock_server.rb`,
-`report.txt`. Golden для NovaPay-сервиса совпадает с целевым текстом `docs/OUTPUT_FORMAT.md` § 1.
+`<p>_extras.rb` (если есть cancel/balance), `<p>_service_spec.rb`, `generated_spec_helper.rb`, `INTEGRATION.md`,
+`fixtures.json`, `mock_server.rb`, `report.txt`. Golden для NovaPay-сервиса совпадает с целевым текстом `docs/OUTPUT_FORMAT.md` § 1.
 
 ### 2.5 Тесты (`spec/`)
 
@@ -115,7 +115,7 @@ bundle exec rake ci                       # ~15 с: rubocop 0; 216 examples, 0 f
                                           # generated specs зелёные; determinism ok (21 files); licenses ok; readme:check ok
 bin/forge analyze --spec examples/specs/novapay.yaml         # 5 ролей 0.95/0.90/0.95/0.90/0.85; 3 WARN + 3 INFO; exit 0
 bin/forge generate --spec examples/specs/novapay.yaml --out tmp/out/novapay --force
-                                          # Verifying… ok (ruby -c ×3, rspec 13 examples, 0 failures); Done: 6 files
+                                          # Verifying… ok (ruby -c ×4, rspec 13 examples, 0 failures); Done: 7 files
 bin/forge generate --spec examples/specs/cardpay.yaml --overrides examples/overrides/cardpay.yml --out tmp/out/c --force --strict; echo $?   # 0 (0 WARN)
 bin/forge generate --spec examples/specs/swiftpay.json --out tmp/out/s --force   # 4 WARN, 3 UNSUPPORTED, 1 pending, exit 0
 bin/forge analyze --spec spec/fixtures/broken/cyclic_ref.yaml; echo $?           # error: circular $ref … hint: … ; 1
@@ -146,6 +146,8 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 | 9 | Карточка T15: Rack::Test | `Rack::MockRequest` из rack | гем `rack-test` не в Gemfile, новый гем требует согласия |
 | 10 | ТЗ пример `report.txt`: «Done: 6 files» | `report.txt` содержит пути относительно каталога вывода (`./novapay_service.rb`), stdout — полные | детерминизм между каталогами (`rake determinism`) |
 | 11 | RULES § 9: `fields.<path>.variant` для `oneOf` | не реализовано, в hint помечено «not implemented yet» | резерв R2, README «Что дальше» |
+| 12 | OUTPUT_FORMAT § 1: `cancel_request`/`fetch_balance` внутри сервиса | отдельный файл `<p>_extras.rb`, класс `<P>Extras < <P>Service`; сервис — только контракт | D-15, замечание экспертов |
+| 13 | ARCHITECTURE: `--strict` → exit 4 | так и есть, но режим «комбинированный»: все файлы и отчёт создаются, код 4 только в конце | D-16, замечание экспертов |
 
 ## 5. Известные ограничения (README «Ограничения»)
 

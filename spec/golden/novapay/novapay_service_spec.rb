@@ -114,13 +114,15 @@ RSpec.describe Provider::NovapayService do
     end
   end
 
-  describe '#cancel_request' do
+  describe 'NovapayExtras#cancel_request' do
     it 'cancels a pending payout' do
+      require_relative 'novapay_extras'
+      extras = Provider::NovapayExtras.new(provider: build_record('novapay'), operations: operations)
       operation.provider_operation_id = provider_id
       stub_request(:post, "#{described_class::BASE_URL}/payouts/#{provider_id}/cancel")
         .to_return(status: 200, body: fixtures.dig('cancel', 'response_200').to_json,
                    headers: { 'Content-Type' => 'application/json' })
-      expect(service.cancel_request(operation).data[:status]).to eq('in_progress')
+      expect(extras.cancel_request(operation).data[:status]).to eq('in_progress')
     end
   end
 end

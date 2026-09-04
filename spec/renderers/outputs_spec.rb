@@ -7,13 +7,7 @@ RSpec.describe Forge::Renderers do
 
   def generate(plan, dir)
     FileUtils.rm_rf(dir)
-    FileUtils.mkdir_p(dir)
-    [Forge::Renderers::Service, Forge::Renderers::ServiceSpec, Forge::Renderers::Fixtures,
-     Forge::Renderers::IntegrationDoc].each do |klass|
-      r = klass.new(plan)
-      File.write(File.join(dir, r.filename), r.render)
-    end
-    FileUtils.cp('lib/forge/generated_spec_helper.rb', dir)
+    Forge::Renderers::Runner.render(plan, out_dir: dir)
     dir
   end
 

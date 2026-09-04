@@ -6,6 +6,7 @@ require_relative 'service_spec'
 require_relative 'fixtures'
 require_relative 'integration_doc'
 require_relative 'mock_server'
+require_relative 'extras'
 
 module Forge
   module Renderers
@@ -19,7 +20,7 @@ module Forge
         new(plan, out_dir, templates_dir, force).render
       end
 
-      def self.steps = STEPS + [['mock server', MockServer]]
+      def self.steps = STEPS + [['extras', Extras], ['mock server', MockServer]]
 
       def initialize(plan, out_dir, templates_dir, force)
         @plan = plan
@@ -30,9 +31,10 @@ module Forge
 
       def render
         prepare_dir!
-        files = self.class.steps.map do |label, klass|
+        files = self.class.steps.filter_map do |label, klass|
           renderer = klass.new(@plan, templates_dir: @templates_dir)
-          { label: label, path: write(renderer.filename, renderer.render) }
+          content = renderer.render
+          content && { label: label, path: write(renderer.filename, content) }
         end
         FileUtils.cp(HELPER, File.join(@out_dir, 'generated_spec_helper.rb'))
         files

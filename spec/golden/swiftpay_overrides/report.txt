@@ -20,13 +20,15 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
+Generating extras...
 Generating mock server...
-Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
+Verifying generated code... ok (ruby -c ×4, rspec skipped: --no-verify)
 Output:
   ./swiftpay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./swiftpay_service_spec.rb
+  ./swiftpay_extras.rb
   ./mock_server.rb
   ./report.txt
 Warnings (1):
@@ -46,4 +48,4 @@ Info (6):
   INFO         override_applied           statuses.PENDING_APPROVAL → in_progress
   INFO         override_applied           statuses.RETURNED → rejected
   INFO         override_applied           fields.beneficiary.address → source
-Done: 6 files, 1 warnings, 3 unsupported. Exit 0.
+Done: 7 files, 1 warnings, 3 unsupported. Exit 0.

@@ -99,8 +99,8 @@ Done: 5 files, 3 warnings, 0 unsupported. Exit 0.
 
 ```
 output/novapay/
-├── novapay_service.rb        # Provider::NovapayService < BaseService: check_conditions, create_request,
-│                             #   fetch_status, process_callback (+ хелперы cancel_request, fetch_balance)
+├── novapay_service.rb        # Provider::NovapayService < BaseService: ровно четыре метода контракта
+├── novapay_extras.rb         # Provider::NovapayExtras < NovapayService: cancel_request, fetch_balance (вне контракта)
 ├── novapay_service_spec.rb   # RSpec на WebMock и fixtures.json — доказательство, что сервис работает
 ├── INTEGRATION.md            # авторизация, методы, маппинг статусов, ошибки, подпись webhook, ДОПУЩЕНИЯ
 ├── fixtures.json             # примеры запросов/ответов/уведомлений и ожидаемые статусы операции
@@ -178,6 +178,9 @@ provider_api.yaml ─▶ Load ─▶ IR ─▶ Analyze ─▶ Plan ─▶ Render
   Подход подтверждён организаторами письменно (`docs/QA_SESSION_1.md` § 7).
 - **Детерминизм.** Одинаковый вход → байт-в-байт одинаковый выход (`rake determinism`). Никаких
   сетевых вызовов и LLM во время генерации.
+- **Строгий режим не прерывает работу.** `--strict` генерирует все файлы и печатает полный отчёт, а
+  ненулевой код (4) возвращает только в конце, если остались WARN/UNSUPPORTED — удобно для CI, где
+  «допущение без overrides» должно быть красным, но артефакты всё равно нужны.
 - **Падаем только когда генерировать нечего** (нет create-эндпоинта → exit 2 с подсказкой, как указать
   его в overrides). Всё остальное — WARN/UNSUPPORTED, а не молчание и не крэш.
 

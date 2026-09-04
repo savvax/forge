@@ -93,21 +93,8 @@ module Provider
       failure(:unauthorized, 'invalid_signature')
     end
 
-    # --- Outside BaseService contract (optional helpers found in the spec) ---
-
-    def cancel_request(operation)
-      response = client.delete("#{BASE_URL}/v1/payments/outbound/#{operation.provider_operation_id}", headers: auth_headers)
-      return apply_status(operation, response.body['status']) if response.status == 200
-
-      failure(http_symbol(response.status), "provider.#{error_code_for(response)}")
-    end
-
-    def fetch_balance
-      response = client.get("#{BASE_URL}/v1/accounts/balance", headers: auth_headers)
-      return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
-
-      success(available: response.body['available'], reserved: response.body['reserved'])
-    end
+    # Endpoints outside the BaseService contract (cancel, balance)
+    # are generated as optional helpers in swiftpay_extras.rb (SwiftpayExtras < SwiftpayService).
 
     private
 

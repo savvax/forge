@@ -69,8 +69,8 @@ HMAC-SHA256(body, callback_secret) → hex → Swift-Signature
 
 ## Вне контракта
 
-- `DELETE /v1/payments/outbound/{payment_id}` — сгенерирован как хелпер `cancel_request`
-- `GET /v1/accounts/balance` — сгенерирован как хелпер `fetch_balance`
+- `DELETE /v1/payments/outbound/{payment_id}` — хелпер `cancel_request` в `swiftpay_extras.rb` (класс `SwiftpayExtras`, вне контракта)
+- `GET /v1/accounts/balance` — хелпер `fetch_balance` в `swiftpay_extras.rb` (класс `SwiftpayExtras`, вне контракта)
 
 ## Допущения
 

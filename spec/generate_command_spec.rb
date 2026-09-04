@@ -12,9 +12,9 @@ RSpec.describe Forge::GenerateCommand do
   before { FileUtils.rm_rf(out) }
 
   it 'runs the pipeline, writes report.txt with local paths and returns 0' do
-    expect { expect(described_class.new(base).run).to eq(0) }.to output(/Done: 6 files, 3 warnings/).to_stdout
+    expect { expect(described_class.new(base).run).to eq(0) }.to output(/Done: 7 files, 3 warnings/).to_stdout
     report = File.read("#{out}/report.txt")
-    expect(report).to include('  ./novapay_service.rb', 'Verifying generated code... ok (ruby -c ×3, rspec skipped')
+    expect(report).to include('  ./novapay_service.rb', 'Verifying generated code... ok (ruby -c ×4, rspec skipped')
     expect(report).not_to include(out)
   end
 

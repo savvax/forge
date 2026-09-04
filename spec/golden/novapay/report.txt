@@ -21,13 +21,15 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
+Generating extras...
 Generating mock server...
-Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
+Verifying generated code... ok (ruby -c ×4, rspec skipped: --no-verify)
 Output:
   ./novapay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./novapay_service_spec.rb
+  ./novapay_extras.rb
   ./mock_server.rb
   ./report.txt
 Warnings (3):
@@ -42,4 +44,4 @@ Info (3):
   INFO         outside_contract           GET /balance (getBalance) — generated as `fetch_balance` helper
   INFO         duplicate_as_success       HTTP 409 returns the success schema (PayoutResponse); treated as success
         hint: the service reads the payout from the body
-Done: 6 files, 3 warnings, 0 unsupported. Exit 0.
+Done: 7 files, 3 warnings, 0 unsupported. Exit 0.

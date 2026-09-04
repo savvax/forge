@@ -89,13 +89,15 @@ RSpec.describe Provider::SwiftpayService do
     end
   end
 
-  describe '#cancel_request' do
+  describe 'SwiftpayExtras#cancel_request' do
     it 'cancels a pending payout' do
+      require_relative 'swiftpay_extras'
+      extras = Provider::SwiftpayExtras.new(provider: build_record('swiftpay'), operations: operations)
       operation.provider_operation_id = provider_id
       stub_request(:delete, "#{described_class::BASE_URL}/v1/payments/outbound/#{provider_id}")
         .to_return(status: 200, body: fixtures.dig('cancel', 'response_200').to_json,
                    headers: { 'Content-Type' => 'application/json' })
-      expect(service.cancel_request(operation).data[:status]).to eq('rejected')
+      expect(extras.cancel_request(operation).data[:status]).to eq('rejected')
     end
   end
 end

@@ -84,7 +84,7 @@
 Дополнительных эндпоинтов в спеке нет.
 <% else -%>
 <% plan.outside_contract.each do |o| -%>
-- `<%= o[:endpoint].method.upcase %> <%= o[:endpoint].path %>` — <%= o[:helper] ? "сгенерирован как хелпер `#{o[:helper]}`" : 'не используется' %>
+- `<%= o[:endpoint].method.upcase %> <%= o[:endpoint].path %>` — <%= o[:helper] ? "хелпер `#{o[:helper]}` в `#{plan.provider[:name]}_extras.rb` (класс `#{plan.provider[:class_name].delete_suffix('Service')}Extras`, вне контракта)" : 'не используется' %>
 <% end -%>
 <% end -%>
 

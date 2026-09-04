@@ -25,7 +25,8 @@ module Forge
       plan = Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
       files = Renderers::Runner.render(plan, out_dir: @opts[:out], templates_dir: @opts[:templates_dir],
                                              force: @opts[:force])
-      generation = { steps: files.map { |f| f[:label] }, verify: verify(files, plan), outputs: outputs(files) }
+      generation = { steps: files.map { |f| f[:label] }, verify: verify(files, plan), outputs: outputs(files),
+                     exit_code: exit_code(findings) }
       text = Report.text(spec, findings, generation: generation)
       Renderers::ReportFile.write(@opts[:out], text)
       print_report(spec, findings, generation, text)
