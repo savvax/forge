@@ -155,3 +155,4 @@ Dev/test: `rspec`, `webmock`, `simplecov`, `rubocop`, `rubocop-rspec`, `rubocop-
 | `docs/REAL_SPECS.md` | Реальные спеки (Stripe, Adyen, PayPal, Paystack, Square, Plaid): что ожидаем |
 | `docs/QA_SESSION_1.md` | Ответы организаторов (источник истины по требованиям) |
 | `NOTES.md` | Решения (ADR-lite) и обратная связь экспертов с чек-поинтов |
+| `docs/AUDIT.md` | Досье для аудита: требования → реализация → команды проверки → осознанные отклонения |
