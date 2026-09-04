@@ -94,7 +94,7 @@ module Forge
       def operation(role, endpoint)
         own = rows.select { |r| r[:role] == role }
         statuses = value(:statuses)
-        OperationPlan.new(role: role, method: endpoint.method, path: endpoint.path,
+        OperationPlan.new(role: role, method: endpoint.method, path: endpoint.path, endpoint: endpoint,
                           path_params: endpoint.path.scan(/\{(\w+)\}/).flatten,
                           headers: role == :create ? value(:fields)[:headers] : [], body_encoding: 'json',
                           success_statuses: success_statuses(endpoint, own),

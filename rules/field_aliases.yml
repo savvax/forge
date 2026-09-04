@@ -17,18 +17,18 @@ aliases:
 requisite_container: [recipient, receiver, beneficiary, destination, payee, account, target, details, card, bank, bank_account]
 requisite_types: [sbp, card, bank_account, wallet]
 requisite_type:  { names: [type, method, payout_method, payment_method, channel, kind, destination_type] }
-requisite_fields:    # хвост пути → поле реквизита; types — к каким типам реквизитов относится
-  phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone }
-  bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code], field: bank_code }
-  bank_name:      { names: [bank_name, bank], field: bank_name }
+requisite_fields:    # хвост пути → поле реквизита; types — типы реквизитов из docs/CONTRACT.md § 3, где поле встречается
+  phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone, types: [sbp, card, wallet] }
+  bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code], field: bank_code, types: [sbp, bank_account] }
+  bank_name:      { names: [bank_name, bank], field: bank_name, types: [sbp, bank_account] }
   number:         { names: [card_number, pan, number, card, card_pan], field: number, types: [card] }
-  holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name], field: holder }
+  holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name], field: holder, types: [card, bank_account] }
   expiry_month:   { names: [expiry_month, exp_month, month], field: expiry_month, types: [card] }
   expiry_year:    { names: [expiry_year, exp_year, year], field: expiry_year, types: [card] }
   account_number: { names: [account_number, account, account_no, acct], field: account_number, types: [bank_account] }
   iban:           { names: [iban], field: iban, types: [bank_account] }
   bic:            { names: [bic, swift, swift_code, swift_bic], field: bic, types: [bank_account] }
-  country:        { names: [country, country_code], field: country }
+  country:        { names: [country, country_code], field: country, types: [bank_account] }
   wallet_id:      { names: [wallet_id, wallet, account_id], field: id, types: [wallet] }
 conditional_required_patterns:   # regex по description → required_if
   - "(?:for|when|if|при|для)\\s+(?<field>\\w+)\\s*=\\s*(?<value>\\w+)"

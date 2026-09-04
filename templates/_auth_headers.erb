@@ -1,0 +1,32 @@
+<% case plan.auth[:type] -%>
+<% when 'api_key' -%>
+<% if plan.auth[:location] == 'header' -%>
+    def auth_headers
+      { '<%= plan.auth[:header] %>' => credentials.fetch('api_key') }
+    end
+<% else -%>
+    def auth_headers
+      {} # api key is sent as a query parameter (see auth_params)
+    end
+
+    def auth_params
+      { '<%= plan.auth[:param_name] %>' => credentials.fetch('api_key') }
+    end
+<% end -%>
+<% when 'basic' -%>
+    def auth_headers
+      token = Base64.strict_encode64("#{credentials.fetch('login')}:#{credentials.fetch('password')}")
+      { 'Authorization' => "Basic #{token}" }
+    end
+<% when 'none' -%>
+    def auth_headers
+      {} # TODO(forge): no security scheme found in the spec; add credentials here
+    end
+<% else -%>
+<% if plan.auth[:scheme_name] && plan.warnings.any? { |w| w.code == :oauth2 } -%>
+    # TODO(forge): OAuth2 token flow is not generated; obtain token manually and store it in credentials.token
+<% end -%>
+    def auth_headers
+      { 'Authorization' => "Bearer #{credentials.fetch('token')}" }
+    end
+<% end -%>

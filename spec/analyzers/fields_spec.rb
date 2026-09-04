@@ -36,7 +36,7 @@ RSpec.describe Forge::Analyzers::Fields do
       expect(mapping(finding, 'recipient.card_number')).to have_attributes(
         source_expr: "operation.payout_requisite.dig('card', 'number')", required_if: { field: 'type', equals: 'card' }
       )
-      expect(mapping(finding, 'recipient.bank_name')).to have_attributes(required: false, requisite_type: nil)
+      expect(mapping(finding, 'recipient.bank_name')).to have_attributes(required: false, requisite_type: 'sbp')
     end
 
     it 'reports requisite types, headers and exactly two WARN conditional_required' do

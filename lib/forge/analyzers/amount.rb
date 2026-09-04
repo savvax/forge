@@ -72,6 +72,7 @@ module Forge
       def expression(unit, field)
         return 'to_minor_units(operation.amount)' if unit == :minor
         return "format('%.2f', operation.amount)" if field.type == 'string'
+        return 'operation.amount.to_f.round(2)' if field.type == 'number'
 
         'operation.amount'
       end

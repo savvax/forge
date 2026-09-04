@@ -1,0 +1,6 @@
+    rescue Provider::RateLimitError => e
+      failure(:too_many_requests, 'provider.rate_limit', retry_after: e.retry_after)
+    rescue Provider::UnauthorizedError
+      failure(:unauthorized, 'provider.invalid_credentials')
+    rescue Provider::ServerError, Provider::ConnectionError => e
+      failure(:bad_gateway, 'provider.unavailable', message: e.message)

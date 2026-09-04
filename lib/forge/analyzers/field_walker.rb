@@ -46,7 +46,31 @@ module Forge
       def walk_container(path, prop, requisite)
         @container ||= path.join('.')
         type = @dict['requisite_types'].include?(path.last) ? path.last : requisite
-        backfill(walk(prop, path, prop.required.to_a, type || :any))
+        narrow(backfill(walk(prop, path, prop.required.to_a, type || :any)))
+      end
+
+      # Есть поле типа с enum: нетипизированное поле получает тип, если пересечение его types с enum — ровно один.
+      def narrow(mappings)
+        enum = type_enum(mappings)
+        return mappings unless enum
+
+        mappings.map { |m| m.requisite_type || m.source_expr.nil? ? m : narrow_one(m, enum) }
+      end
+
+      def type_enum(mappings)
+        field = mappings.find { |m| m.source_expr == 'requisite_type' }
+        enum = field&.schema&.enum
+        enum&.map(&:to_s)
+      end
+
+      def narrow_one(mapping, enum)
+        types = types_for(mapping) & enum
+        types.size == 1 ? retype(mapping, types.first) : mapping
+      end
+
+      def types_for(mapping)
+        _key, rule = @dict['requisite_fields'].find { |_n, r| self.class.match?(r['names'], mapping.path) }
+        Array(rule&.[]('types'))
       end
 
       def variant(path, prop, requisite)
@@ -102,7 +126,14 @@ module Forge
       def dig_expr(type, field) = "operation.payout_requisite.dig(#{type ? "'#{type}'" : 'requisite_type'}, '#{field}')"
 
       def type_field?(path) = self.class.match?(@dict.dig('requisite_type', 'names'), path)
-      def resolve_type(requisite, rule) = requisite == :any ? Array(rule['types']).first : requisite
+
+      # :any → тип известен, только если поле встречается ровно в одном типе реквизитов (CONTRACT § 3).
+      def resolve_type(requisite, rule)
+        return requisite unless requisite == :any
+
+        types = Array(rule['types'])
+        types.size == 1 ? types.first : nil
+      end
 
       def required_if(path, prop)
         text = prop.description.to_s
