@@ -78,7 +78,18 @@ Pay-in — только в «Что дальше».
 
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
-(пусто)
+Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:
+
+| Спека | Проблема | Решение |
+|---|---|---|
+| Stripe, Square | рекурсивные схемы (`file ↔ file_link`, `CatalogObject`) — резолвер падал с `circular $ref` | D-14: маркер `x-forge-circular`, фатально только в схеме запроса create |
+| Stripe | 8 МБ, тысячи ссылок на одни схемы — резолв и IR росли экспоненциально (> 10 мин) | кэш целей `$ref` + мемоизация `Schema.from` по identity → 0.1 с |
+| Square | `$ref` на несуществующую схему `AppFeeAllocation` вне контракта | D-14: `x-forge-unresolved`, UNSUPPORTED вне create |
+| Paystack | `$ref` на path-pointer с percent-encoding `%7Bid%7D` | `URI.decode_www_form_component` при lookup |
+| Paystack | повтор `--include-paths` терял первое значение (Thor array) | `repeatable: true` + flatten |
+| Plaid | при равных очках create выигрывал `/transfer/originator/funding_account/create` | tie-break: короче путь → каноничнее ресурс |
+| Plaid | статус через `POST /transfer/get` с id в теле | не поддержано (README «Ограничения», roadmap) |
+| Paystack | `DELETE /transferrecipient/{code}` принят как cancel (0.55, WARN) | честный WARN + hint `endpoints.<id>: other` |
 
 ## CP1 · пт 4.09
 
@@ -89,5 +100,19 @@ Pay-in — только в «Что дальше».
 ## CP3 · вс 6.09
 
 ## Ревью
+
+Самопроверка по чек-листу PROCESS § 4 (4.09, после T20):
+1. `rake guard:vendor` — чисто; единственные упоминания провайдеров — `spec/`, `examples/`, `docs/`.
+2. Каждое значение из карточек T01–T20 покрыто тестом (216 примеров, покрытие 97.8 % / 84.6 %, минимум по файлу 83 %).
+3. Ошибки: `error: <что> at <pointer> in <file>\n  hint: <что делать>`, без стектрейса без `--debug` (`spec/cli_spec.rb`).
+4. Детерминизм: `rake determinism` (21 файл, два прогона), в `report.txt` пути относительно каталога вывода.
+5. Размеры: `plan/fixtures.rb` был 227 строк → вынесена `FixturesOperation`; ERB-шаблоны > 200 строк (service, spec) —
+   это выходной код, а не логика.
+6. README/NOTES обновлялись в каждой карточке; решения D-01…D-14.
+7. Отклонения от docs, о которых знать эксперту: `Analyzers::Fields` решает критичность `$ref` (D-05/D-14);
+   `OperationPlan#endpoint` (D-11); тело запроса в сгенерированном spec — подмножество примера (D-13);
+   `reference_spec` проверяет `payout_requisite` + `'sbp'`/`'phone'`, а не буквальный `dig('sbp', 'phone')` из ТЗ,
+   потому что golden из OUTPUT_FORMAT § 1 использует `build_recipient` с вариантами по типу.
+Блокеров нет.
 
 (отчёты `/review` по задачам: `### R-T05`)
