@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Сценарий демо (docs/DEMO_CP3.md): analyze → generate → rspec сгенерированного → e2e → файлы.
+# usage: bin/demo [SPEC] [--fast]   (--fast без пауз)
+require 'open3'
+
+spec_file = ARGV.find { |a| !a.start_with?('--') } || 'examples/specs/novapay.yaml'
+fast = ARGV.include?('--fast')
+name = File.basename(spec_file, '.*')
+out = "tmp/demo/#{name}"
+
+def banner(title)
+  puts
+  puts "━━━ #{title} " + ('━' * [0, 70 - title.size].max)
+end
+
+def run(cmd, pause:)
+  puts "$ #{cmd}"
+  out, status = Open3.capture2e(cmd)
+  puts out
+  abort("✗ command failed (exit #{status.exitstatus})") unless status.success?
+  sleep 1.5 if pause
+end
+
+banner "1/5 analyze — что forge распознал в #{spec_file}"
+run("bin/forge analyze --spec #{spec_file}", pause: !fast)
+
+banner '2/5 generate — сервис, spec, гайд, фикстуры, мок, отчёт'
+run("bin/forge generate --spec #{spec_file} --out #{out} --force", pause: !fast)
+
+banner '3/5 сгенерированный RSpec — доказательство, что сервис работает'
+run("bundle exec rspec -I lib -I #{out} #{out}/#{name}_service_spec.rb", pause: !fast)
+
+banner '4/5 e2e — мок провайдера + сервис + подписанный webhook → approved'
+run("bin/e2e #{spec_file}", pause: !fast)
+
+banner '5/5 файлы'
+run("ls -la #{out}", pause: false)
+puts "\nСервис: #{out}/#{name}_service.rb   Гайд: #{out}/INTEGRATION.md   Отчёт: #{out}/report.txt"
+puts 'Допущения и как их закрыть: раздел «Допущения» в INTEGRATION.md → examples/overrides/*.yml'

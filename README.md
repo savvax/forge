@@ -8,8 +8,8 @@
 Зачем читать: это вход для жюри и экспертов. Пять минут — и вы знаете, как запустить,
 что получается, где в коде каждый критерий и что мы сознательно не делаем.
 
-> Статус: строки с пометкой **(план)** — ещё не реализовано; пометки снимаются по мере
-> закрытия этапов (`docs/PLAN.md`). К CP3 пометок быть не должно.
+> Статус: все этапы M1–M4 закрыты (`docs/PLAN.md`); `rake ci` зелёный за ~15 с; `bin/e2e` доводит
+> выплату до `approved` на сгенерированном моке для NovaPay и CardPay; 7 реальных API анализируются без падений.
 
 > Статус: **M4 Proof закрыт** — `bin/e2e examples/specs/novapay.yaml` поднимает сгенерированный мок, создаёт выплату, получает подписанный webhook и печатает `operation approved ✓`; то же для CardPay. Реальные спеки (7 API) — exit 0, отчёты в `examples/real/reports/`.
 >
@@ -108,25 +108,44 @@ output/novapay/
 └── report.txt                # что распознано, confidence, WARN / UNSUPPORTED с подсказками
 ```
 
-Пример вывода `analyze` для NovaPay (первые строки — дословно как в ТЗ):
+Реальный вывод `bin/forge analyze --spec examples/specs/novapay.yaml` (первые строки — дословно как в ТЗ; снапшот `spec/snapshots/novapay_analyze.txt`):
 
 ```
 Parsing spec... ok (openapi 3.0.3, NovaPay Payout API 1.0.0)
 Found 5 endpoints: POST /payouts, GET /payouts/{payout_id}, POST /payouts/{payout_id}/cancel,
-                  POST /webhooks/payout, GET /balance
-  create   POST /payouts                      createPayout      confidence 0.95
-  status   GET /payouts/{payout_id}           getPayoutStatus   confidence 0.90
-  cancel   POST /payouts/{payout_id}/cancel   cancelPayout      confidence 0.95   (outside contract → cancel_request)
-  webhook  POST /webhooks/payout              payoutWebhook     confidence 0.90
-  balance  GET /balance                       getBalance        confidence 0.85   (outside contract → fetch_balance)
-Auth: ApiKeyAuth (header: X-API-Key) → credentials.api_key
-Statuses (PayoutResponse.status): pending, processing → in_progress; completed → approved; failed, cancelled → rejected
+                   POST /webhooks/payout, GET /balance
+  create   POST /payouts                              createPayout             confidence 0.95
+  status   GET /payouts/{payout_id}                   getPayoutStatus          confidence 0.90
+  cancel   POST /payouts/{payout_id}/cancel           cancelPayout             confidence 0.95   (outside contract → cancel_request)
+  webhook  POST /webhooks/payout                      payoutWebhook            confidence 0.90
+  balance  GET /balance                               getBalance               confidence 0.85   (outside contract → fetch_balance)
+Auth: ApiKeyAuth (api_key, header: X-API-Key) → credentials.api_key
+Statuses (status): pending, processing → in_progress; completed → approved; failed, cancelled → rejected
+Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_block;
+        401 (status) unauthorized → alert_block; 402 insufficient_balance → retry;
+        404 not_found → reject; 409 (create) duplicate → treat_as_success;
+        409 (cancel) invalid_status → reject; 422 validation_error → reject;
+        429 rate_limit_exceeded → retry_backoff (Retry-After); 500 internal_error → retry
 Webhook signature: X-NovaPay-Signature (HMAC-SHA256, raw body, hex) → credentials.callback_secret
-Amount: integer, minor units (×100), min 1000 RUB — source: description "в копейках", minimum 100000
-Warnings (3): …   Info (3): …
+Webhook events: payout.completed → approved; payout.failed → rejected; payout.processing → in_progress; payout.cancelled → rejected
+Amount: integer, minor units (×100), min 1000 RUB — source: amount (integer, min 100000) → minor units: 'Сумма в копейках'
+Fields: 8 request fields, 0 unmapped (recipient: sbp, card)
+Warnings (3):
+  WARN         signature_encoding_assumed X-NovaPay-Signature: encoding not stated; hex assumed
+        hint: webhook.signature_encoding: hex|base64  (overrides.yml)
+  WARN         conditional_required       recipient.bank_code: required only for type=sbp (from description)
+        hint: fields.recipient.bank_code.required_if: { field: type, equals: sbp }  applied; verify
+  WARN         conditional_required       recipient.card_number: required only for type=card (from description)
+        hint: fields.recipient.card_number.required_if: { field: type, equals: card }  applied; verify
+Info (3):
+  INFO         outside_contract           POST /payouts/{payout_id}/cancel (cancelPayout) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /balance (getBalance) — generated as `fetch_balance` helper
+  INFO         duplicate_as_success       HTTP 409 returns the success schema (PayoutResponse); treated as success
+        hint: the service reads the payout from the body
+Done: 3 warnings, 0 unsupported. Exit 0.
 ```
 
-Полный эталон — `docs/OUTPUT_FORMAT.md` § 6. **(план)**: после T07 сюда вставляется реальный вывод.
+Формат — `docs/OUTPUT_FORMAT.md` § 6.
 
 ## Как это работает
 
@@ -166,14 +185,15 @@ provider_api.yaml ─▶ Load ─▶ IR ─▶ Analyze ─▶ Plan ─▶ Render
 
 ```yaml
 # overrides.yml — общий механизм, не привязка к провайдеру
-amount_unit: minor                       # minor (копейки) | major (рубли)
+amount:
+  unit: minor                            # minor (копейки) | major (рубли); multiplier, minimum_major
 statuses:
   ON_HOLD: in_progress                   # статус провайдера → статус Space Payments
 fields:
   recipient.bank_code:
     required_if: { field: type, equals: sbp }
-  destination.card.expiry:
-    source: operation.payout_requisite.dig('card', 'expiry')
+  destination.card.expiry:                 # поле без источника → своё выражение на стороне operation
+    source: "format('%02d/%02d', operation.payout_requisite.dig('card', 'expiry_month'), operation.payout_requisite.dig('card', 'expiry_year') % 100)"
 webhook:
   signature_encoding: hex                # hex | base64
   signature_payload: raw_body            # raw_body | fields
@@ -195,12 +215,12 @@ paths:
 | `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
 | `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 1 WARN |
 
-Все три покрыты golden-тестами байт-в-байт (`spec/golden/`). **(план)** T13–T14.
+Все три покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без).
 
 Реальные спецификации (Stripe, Adyen Payout и Transfers, PayPal Payouts, Paystack, Square, Plaid):
 `bundle exec rake real` скачивает их и прогоняет `analyze`; отчёты — `examples/real/reports/`.
 Ожидания и найденные ограничения — `docs/REAL_SPECS.md`. **WARN на чужой спеке — это честность
-инструмента, а не сбой.** **(план)** T18.
+инструмента, а не сбой.**
 
 ## Проверено на реальных спецификациях
 
