@@ -74,7 +74,9 @@ module Forge
 
       def length_expr(validation)
         expr = validation[:expr]
-        expr.end_with?('.to_s') ? "#{expr}.length" : "#{expr}.to_s.length"
+        return "#{expr}.length" if expr.end_with?('.to_s')
+
+        expr.match?(/\A[\w.]+\z/) ? "#{expr}.to_s.length" : "(#{expr}).to_s.length"
       end
 
       def pattern_check(validation)

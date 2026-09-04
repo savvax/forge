@@ -50,7 +50,7 @@ RSpec.describe Forge::Renderers::Service do
       expect(Forge::Verifier.syntax!([write(plan_for_hash(minimal_spec), 'minimal_service.rb')])).to be_truthy
       expect(code).to include("failure(:not_implemented, 'callbacks_not_supported')",
                               "failure(:not_implemented, 'status_endpoint_missing')",
-                              "'Authorization' => \"Bearer #{credentials.fetch('token')}\"",
+                              %q('Authorization' => "Bearer #{credentials.fetch('token')}"),
                               "format('%.2f', operation.amount)")
       expect(code).not_to include('cancel_request', 'fetch_balance', 'EVENT_MAP', 'to_minor_units', 'build_recipient')
     end

@@ -101,7 +101,7 @@ module Provider
       HTTP_STATUS_SYMBOLS.fetch(status) { :"http_#{status}" }
     end
 
-    # Ищет заголовок без учёта регистра, включая Rack-форму HTTP_X_NOVAPAY_SIGNATURE.
+    # Ищет заголовок без учёта регистра, включая Rack-форму HTTP_X_PROVIDER_SIGNATURE.
     def header_value(headers, name)
       wanted = [name.downcase, "http_#{name.tr('-', '_')}".downcase]
       headers.each { |key, value| return value if wanted.include?(key.to_s.downcase) }

@@ -22,6 +22,8 @@ module Forge
     RSPEC_HINT = 'run it directly to see the full output; --no-verify skips this step'
 
     # --options /dev/null: не читать .rspec проекта (spec_helper + SimpleCov относятся к forge, не к выводу).
+    def spec!(spec_path, load_paths: []) = rspec!(spec_path, load_paths: load_paths)
+
     def rspec!(spec_path, load_paths: [])
       args = ['bundle', 'exec', 'rspec', '--options', '/dev/null', *load_paths.flat_map { |p| ['-I', p] }, spec_path]
       out, status = Open3.capture2e(*args)

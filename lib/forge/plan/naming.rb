@@ -17,7 +17,7 @@ module Forge
 
       def from_title(title)
         words = title.to_s.split(/[\s\-_]+/).reject { |w| STOP_WORDS.any? { |s| w.downcase.match?(/\A#{s}\z/) } }
-        from_provider(words.empty? ? 'provider' : words.join(' ')).merge(title: title)
+        from_provider(words.empty? ? 'provider' : words.join(' '))
       end
 
       def camelize(name) = name.split('_').map(&:capitalize).join

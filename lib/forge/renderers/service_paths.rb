@@ -12,8 +12,10 @@ module Forge
 
       def op(role) = @plan.operations[role]
 
+      ID_EXPR = '#{operation.provider_operation_id}' # rubocop:disable Lint/InterpolationCheck
+
       def url(role)
-        path = op(role).path.gsub(/\{\w+\}/, operation.provider_operation_id.to_s)
+        path = op(role).path.gsub(/\{\w+\}/, ID_EXPR)
         "\"\#{BASE_URL}#{path}\""
       end
 

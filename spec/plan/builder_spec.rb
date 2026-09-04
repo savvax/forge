@@ -14,7 +14,7 @@ RSpec.describe Forge::Plan::Builder do
 
     it 'names the provider and base url' do
       expect(plan.provider).to eq(name: 'novapay', class_name: 'NovapayService', env_prefix: 'NOVAPAY',
-                                  file_name: 'novapay_service.rb', title: 'NovaPay Payout API')
+                                  file_name: 'novapay_service.rb', title: 'NovaPay')
       expect(plan.base_url).to eq(default: 'https://api.sandbox.novapay.example/v1',
                                   production: 'https://api.novapay.example/v1', env_var: 'NOVAPAY_BASE_URL')
     end
