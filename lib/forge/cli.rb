@@ -2,6 +2,7 @@
 
 require 'thor'
 require_relative '../forge'
+require_relative 'generate_command'
 
 module Forge
   # Thor-команды. Ошибки Forge::Error печатаются без стектрейса (кроме --debug) с кодом выхода класса.
@@ -17,32 +18,38 @@ module Forge
     option :format, default: 'text', enum: %w[text json]
     def analyze
       guarded do
-        spec, findings = analyze_spec(options)
+        spec, findings = GenerateCommand.analyze(options)
         puts options[:format] == 'json' ? Report.json(spec, findings) : Report.text(spec, findings)
       end
     end
 
-    desc 'generate', 'Сгенерировать интеграцию провайдера'
+    desc 'generate', 'Сгенерировать интеграцию провайдера (docs/OUTPUT_FORMAT.md)'
     option :spec, required: true
-    option :provider
-    option :out, default: 'output'
-    def generate = not_implemented
+    option :provider, desc: 'имя провайдера (иначе из info.title)'
+    option :out, default: 'output', desc: 'каталог вывода'
+    option :overrides
+    option :include_paths, type: :array, default: []
+    option :templates_dir, desc: 'каталог с переопределёнными шаблонами *.erb'
+    option :lang, default: 'ruby', enum: %w[ruby]
+    option :format, default: 'text', enum: %w[text json]
+    option :strict, type: :boolean, default: false, desc: 'exit 4, если есть WARN/UNSUPPORTED'
+    option :verify, type: :boolean, default: true, desc: '--no-verify пропускает rspec сгенерированного spec'
+    option :force, type: :boolean, default: false, desc: 'перезаписать непустой каталог'
+    def generate
+      guarded { exit GenerateCommand.new(options).run }
+    end
 
     desc 'mock', 'Поднять мок-сервер провайдера из спеки'
     option :spec, required: true
-    def mock = not_implemented
+    def mock
+      warn 'error: not implemented'
+      exit GenerationError.exit_code
+    end
 
     desc 'version', 'Версия forge'
     def version = puts("forge #{Forge::VERSION}")
 
     private
-
-    def analyze_spec(opts)
-      hash = Loader.load(opts[:spec])
-      spec = IR::Builder.build(hash, source_path: opts[:spec])
-      overrides = opts[:overrides] && Plan::Overrides.load(opts[:overrides])
-      [spec, Analyzers::Runner.run(spec, rules: Rules.load, include_paths: opts[:include_paths], overrides: overrides)]
-    end
 
     def guarded
       yield
@@ -51,11 +58,6 @@ module Forge
 
       warn "error: #{e.message}"
       exit e.class.exit_code
-    end
-
-    def not_implemented
-      warn 'error: not implemented'
-      exit GenerationError.exit_code
     end
   end
 end

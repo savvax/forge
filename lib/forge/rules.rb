@@ -5,7 +5,9 @@ require 'yaml'
 module Forge
   # Словари rules/*.yml: загружаются один раз, замораживаются. Нормализация слов (docs/RULES.md § 0).
   class Rules
-    def self.load(dir = 'rules')
+    DEFAULT_DIR = File.expand_path('../../rules', __dir__)
+
+    def self.load(dir = DEFAULT_DIR)
       unless File.directory?(dir)
         raise GenerationError.new("rules directory not found: #{dir}", hint: 'run from the project root')
       end

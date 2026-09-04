@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Обёртка с флагами из ТЗ: --spec FILE --provider NAME [--lang ruby] → bin/forge generate --out ./output
+# Обёртка с флагами из ТЗ: --spec FILE --provider NAME [--lang ruby] → bin/forge generate --out ./output/<provider>
 require 'optparse'
 
 opts = { lang: 'ruby' }
@@ -19,4 +19,5 @@ end
 abort 'error: --spec and --provider are required' unless opts[:spec] && opts[:provider]
 
 forge = File.expand_path('forge', __dir__)
-exec(forge, 'generate', '--spec', opts[:spec], '--provider', opts[:provider], '--out', './output')
+out = File.join('./output', opts[:provider].downcase.gsub(/[^a-z0-9]+/, '_'))
+exec(forge, 'generate', '--spec', opts[:spec], '--provider', opts[:provider], '--out', out, '--force')

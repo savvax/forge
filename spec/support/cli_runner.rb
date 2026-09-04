@@ -9,13 +9,13 @@ module CliHelper
     def output = stdout + stderr
   end
 
-  def run_cli(*, env: {})
-    stdout, stderr, status = Open3.capture3(env, 'bin/forge', *)
+  def run_cli(*, env: {}, chdir: Dir.pwd)
+    stdout, stderr, status = Open3.capture3(env, File.expand_path('bin/forge'), *, chdir: chdir)
     CliResult.new(stdout, stderr, status)
   end
 
-  def run_integrate(*)
-    stdout, stderr, status = Open3.capture3('bin/integrate', *)
+  def run_integrate(*, chdir: Dir.pwd)
+    stdout, stderr, status = Open3.capture3(File.expand_path('bin/integrate'), *, chdir: chdir)
     CliResult.new(stdout, stderr, status)
   end
 end

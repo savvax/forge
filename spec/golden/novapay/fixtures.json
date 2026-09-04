@@ -1,0 +1,160 @@
+{
+  "meta": {
+    "provider": "novapay",
+    "spec": "NovaPay Payout API 1.0.0",
+    "forge": "1.0.0"
+  },
+  "auth": {
+    "headers": {
+      "X-API-Key": "<credentials.api_key>"
+    }
+  },
+  "create_request": {
+    "endpoint": "POST /payouts",
+    "request": {
+      "amount": 1500000,
+      "currency": "RUB",
+      "external_id": "op_abc123",
+      "recipient": {
+        "type": "sbp",
+        "phone": "79001234567",
+        "bank_code": "044525225",
+        "bank_name": "Сбербанк"
+      }
+    },
+    "operation": {
+      "id": "op_abc123",
+      "amount": "15000.00",
+      "currency": "RUB",
+      "payout_requisite": {
+        "sbp": {
+          "phone": "79001234567",
+          "bank_code": "044525225",
+          "bank_name": "Сбербанк"
+        }
+      }
+    },
+    "response_201": {
+      "id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "pending",
+      "amount": 1500000,
+      "currency": "RUB",
+      "created_at": "2026-07-30T10:00:00Z"
+    },
+    "response_401": {
+      "error": {
+        "code": "unauthorized",
+        "message": "Invalid API key"
+      }
+    },
+    "response_402": {
+      "error": {
+        "code": "insufficient_balance",
+        "message": "Insufficient provider balance"
+      }
+    },
+    "response_422": {
+      "error": {
+        "code": "validation_error",
+        "message": "Amount must be at least 100000 kopecks",
+        "details": [
+          {
+            "field": "amount",
+            "message": "minimum is 100000"
+          }
+        ]
+      }
+    },
+    "response_429": {
+      "headers": {
+        "Retry-After": 60
+      },
+      "body": {
+        "error": {
+          "code": "rate_limit_exceeded",
+          "message": "Rate limit exceeded, retry after 60 seconds"
+        }
+      }
+    },
+    "expected_operation_status": "in_progress"
+  },
+  "fetch_status": {
+    "endpoint": "GET /payouts/{payout_id}",
+    "response_401": {
+      "error": {
+        "code": "unauthorized",
+        "message": "Invalid API key"
+      }
+    },
+    "response_404": {
+      "error": {
+        "code": "not_found",
+        "message": "Payout not found"
+      }
+    },
+    "response_200": {
+      "id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "completed",
+      "amount": 1500000,
+      "currency": "RUB",
+      "created_at": "2026-07-30T10:00:00Z"
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback": {
+    "headers": {
+      "X-NovaPay-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+    },
+    "payload": {
+      "event": "payout.completed",
+      "payout_id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "completed",
+      "completed_at": "2026-07-30T10:05:00Z"
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback_failed": {
+    "headers": {
+      "X-NovaPay-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+    },
+    "payload": {
+      "event": "payout.failed",
+      "payout_id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "failed",
+      "error": {
+        "code": "recipient_not_found",
+        "message": "Recipient account not found"
+      }
+    },
+    "expected_operation_status": "rejected"
+  },
+  "cancel": {
+    "endpoint": "POST /payouts/{payout_id}/cancel",
+    "response_409": {
+      "error": {
+        "code": "invalid_status",
+        "message": "Cannot cancel payout in status completed"
+      }
+    },
+    "response_200": {
+      "id": "np_7f3a9b2c",
+      "external_id": "op_abc123",
+      "status": "pending",
+      "amount": 1500000,
+      "currency": "RUB",
+      "created_at": "2026-07-30T10:00:00Z"
+    }
+  },
+  "balance": {
+    "endpoint": "GET /balance",
+    "response_200": {
+      "balance": 500000000,
+      "currency": "RUB",
+      "hold": 15000000
+    }
+  }
+}

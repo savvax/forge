@@ -77,6 +77,8 @@ module Forge
         end
       end
 
+      def cell(text) = text.to_s.gsub('|', '\\|')
+
       def requirement(mapping)
         return "если #{mapping.required_if[:field]}=#{mapping.required_if[:equals]}" if mapping.required_if
 
@@ -86,7 +88,7 @@ module Forge
       def assumption_rows
         plan.warnings.reject { |w| w.level == :info }.map do |w|
           source = "#{w.code}#{" at `#{w.pointer}`" if w.pointer}"
-          "| #{w.message} | #{source} | #{w.level.to_s.upcase} | #{w.hint ? "`#{w.hint}`" : '—'} |"
+          "| #{cell(w.message)} | #{cell(source)} | #{w.level.to_s.upcase} | #{w.hint ? "`#{cell(w.hint)}`" : '—'} |"
         end
       end
     end
