@@ -7,6 +7,7 @@ require_relative 'forge/loader'
   require_relative "forge/ir/#{f}"
 end
 require_relative 'forge/rules'
+require_relative 'forge/plan/overrides'
 require_relative 'forge/analyzers/runner'
 require_relative 'forge/report'
 require_relative 'forge/plan/builder'

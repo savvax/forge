@@ -21,6 +21,14 @@ module Forge
                                   source: "#{endpoint.method.upcase} #{endpoint.path} (#{endpoint.source})")
       end
 
+      # 'payout.completed' → 'completed', 'transfer.on_hold' → 'on_hold' (срезаем префиксы-слова выплат).
+      def self.event_status(event, rules)
+        tokens = Rules.normalize(event).split('_')
+        prefixes = rules.fetch(:endpoint_roles)['payout_words'] + %w[event]
+        tokens.shift while tokens.size > 1 && prefixes.include?(tokens.first)
+        tokens.join('_')
+      end
+
       private
 
       def dict = rules.fetch(:webhook_signature)
@@ -106,13 +114,7 @@ module Forge
         %w[in_progress approved rejected].find { |k| status_dict[k].include?(key) }
       end
 
-      # 'payout.completed' → 'completed', 'transfer.on_hold' → 'on_hold' (срезаем префиксы-слова выплат).
-      def event_status(event)
-        tokens = Rules.normalize(event).split('_')
-        prefixes = rules.fetch(:endpoint_roles)['payout_words'] + %w[event]
-        tokens.shift while tokens.size > 1 && prefixes.include?(tokens.first)
-        tokens.join('_')
-      end
+      def event_status(event) = self.class.event_status(event, rules)
 
       def unmapped_event(event)
         warn(:unmapped_event, "webhook event '#{event}' → status '#{event_status(event)}' unknown",

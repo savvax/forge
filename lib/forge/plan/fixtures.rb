@@ -6,6 +6,7 @@ module Forge
   module Plan
     # fixtures.json из examples спеки (docs/OUTPUT_FORMAT.md § 4). Недостающее досинтезирует T11.
     class Fixtures
+      REQUISITE_EXPR = /payout_requisite\.dig\((.+?), '(.+?)'\)/
       CALLBACK_KEYS = { 'approved' => 'callback', 'rejected' => 'callback_failed',
                         'in_progress' => 'callback_processing' }.freeze
 
@@ -99,15 +100,15 @@ module Forge
         case mapping.source_expr
         when 'operation.id.to_s' then operation['id'] = value.to_s
         when 'operation.currency' then operation['currency'] = value.to_s
-        when /payout_requisite\.dig\((.+?), '(.+?)'\)/ then assign_requisite(operation, type, value)
+        when REQUISITE_EXPR then assign_requisite(operation, type, value, ::Regexp.last_match)
         else operation['amount'] = major_amount(value) if mapping.transform == 'amount'
         end
       end
 
-      def assign_requisite(operation, type, value)
-        key = ::Regexp.last_match(1).delete("'")
+      def assign_requisite(operation, type, value, match)
+        key = match[1].delete("'")
         key = type if key == 'requisite_type'
-        (operation['payout_requisite'][key] ||= {})[::Regexp.last_match(2)] = value if key
+        (operation['payout_requisite'][key] ||= {})[match[2]] = value if key
       end
 
       def major_amount(value)

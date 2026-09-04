@@ -12,7 +12,7 @@ module Forge
 
     desc 'analyze', 'Разобрать OpenAPI-спеку и напечатать отчёт'
     option :spec, required: true, desc: 'OpenAPI 3.x файл (YAML/JSON)'
-    option :overrides, desc: 'overrides.yml (применяется в generate; здесь пока только проверяется наличие)'
+    option :overrides, desc: 'overrides.yml — переопределения решений анализа (docs/RULES.md § 9)'
     option :include_paths, type: :array, default: [], desc: 'glob по path, ограничивает анализ'
     option :format, default: 'text', enum: %w[text json]
     def analyze
@@ -40,7 +40,8 @@ module Forge
     def analyze_spec(opts)
       hash = Loader.load(opts[:spec])
       spec = IR::Builder.build(hash, source_path: opts[:spec])
-      [spec, Analyzers::Runner.run(spec, rules: Rules.load, include_paths: opts[:include_paths])]
+      overrides = opts[:overrides] && Plan::Overrides.load(opts[:overrides])
+      [spec, Analyzers::Runner.run(spec, rules: Rules.load, include_paths: opts[:include_paths], overrides: overrides)]
     end
 
     def guarded

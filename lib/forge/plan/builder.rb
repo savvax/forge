@@ -46,9 +46,9 @@ module Forge
       end
 
       def base_parts
-        provider = @provider_name ? Naming.from_provider(@provider_name) : Naming.from_title(@spec.title)
-        { provider: provider, base_url: base_url(provider), auth: value(:auth), amount: value(:amount),
-          fields: value(:fields), requisite_types: value(:fields)[:requisite_types],
+        provider = provider_naming
+        { provider: provider, base_url: base_url(provider).merge(override('base_url')), auth: value(:auth),
+          amount: value(:amount), fields: value(:fields), requisite_types: value(:fields)[:requisite_types],
           validations: Validations.build(value(:fields), value(:amount)), gateway_config: gateway_config,
           outside_contract: outside_contract, warnings: @f.values.flat_map(&:warnings), meta: meta }
           .merge(status_parts)
@@ -82,6 +82,14 @@ module Forge
       end
 
       def find_server(servers, pattern) = servers.find { |s| pattern.match?("#{s.url} #{s.description}") }
+
+      def override(key) = @overrides.to_h.fetch(key, {}).transform_keys(&:to_sym)
+
+      def provider_naming
+        name = override('provider')[:name] || @provider_name
+        naming = name ? Naming.from_provider(name) : Naming.from_title(@spec.title)
+        naming.merge(override('provider').slice(:class_name))
+      end
 
       def operation(role, endpoint)
         own = rows.select { |r| r[:role] == role }

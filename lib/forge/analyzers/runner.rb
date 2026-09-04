@@ -14,21 +14,24 @@ module Forge
     class Runner
       ORDER = [EndpointRoles, Auth, Statuses, Errors, Webhooks, Amount, Fields].freeze
 
-      def self.run(spec, rules:, include_paths: []) = new(spec, rules, include_paths).run
+      def self.run(spec, rules:, include_paths: [], overrides: nil) = new(spec, rules, include_paths, overrides).run
 
-      def initialize(spec, rules, include_paths)
+      def initialize(spec, rules, include_paths, overrides)
         @spec = spec
         @rules = rules
-        @include_paths = include_paths
+        @overrides = overrides || {}
+        @include_paths = include_paths + Array(@overrides.dig('paths', 'include'))
       end
 
+      # Overrides: endpoints — сразу после ролей (остальные анализаторы зависят от них), прочее — в конце.
       def run
         findings = ORDER.each_with_object({}) do |klass, acc|
           finding = klass.new(@spec, @rules, include_paths: @include_paths, findings: acc).call
+          finding = Plan::OverridesApply.roles(finding, @overrides, @spec) if finding.key == :endpoint_roles
           acc[finding.key] = finding
         end
         findings[:endpoint_roles] = with_spec_warnings(findings[:endpoint_roles])
-        findings
+        Plan::OverridesApply.findings(findings, @overrides, @spec)
       end
 
       private

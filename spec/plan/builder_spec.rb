@@ -30,8 +30,10 @@ RSpec.describe Forge::Plan::Builder do
     end
 
     it 'has 4 validations, status/error maps and amount' do
-      expect(plan.validations.map { |v| v[:error_code] }).to eq(%w[amount_too_low external_id_too_long phone_invalid
-                                                                   currency_not_supported])
+      expect(plan.validations.map do |v|
+        v[:error_code]
+      end).to eq(%w[amount_too_low currency_not_supported external_id_too_long
+                    phone_invalid])
       expect(plan.amount[:minimum_major]).to eq(1000)
       expect(plan.status_map).to include('completed' => 'approved')
       expect(plan.error_map.keys).to eq([400, 401, 402, 404, 422, 429, 500])
