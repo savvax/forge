@@ -20,12 +20,14 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
-Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
 Output:
   ./swiftpay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./swiftpay_service_spec.rb
+  ./mock_server.rb
   ./report.txt
 Warnings (1):
   WARN         one_of_first_variant       beneficiary: 2 variants (IbanBeneficiary, AccountBeneficiary); first (IbanBeneficiary) is used
@@ -44,4 +46,4 @@ Info (6):
   INFO         override_applied           statuses.PENDING_APPROVAL → in_progress
   INFO         override_applied           statuses.RETURNED → rejected
   INFO         override_applied           fields.beneficiary.address → source
-Done: 5 files, 1 warnings, 3 unsupported. Exit 0.
+Done: 6 files, 1 warnings, 3 unsupported. Exit 0.

@@ -17,12 +17,14 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
-Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
 Output:
   ./cardpay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./cardpay_service_spec.rb
+  ./mock_server.rb
   ./report.txt
 Info (8):
   INFO         webhook_source_callbacks   webhook taken from callbacks: POST {$request.body#/callback_url}
@@ -34,4 +36,4 @@ Info (8):
   INFO         override_applied           base_url → default, production
   INFO         credential_field           merchant_id → credentials.merchant_id
         hint: fill it in credentials
-Done: 5 files, 0 warnings, 0 unsupported. Exit 0.
+Done: 6 files, 0 warnings, 0 unsupported. Exit 0.

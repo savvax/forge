@@ -12,15 +12,21 @@ RSpec.describe Forge::GenerateCommand do
   before { FileUtils.rm_rf(out) }
 
   it 'runs the pipeline, writes report.txt with local paths and returns 0' do
-    expect { expect(described_class.new(base).run).to eq(0) }.to output(/Done: 5 files, 3 warnings/).to_stdout
+    expect { expect(described_class.new(base).run).to eq(0) }.to output(/Done: 6 files, 3 warnings/).to_stdout
     report = File.read("#{out}/report.txt")
-    expect(report).to include('  ./novapay_service.rb', 'Verifying generated code... ok (ruby -c ×2, rspec skipped')
+    expect(report).to include('  ./novapay_service.rb', 'Verifying generated code... ok (ruby -c ×3, rspec skipped')
     expect(report).not_to include(out)
   end
 
   it 'returns 4 with strict and prints json when asked' do
     expect { expect(described_class.new(base.merge(strict: true, format: 'json')).run).to eq(4) }
       .to output(/"exit_code": 4/).to_stdout
+  end
+
+  it 'renders the mock files for bin/forge mock' do
+    plan, dir = described_class.new(base.merge(out: 'tmp/mock_cmd')).render_mock
+    expect(plan.provider[:name]).to eq('novapay')
+    expect(File).to exist("#{dir}/mock_server.rb")
   end
 
   it 'applies overrides and provider name' do

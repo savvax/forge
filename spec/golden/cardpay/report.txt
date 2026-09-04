@@ -17,12 +17,14 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
-Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
 Output:
   ./cardpay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./cardpay_service_spec.rb
+  ./mock_server.rb
   ./report.txt
 Warnings (5):
   WARN         production_default         no sandbox server; default BASE_URL is production (https://api.cardpay.example/v2)
@@ -41,4 +43,4 @@ Info (4):
   INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
   INFO         credential_field           merchant_id → credentials.merchant_id
         hint: fill it in credentials
-Done: 5 files, 5 warnings, 0 unsupported. Exit 0.
+Done: 6 files, 5 warnings, 0 unsupported. Exit 0.

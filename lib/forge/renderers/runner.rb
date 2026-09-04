@@ -5,6 +5,7 @@ require_relative 'service'
 require_relative 'service_spec'
 require_relative 'fixtures'
 require_relative 'integration_doc'
+require_relative 'mock_server'
 
 module Forge
   module Renderers
@@ -18,7 +19,7 @@ module Forge
         new(plan, out_dir, templates_dir, force).render
       end
 
-      def self.steps = STEPS + (defined?(MockServer) ? [['mock server', MockServer]] : [])
+      def self.steps = STEPS + [['mock server', MockServer]]
 
       def initialize(plan, out_dir, templates_dir, force)
         @plan = plan

@@ -55,6 +55,7 @@ RSpec/DescribeClass:
     - 'spec/cli_spec.rb'
     - 'spec/determinism_spec.rb'
     - 'spec/real_specs_spec.rb'
+    - 'spec/e2e_spec.rb'
     - 'spec/rules/**/*'
 
 Metrics/ParameterLists:

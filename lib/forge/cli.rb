@@ -39,11 +39,14 @@ module Forge
       guarded { exit GenerateCommand.new(options).run }
     end
 
-    desc 'mock', 'Поднять мок-сервер провайдера из спеки'
+    desc 'mock', 'Поднять мок-сервер провайдера из спеки (Sinatra, docs/OUTPUT_FORMAT.md § 5)'
     option :spec, required: true
+    option :port, type: :numeric, default: 4567
+    option :webhook_url, desc: 'куда мок шлёт webhook при POST /_simulate/:id/:event'
+    option :overrides
+    option :out, default: 'tmp/mock', desc: 'куда рендерить файлы мока'
     def mock
-      warn 'error: not implemented'
-      exit GenerationError.exit_code
+      guarded { GenerateCommand.new(options.merge(include_paths: [], force: true, verify: false)).mock! }
     end
 
     desc 'version', 'Версия forge'

@@ -20,12 +20,14 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
-Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
 Output:
   ./swiftpay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./swiftpay_service_spec.rb
+  ./mock_server.rb
   ./report.txt
 Warnings (4):
   WARN         unmapped_status            status 'PENDING_APPROVAL' (pending_approval) of status is unknown
@@ -47,4 +49,4 @@ Info (3):
   INFO         webhook_source_webhooks    webhook taken from webhooks: POST paymentStatusChanged (paymentStatusChanged)
   INFO         outside_contract           DELETE /v1/payments/outbound/{payment_id} (cancelOutboundPayment) — generated as `cancel_request` helper
   INFO         outside_contract           GET /v1/accounts/balance (getAccountBalance) — generated as `fetch_balance` helper
-Done: 5 files, 4 warnings, 3 unsupported. Exit 0.
+Done: 6 files, 4 warnings, 3 unsupported. Exit 0.

@@ -13,12 +13,6 @@ RSpec.describe 'CLI' do
       expect(res.stdout).to include('analyze', 'generate', 'mock', 'version')
       expect(res.exit_code).to eq(0)
     end
-
-    it 'mock is not implemented yet (exit 2)' do
-      res = run_cli('mock', '--spec', 'x.yaml')
-      expect(res.stderr).to include('not implemented')
-      expect(res.exit_code).to eq(2)
-    end
   end
 
   describe 'bin/forge analyze' do
@@ -107,9 +101,9 @@ RSpec.describe 'CLI' do
       expect(res.exit_code).to eq(0)
       expect(res.stdout).to include('Generating service...', 'Generating integration guide...',
                                     'Generating test fixtures...', 'Output:', "  ./#{out}/novapay_service.rb",
-                                    'Done: 5 files, 3 warnings, 0 unsupported.')
-      expect(Dir.children(out).sort).to eq(%w[INTEGRATION.md fixtures.json generated_spec_helper.rb novapay_service.rb
-                                              novapay_service_spec.rb report.txt])
+                                    'Done: 6 files, 3 warnings, 0 unsupported.')
+      expect(Dir.children(out).sort).to eq(%w[INTEGRATION.md fixtures.json generated_spec_helper.rb mock_server.rb
+                                              novapay_service.rb novapay_service_spec.rb report.txt])
       again = generate
       expect(again.exit_code).to eq(2)
       expect(again.stderr).to include('not empty', 'hint: pass --force')
@@ -133,7 +127,7 @@ RSpec.describe 'CLI' do
     it 'runs the generated spec unless --no-verify' do
       res = run_cli('generate', '--spec', 'examples/specs/novapay.yaml', '--out', out, '--force')
       expect(res.exit_code).to eq(0)
-      expect(res.stdout).to match(/Verifying generated code\.\.\. ok \(ruby -c ×2, rspec \d+ examples, 0 failures/)
+      expect(res.stdout).to match(/Verifying generated code\.\.\. ok \(ruby -c ×3, rspec \d+ examples, 0 failures/)
     end
 
     it 'fails with exit 2 when there is no create endpoint' do

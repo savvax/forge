@@ -1,0 +1,161 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# e2e: мок провайдера + сгенерированный сервис + webhook → операция approved (docs/TESTING.md § 8).
+# usage: bin/e2e SPEC [--overrides FILE]   (exit 0 = operation approved ✓)
+require 'json'
+require 'net/http'
+require 'optparse'
+require 'socket'
+require 'timeout'
+require_relative '../lib/forge'
+require_relative '../lib/forge/generate_command'
+require_relative '../lib/provider'
+
+# Сценарий: generate → mock → check_conditions → create_request → fetch_status → simulate → process_callback.
+class E2E
+  CREDENTIALS = { 'api_key' => 'test-key', 'token' => 'test-key', 'login' => 'user', 'password' => 'test-key',
+                  'callback_secret' => 'secret' }.freeze
+
+  # Крошечный HTTP-приёмник webhook на TCPServer: один запрос за раз, кладёт его в очередь.
+  class WebhookReceiver
+    attr_reader :port, :queue
+
+    def initialize
+      @server = TCPServer.new('127.0.0.1', 0)
+      @port = @server.addr[1]
+      @queue = Queue.new
+      Thread.new { loop { handle(@server.accept) } }
+    end
+
+    def wait(seconds) = Timeout.timeout(seconds) { @queue.pop }
+
+    private
+
+    def handle(client)
+      line = client.gets
+      headers = {}
+      while (header = client.gets) && header != "\r\n"
+        key, value = header.split(':', 2)
+        headers[key.strip] = value.strip
+      end
+      body = client.read(headers['Content-Length'].to_i)
+      client.write("HTTP/1.1 200 OK\r\nContent-Length: 2\r\nConnection: close\r\n\r\nok")
+      client.close
+      @queue << { line: line, headers: headers, body: body }
+    end
+  end
+
+  def initialize(spec_file, overrides)
+    @spec_file = spec_file
+    @overrides = overrides
+    @out = File.join('tmp/e2e', File.basename(spec_file, '.*'))
+  end
+
+  def run
+    generate
+    start_mock
+    build_service
+    contract_calls
+    simulate_and_callback
+    puts "operation approved ✓ (#{@plan.provider[:name]})"
+  end
+
+  private
+
+  def step(name) = puts("• #{name}")
+  def fail!(message) = abort("✗ #{message}")
+
+  def generate
+    spec, findings, overrides = Forge::GenerateCommand.analyze({ spec: @spec_file, overrides: @overrides,
+                                                                 include_paths: [] })
+    @plan = Forge::Plan::Builder.build(spec, findings, overrides: overrides)
+    Forge::Renderers::Runner.render(@plan, out_dir: @out, force: true)
+    step "generated #{@plan.provider[:name]} into #{@out}"
+  end
+
+  def start_mock
+    @receiver = WebhookReceiver.new
+    @mock_port = TCPServer.open('127.0.0.1', 0) { |s| s.addr[1] }
+    env = { 'PORT' => @mock_port.to_s, 'WEBHOOK_URL' => "http://127.0.0.1:#{@receiver.port}/webhook",
+            'MOCK_API_KEY' => 'test-key', 'MOCK_CALLBACK_SECRET' => 'secret' }
+    pid = spawn(env, RbConfig.ruby, File.join(@out, 'mock_server.rb'), out: File::NULL,
+                                                                       err: File.join(@out, 'mock.log'))
+    at_exit { Process.kill('TERM', pid) }
+    wait_for_mock
+    step "mock up on :#{@mock_port}, webhook receiver on :#{@receiver.port}"
+  end
+
+  def wait_for_mock
+    Timeout.timeout(15) do
+      Net::HTTP.get(URI("http://127.0.0.1:#{@mock_port}/_state"))
+    rescue StandardError
+      sleep 0.2
+      retry
+    end
+  end
+
+  def build_service
+    load File.expand_path(File.join(@out, @plan.provider[:file_name]))
+    klass = Provider.const_get(@plan.provider[:class_name])
+    klass.send(:remove_const, :BASE_URL)
+    klass.const_set(:BASE_URL, "http://127.0.0.1:#{@mock_port}")
+    fixtures = JSON.parse(File.read(File.join(@out, 'fixtures.json')))
+    @operations = Provider::MemoryOperations.new
+    @service = klass.new(provider: record_from(fixtures), operations: @operations)
+    @operation = operation_from(fixtures.dig('create_request', 'operation'))
+    @operations.save(@operation)
+  end
+
+  def record_from(fixtures)
+    credentials = CREDENTIALS.merge(fixtures.dig('create_request', 'credentials') || {})
+    Provider::Record.new(name: @plan.provider[:name], credentials: credentials,
+                         config: { 'callback_url' => "http://127.0.0.1:#{@receiver.port}/webhook" })
+  end
+
+  def operation_from(fixture)
+    Provider::Operation.new(id: fixture['id'], amount: fixture['amount'].to_s.to_d, currency: fixture['currency'],
+                            payout_requisite: fixture['payout_requisite'], description: fixture['description'])
+  end
+
+  def contract_calls
+    type = @operation.payout_requisite.keys.first
+    check('check_conditions', @service.check_conditions(@operation, type))
+    check('create_request', @service.create_request(@operation, type))
+    step "create_request ok → provider id #{@operation.provider_operation_id}, status #{@operation.status}"
+    check('fetch_status', @service.fetch_status(@operation))
+    step "fetch_status ok → #{@operation.status} (#{@operation.provider_status})"
+  end
+
+  def check(name, result)
+    fail!("#{name}: #{result.code} #{result.data}") if result.failed?
+    step "#{name} ok" if name == 'check_conditions'
+  end
+
+  def simulate_and_callback
+    simulate(@plan.event_map.key('approved') || @plan.status_map.key('approved') || fail!('no approved event'))
+    hook = wait_hook
+    step "webhook received: #{hook[:line].strip}"
+    payload = JSON.parse(hook[:body])
+    check('process_callback', @service.process_callback(payload, raw_body: hook[:body], headers: hook[:headers]))
+    final = @operations.find(@operation.id).status
+    fail!("operation status is #{final}, expected approved") unless final == 'approved'
+  end
+
+  def simulate(event)
+    url = URI("http://127.0.0.1:#{@mock_port}/_simulate/#{@operation.provider_operation_id}/#{event}")
+    res = Net::HTTP.post(url, '')
+    fail!("simulate: HTTP #{res.code} #{res.body}") unless res.code == '200'
+  end
+
+  def wait_hook
+    @receiver.wait(5)
+  rescue Timeout::Error
+    fail!('webhook not received in 5s')
+  end
+end
+
+opts = {}
+OptionParser.new { |o| o.on('--overrides FILE') { |v| opts[:overrides] = v } }.parse!
+spec_file = ARGV.first || abort('usage: bin/e2e SPEC [--overrides FILE]')
+E2E.new(spec_file, opts[:overrides]).run

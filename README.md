@@ -11,7 +11,9 @@
 > Статус: строки с пометкой **(план)** — ещё не реализовано; пометки снимаются по мере
 > закрытия этапов (`docs/PLAN.md`). К CP3 пометок быть не должно.
 
-> Статус: **M3 (спеки) закрыт** — golden для NovaPay, CardPay и SwiftPay (с overrides и без), `generate --overrides … --strict` для CardPay даёт exit 0. Далее — реальные спеки (T18), мок и e2e (T15).
+> Статус: **M4 Proof закрыт** — `bin/e2e examples/specs/novapay.yaml` поднимает сгенерированный мок, создаёт выплату, получает подписанный webhook и печатает `operation approved ✓`; то же для CardPay. Реальные спеки (7 API) — exit 0, отчёты в `examples/real/reports/`.
+>
+> Ранее: **M3 (спеки) закрыт** — golden для NovaPay, CardPay и SwiftPay (с overrides и без), `generate --overrides … --strict` для CardPay даёт exit 0. Далее — реальные спеки (T18), мок и e2e (T15).
 >
 > Ранее: **M2 Generate закрыт** — `bin/forge generate` для NovaPay даёт сервис, spec (13 примеров, зелёный), `INTEGRATION.md`, `fixtures.json`, `report.txt`; golden и determinism зелёные. Дальше — M3 Universal (CardPay/SwiftPay golden, реальные спеки).
 

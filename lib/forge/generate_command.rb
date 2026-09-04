@@ -32,6 +32,29 @@ module Forge
       exit_code(findings)
     end
 
+    # bin/forge mock: рендерит файлы в --out/<provider>/ и запускает мок в текущем процессе.
+    def mock!
+      plan, dir = render_mock
+      ENV['PORT'] = @opts[:port].to_s
+      ENV['WEBHOOK_URL'] = @opts[:webhook_url] if @opts[:webhook_url]
+      puts "mock #{plan.provider[:name]} on http://127.0.0.1:#{@opts[:port]} (files: #{dir})"
+      load File.expand_path(File.join(dir, 'mock_server.rb'))
+      Object.const_get("#{plan.provider[:class_name].delete_suffix('Service')}Mock").run!
+    end
+
+    # → [plan, dir]: файлы мока (и весь вывод) в --out/<provider>/.
+    def render_mock
+      plan = build_plan
+      dir = File.join(@opts[:out], plan.provider[:name])
+      Renderers::Runner.render(plan, out_dir: dir, force: true)
+      [plan, dir]
+    end
+
+    def build_plan
+      spec, findings, overrides = self.class.analyze(@opts)
+      Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
+    end
+
     private
 
     def verify(files, plan)
