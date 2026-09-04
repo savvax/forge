@@ -4,7 +4,7 @@ payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, tra
                disbursement, disbursements, payment, payments, send, remittance, outbound]
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
-                 recipients, otp, export, bulk, search, resend, finalize]
+                 recipients, otp, export, bulk, search, resend, finalize, authorization, authorize]
 negative_penalty: 0.4
 
 words:

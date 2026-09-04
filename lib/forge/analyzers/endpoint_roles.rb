@@ -36,7 +36,8 @@ module Forge
       end
 
       def pick_winner(role, group)
-        winner, *losers = group.sort_by.with_index { |(_endpoint, _role, score), index| [-score, index] }
+        # Равные очки: короче путь (каноничнее ресурс: /transfer/create < /transfer/x/y/create), затем порядок в спеке.
+        winner, *losers = group.sort_by.with_index { |(ep, _role, score), index| [-score, ep.path.count('/'), index] }
         losers.each { |(endpoint, _role, score)| conflict(endpoint, role, winner, score) }
         low_confidence(winner[0], role, winner[2])
         [winner[0], winner[2]]

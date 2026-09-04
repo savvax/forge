@@ -46,7 +46,7 @@ RSpec.describe 'CLI' do
       expect(res.exit_code).to eq(0)
     end
 
-    broken = Dir['spec/fixtures/broken/*'].reject { |f| f.include?('no_create') || f.include?('external_ref') }
+    broken = Dir['spec/fixtures/broken/*'].grep_v(/no_create|external_ref|cyclic|bad_ref/)
     broken.each do |file|
       it "fails cleanly on #{File.basename(file)}" do
         res = run_cli('analyze', '--spec', file)
@@ -55,6 +55,18 @@ RSpec.describe 'CLI' do
         expect(res.stderr).to include('hint:', File.basename(file))
         expect(res.stderr).not_to include('.rb:')
       end
+    end
+
+    it 'exits 1 on a missing ref target inside the create request (D-14)' do
+      res = run_cli('analyze', '--spec', 'spec/fixtures/broken/bad_ref.yaml')
+      expect(res.exit_code).to eq(1)
+      expect(res.stderr).to include("unresolved $ref '#/components/schemas/Missing'", 'bad_ref.yaml', 'hint:')
+    end
+
+    it 'exits 1 on a circular ref inside the create request (analyzer decides, D-14)' do
+      res = run_cli('analyze', '--spec', 'spec/fixtures/broken/cyclic_ref.yaml')
+      expect(res.exit_code).to eq(1)
+      expect(res.stderr).to include('circular $ref: #/components/schemas/A -> #/components/schemas/B', 'hint:')
     end
 
     it 'exits 1 on an external ref inside the create request' do

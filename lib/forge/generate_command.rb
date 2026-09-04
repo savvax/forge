@@ -11,7 +11,7 @@ module Forge
     def self.analyze(opts)
       spec = IR::Builder.build(Loader.load(opts[:spec]), source_path: opts[:spec])
       overrides = opts[:overrides] && Plan::Overrides.load(opts[:overrides])
-      findings = Analyzers::Runner.run(spec, rules: Rules.load, include_paths: opts[:include_paths],
+      findings = Analyzers::Runner.run(spec, rules: Rules.load, include_paths: Array(opts[:include_paths]).flatten,
                                              overrides: overrides)
       [spec, findings, overrides]
     end

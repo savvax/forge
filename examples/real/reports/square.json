@@ -1,0 +1,215 @@
+{
+  "spec": {
+    "openapi": "3.0.0",
+    "title": "Square",
+    "version": "2.0",
+    "source": "examples/real/square.json"
+  },
+  "endpoints": [
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v2/payouts/{payout_id}",
+      "operation_id": "GetPayout",
+      "confidence": 0.9,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "none",
+    "scheme_name": null,
+    "header": null,
+    "prefix": null,
+    "credential_key": null,
+    "credential_keys": [],
+    "location": null
+  },
+  "statuses": {
+    "field_path": [
+      "payout",
+      "status"
+    ],
+    "map": {
+      "SENT": "in_progress",
+      "FAILED": "rejected",
+      "PAID": "approved"
+    },
+    "unmapped": [],
+    "response_id_path": [
+      "payout",
+      "id"
+    ],
+    "response_status_path": [
+      "payout",
+      "status"
+    ],
+    "response_id_confidence": 0.8
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [],
+    "requisite_types": [],
+    "requisite_container": null,
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v2/payouts/{payout_id}/payout-entries (ListPayoutEntries) also looks like status (0.75); GET /v2/payouts/{payout_id} (GetPayout) wins (0.9)",
+      "pointer": "#/paths/~1v2~1payouts~1{payout_id}~1payout-entries/get",
+      "hint": "endpoints.ListPayoutEntries: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v2/payouts (ListPayouts) also looks like status (0.55); GET /v2/payouts/{payout_id} (GetPayout) wins (0.9)",
+      "pointer": "#/paths/~1v2~1payouts/get",
+      "hint": "endpoints.ListPayouts: status"
+    },
+    {
+      "level": "warn",
+      "code": "no_create_endpoint",
+      "message": "no create endpoint found",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: create  (overrides.yml) or --include-paths"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://connect.squareup.com)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/payouts (ListPayouts) — not used",
+      "pointer": "#/paths/~1v2~1payouts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/payouts/{payout_id}/payout-entries (ListPayoutEntries) — not used",
+      "pointer": "#/paths/~1v2~1payouts~1{payout_id}~1payout-entries/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "auth_not_found",
+      "message": "no security requirement on the create endpoint or at the root",
+      "pointer": "#/security",
+      "hint": "auth.type: api_key|bearer|basic (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "GET /v2/payments: external $ref → {} (payments.[].app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payments.[].buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments/get",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "POST /v2/payments: external $ref → {} (payment.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payment.buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments/post",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "GET /v2/payments/{payment_id}: external $ref → {} (payment.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payment.buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments~1{payment_id}/get",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "PUT /v2/payments/{payment_id}: external $ref → {} (payment.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payment.buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments~1{payment_id}/put",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "POST /v2/payments/{payment_id}/cancel: external $ref → {} (payment.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payment.buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments~1{payment_id}~1cancel/post",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "POST /v2/payments/{payment_id}/complete: external $ref → {} (payment.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation, payment.buyer_currency_exchange → #/components/schemas/CurrencyExchange)",
+      "pointer": "#/paths/~1v2~1payments~1{payment_id}~1complete/post",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "GET /v2/refunds: external $ref → {} (refunds.[].app_fee_allocations.[] → #/components/schemas/AppFeeAllocation)",
+      "pointer": "#/paths/~1v2~1refunds/get",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "POST /v2/refunds: external $ref → {} (refund.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation)",
+      "pointer": "#/paths/~1v2~1refunds/post",
+      "hint": "inline the schema if this response matters"
+    },
+    {
+      "level": "unsupported",
+      "code": "external_ref",
+      "message": "GET /v2/refunds/{refund_id}: external $ref → {} (refund.app_fee_allocations.[] → #/components/schemas/AppFeeAllocation)",
+      "pointer": "#/paths/~1v2~1refunds~1{refund_id}/get",
+      "hint": "inline the schema if this response matters"
+    }
+  ],
+  "exit_code": 0
+}

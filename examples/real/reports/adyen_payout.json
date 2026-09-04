@@ -1,0 +1,1322 @@
+{
+  "spec": {
+    "openapi": "3.1.0",
+    "title": "Adyen Payout API",
+    "version": "68",
+    "source": "examples/real/adyen_payout.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/payout",
+      "operation_id": "post-payout",
+      "confidence": 0.95,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "scheme_name": "BasicAuth",
+    "header": "Authorization",
+    "prefix": "Basic",
+    "credential_key": "login",
+    "credential_keys": [
+      "login",
+      "password"
+    ],
+    "location": "header"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 400,
+        "role": "create",
+        "pointer": "#/paths/~1payout/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1payout/post/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1payout/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 422,
+        "role": "create",
+        "pointer": "#/paths/~1payout/post/responses/422",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "create",
+        "pointer": "#/paths/~1payout/post/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      }
+    ],
+    "http": {
+      "400": "validation_error",
+      "401": "invalid_credentials",
+      "403": "forbidden",
+      "422": "validation_error",
+      "500": "internal_error"
+    },
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "value",
+    "path": [
+      "amount",
+      "value"
+    ],
+    "unit": "minor",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": "amount.currency",
+    "type": "integer",
+    "expr": "to_minor_units(operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "currency",
+        "path": [
+          "amount",
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "value",
+        "path": [
+          "amount",
+          "value"
+        ],
+        "source_expr": "to_minor_units(operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "city",
+        "path": [
+          "billingAddress",
+          "city"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "country",
+        "path": [
+          "billingAddress",
+          "country"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "houseNumberOrName",
+        "path": [
+          "billingAddress",
+          "houseNumberOrName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "postalCode",
+        "path": [
+          "billingAddress",
+          "postalCode"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "stateOrProvince",
+        "path": [
+          "billingAddress",
+          "stateOrProvince"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "street",
+        "path": [
+          "billingAddress",
+          "street"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "cvc",
+        "path": [
+          "card",
+          "cvc"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "expiryMonth",
+        "path": [
+          "card",
+          "expiryMonth"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'expiry_month')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "expiryYear",
+        "path": [
+          "card",
+          "expiryYear"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'expiry_year')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "holderName",
+        "path": [
+          "card",
+          "holderName"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'holder')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "issueNumber",
+        "path": [
+          "card",
+          "issueNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "number",
+        "path": [
+          "card",
+          "number"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'number')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "startMonth",
+        "path": [
+          "card",
+          "startMonth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "startYear",
+        "path": [
+          "card",
+          "startYear"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "fraudOffset",
+        "path": [
+          "fraudOffset"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "city",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "city"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "country",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "country"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "houseNumberOrName",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "houseNumberOrName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "postalCode",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "postalCode"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "stateOrProvince",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "stateOrProvince"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "street",
+        "path": [
+          "fundSource",
+          "billingAddress",
+          "street"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "cvc",
+        "path": [
+          "fundSource",
+          "card",
+          "cvc"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "expiryMonth",
+        "path": [
+          "fundSource",
+          "card",
+          "expiryMonth"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'expiry_month')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "expiryYear",
+        "path": [
+          "fundSource",
+          "card",
+          "expiryYear"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'expiry_year')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "holderName",
+        "path": [
+          "fundSource",
+          "card",
+          "holderName"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'holder')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "issueNumber",
+        "path": [
+          "fundSource",
+          "card",
+          "issueNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "number",
+        "path": [
+          "fundSource",
+          "card",
+          "number"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'number')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "startMonth",
+        "path": [
+          "fundSource",
+          "card",
+          "startMonth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "startYear",
+        "path": [
+          "fundSource",
+          "card",
+          "startYear"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "shopperEmail",
+        "path": [
+          "fundSource",
+          "shopperEmail"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "firstName",
+        "path": [
+          "fundSource",
+          "shopperName",
+          "firstName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "lastName",
+        "path": [
+          "fundSource",
+          "shopperName",
+          "lastName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "telephoneNumber",
+        "path": [
+          "fundSource",
+          "telephoneNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "merchantAccount",
+        "path": [
+          "merchantAccount"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "contract",
+        "path": [
+          "recurring",
+          "contract"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ONECLICK",
+            "ONECLICK,RECURRING",
+            "RECURRING",
+            "PAYOUT",
+            "EXTERNAL"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "recurringDetailName",
+        "path": [
+          "recurring",
+          "recurringDetailName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "recurringExpiry",
+        "path": [
+          "recurring",
+          "recurringExpiry"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "recurringFrequency",
+        "path": [
+          "recurring",
+          "recurringFrequency"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "tokenService",
+        "path": [
+          "recurring",
+          "tokenService"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "VISATOKENSERVICE",
+            "MCTOKENSERVICE",
+            "AMEXTOKENSERVICE",
+            "TOKEN_SHARING"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": true,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "selectedRecurringDetailReference",
+        "path": [
+          "selectedRecurringDetailReference"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "shopperEmail",
+        "path": [
+          "shopperEmail"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "shopperInteraction",
+        "path": [
+          "shopperInteraction"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Ecommerce",
+            "ContAuth",
+            "Moto",
+            "POS"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "firstName",
+        "path": [
+          "shopperName",
+          "firstName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "lastName",
+        "path": [
+          "shopperName",
+          "lastName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "shopperReference",
+        "path": [
+          "shopperReference"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "telephoneNumber",
+        "path": [
+          "telephoneNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [
+      "card"
+    ],
+    "requisite_container": "card",
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /confirmThirdParty (post-confirmThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
+      "pointer": "#/paths/~1confirmThirdParty/post",
+      "hint": "endpoints.post-confirmThirdParty: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /declineThirdParty (post-declineThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
+      "pointer": "#/paths/~1declineThirdParty/post",
+      "hint": "endpoints.post-declineThirdParty: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /storeDetail (post-storeDetail) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
+      "pointer": "#/paths/~1storeDetail/post",
+      "hint": "endpoints.post-storeDetail: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
+      "pointer": "#/paths/~1storeDetailAndSubmitThirdParty/post",
+      "hint": "endpoints.post-storeDetailAndSubmitThirdParty: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /submitThirdParty (post-submitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
+      "pointer": "#/paths/~1submitThirdParty/post",
+      "hint": "endpoints.post-submitThirdParty: create"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /confirmThirdParty (post-confirmThirdParty) — not used",
+      "pointer": "#/paths/~1confirmThirdParty/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /declineThirdParty (post-declineThirdParty) — not used",
+      "pointer": "#/paths/~1declineThirdParty/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /storeDetail (post-storeDetail) — not used",
+      "pointer": "#/paths/~1storeDetail/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) — not used",
+      "pointer": "#/paths/~1storeDetailAndSubmitThirdParty/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /submitThirdParty (post-submitThirdParty) — not used",
+      "pointer": "#/paths/~1submitThirdParty/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "apiKey_alternative",
+      "message": "alternative security scheme 'ApiKeyAuth' (apiKey) is ignored",
+      "pointer": "#/components/securitySchemes/ApiKeyAuth",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.city (string, The name of the city. Maximum length: 3000 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.city.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.\n> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.houseNumberOrName (string, The number or name of the house. Maximum length: 3000 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.houseNumberOrName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten characters for an address in all other countries.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.postalCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n> Required for the US and Canada.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.stateOrProvince.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "billingAddress.street (string, The name of the street. Maximum length: 3000 characters.\n> The house number should not be included in this field; it should be separately provided via `houseNumberOrName`.) has no source",
+      "pointer": null,
+      "hint": "fields.billingAddress.street.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid) (1-20 characters). Depending on the card brand, it is known also as:\n* CVV2/CVC2 – length: 3 digits\n* CID – length: 4 digits\n> If you are using [Client-Side Encryption](https://docs.adyen.com/classic-integration/cse-integration-ecommerce), the CVC code is present in the encrypted data. You must never post the card details to the server.\n> This field must be always present in a [one-click payment request](https://docs.adyen.com/classic-integration/recurring-payments).\n> When this value is returned in a response, it is always empty because it is not stored.) has no source",
+      "pointer": null,
+      "hint": "fields.card.cvc.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "card.issueNumber (string, The issue number of the card (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.card.issueNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "card.startMonth (string, The month component of the start date (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.card.startMonth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "card.startYear (string, The year component of the start date (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.card.startYear.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fraudOffset (integer, An integer value that is added to the normal fraud score. The value can be either positive or negative.) has no source",
+      "pointer": null,
+      "hint": "fields.fraudOffset.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.city (string, The name of the city. Maximum length: 3000 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.city.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.\n> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.houseNumberOrName (string, The number or name of the house. Maximum length: 3000 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.houseNumberOrName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten characters for an address in all other countries.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.postalCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n> Required for the US and Canada.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.stateOrProvince.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.billingAddress.street (string, The name of the street. Maximum length: 3000 characters.\n> The house number should not be included in this field; it should be separately provided via `houseNumberOrName`.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.billingAddress.street.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid) (1-20 characters). Depending on the card brand, it is known also as:\n* CVV2/CVC2 – length: 3 digits\n* CID – length: 4 digits\n> If you are using [Client-Side Encryption](https://docs.adyen.com/classic-integration/cse-integration-ecommerce), the CVC code is present in the encrypted data. You must never post the card details to the server.\n> This field must be always present in a [one-click payment request](https://docs.adyen.com/classic-integration/recurring-payments).\n> When this value is returned in a response, it is always empty because it is not stored.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.card.cvc.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.card.issueNumber (string, The issue number of the card (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.card.issueNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.card.startMonth (string, The month component of the start date (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.card.startMonth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.card.startYear (string, The year component of the start date (for some UK debit cards only).) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.card.startYear.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.shopperEmail (string, Email address of the person.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.shopperEmail.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.shopperName.firstName (string, The first name.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.shopperName.firstName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.shopperName.lastName (string, The last name.) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.shopperName.lastName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "fundSource.telephoneNumber (string, Phone number of the person) has no source",
+      "pointer": null,
+      "hint": "fields.fundSource.telephoneNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "merchantAccount (string, The merchant account identifier, with which you want to process the transaction.) has no source",
+      "pointer": null,
+      "hint": "fields.merchantAccount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recurring.contract (string, The type of recurring contract to be used.\nPossible values:\n* `ONECLICK` – Payment details can be used to initiate a one-click payment, where the shopper enters the [card security code (CVC/CVV)](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid).\n* `RECURRING` – Payment details can be used without the card security code to initiate [card-not-present transactions](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-not-present-cnp).\n* `ONECLICK,RECURRING` – Payment details can be used regardless of whether the shopper is on your site or not.\n* `PAYOUT` – Payment details can be used to [make a payout](https://docs.adyen.com/online-payments/online-payouts).\n* `EXTERNAL` - Use this when you store payment details and send the raw card number or network token directly in your API request.\n) has no source",
+      "pointer": null,
+      "hint": "fields.recurring.contract.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recurring.recurringDetailName (string, A descriptive name for this detail.) has no source",
+      "pointer": null,
+      "hint": "fields.recurring.recurringDetailName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recurring.recurringExpiry (string, Date after which no further authorisations shall be performed. Only for 3D Secure 2.) has no source",
+      "pointer": null,
+      "hint": "fields.recurring.recurringExpiry.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recurring.recurringFrequency (string, Minimum number of days between authorisations. Only for 3D Secure 2.) has no source",
+      "pointer": null,
+      "hint": "fields.recurring.recurringFrequency.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recurring.tokenService (string, The name of the token service.) has no source",
+      "pointer": null,
+      "hint": "fields.recurring.tokenService.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "selectedRecurringDetailReference (string, The `recurringDetailReference` you want to use for this payment. The value `LATEST` can be used to select the most recently stored recurring detail.) has no source",
+      "pointer": null,
+      "hint": "fields.selectedRecurringDetailReference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "shopperEmail (string, The shopper's email address. We recommend that you provide this data, as it is used in velocity fraud checks. > Required for Visa and JCB transactions that require 3D Secure 2 authentication if you did not include the `telephoneNumber`.) has no source",
+      "pointer": null,
+      "hint": "fields.shopperEmail.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "shopperInteraction (string, Specifies the sales channel, through which the shopper gives their card details, and whether the shopper is a returning customer.\nFor the web service API, Adyen assumes Ecommerce shopper interaction by default.\n\nThis field has the following possible values:\n* `Ecommerce` - Online transactions where the cardholder is present (online). For better authorisation rates, we recommend sending the card security code (CSC) along with the request.\n* `ContAuth` - Card on file and/or subscription transactions, where the cardholder is known to the merchant (returning customer). If the shopper is present (online), you can supply also the CSC to improve authorisation (one-click payment).\n* `Moto` - Mail-order and telephone-order transactions where the shopper is in contact with the merchant via email or telephone.\n* `POS` - Point-of-sale transactions where the shopper is physically present to make a payment using a secure payment terminal.) has no source",
+      "pointer": null,
+      "hint": "fields.shopperInteraction.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "shopperName.firstName (string, The first name.) has no source",
+      "pointer": null,
+      "hint": "fields.shopperName.firstName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "shopperName.lastName (string, The last name.) has no source",
+      "pointer": null,
+      "hint": "fields.shopperName.lastName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "shopperReference (string, Required for recurring payments. \nYour reference to uniquely identify this shopper, for example user ID or account ID. The value is case-sensitive and must be at least three characters.\n> Your reference must not include personally identifiable information (PII) such as name or email address.) has no source",
+      "pointer": null,
+      "hint": "fields.shopperReference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "telephoneNumber (string, The shopper's telephone number.\n The phone number must include a plus sign (+) and a country code (1-3 digits), followed by the number (4-15 digits). If the value you provide does not follow the guidelines, we do not submit it for authentication.\n> Required for Visa and JCB transactions that require 3D Secure 2 authentication, if you did not include the `shopperEmail`.) has no source",
+      "pointer": null,
+      "hint": "fields.telephoneNumber.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

@@ -1,0 +1,1208 @@
+{
+  "spec": {
+    "openapi": "3.0.0",
+    "title": "The Plaid API",
+    "version": "2020-09-14_1.740.1",
+    "source": "examples/real/plaid.yml"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/transfer/create",
+      "operation_id": "transferCreate",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "POST",
+      "path": "/transfer/cancel",
+      "operation_id": "transferCancel",
+      "confidence": 0.85,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "api_key",
+    "scheme_name": "clientId",
+    "header": "PLAID-CLIENT-ID",
+    "prefix": null,
+    "credential_key": "api_key",
+    "credential_keys": [
+      "api_key"
+    ],
+    "location": "header",
+    "param_name": "PLAID-CLIENT-ID"
+  },
+  "statuses": {
+    "field_path": [
+      "transfer",
+      "status"
+    ],
+    "map": {
+      "pending": "in_progress",
+      "settled": "approved",
+      "cancelled": "rejected",
+      "failed": "rejected"
+    },
+    "unmapped": [
+      "posted",
+      "funds_available",
+      "returned"
+    ],
+    "response_id_path": [
+      "transfer",
+      "id"
+    ],
+    "response_status_path": [
+      "transfer",
+      "status"
+    ],
+    "response_id_confidence": 0.8
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "amount",
+    "path": [
+      "amount"
+    ],
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": null,
+    "type": "string",
+    "expr": "format('%.2f', operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "client_id",
+        "path": [
+          "client_id"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "secret",
+        "path": [
+          "secret"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "idempotency_key",
+        "path": [
+          "idempotency_key"
+        ],
+        "source_expr": "operation.idempotency_key",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "access_token",
+        "path": [
+          "access_token"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "account_id",
+        "path": [
+          "account_id"
+        ],
+        "source_expr": "credentials.fetch('account_id')",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "authorization_id",
+        "path": [
+          "authorization_id"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "type",
+        "path": [
+          "type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "debit",
+            "credit"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "network",
+        "path": [
+          "network"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ach",
+            "same-day-ach",
+            "rtp",
+            "wire",
+            "rfp"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "amount",
+        "path": [
+          "amount"
+        ],
+        "source_expr": "format('%.2f', operation.amount)",
+        "required": false,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "description",
+        "path": [
+          "description"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "ach_class",
+        "path": [
+          "ach_class"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "ccd",
+            "ppd",
+            "tel",
+            "web"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "legal_name",
+        "path": [
+          "user",
+          "legal_name"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "phone_number",
+        "path": [
+          "user",
+          "phone_number"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "email_address",
+        "path": [
+          "user",
+          "email_address"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "street",
+        "path": [
+          "user",
+          "address",
+          "street"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "city",
+        "path": [
+          "user",
+          "address",
+          "city"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "region",
+        "path": [
+          "user",
+          "address",
+          "region"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "postal_code",
+        "path": [
+          "user",
+          "address",
+          "postal_code"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "country",
+        "path": [
+          "user",
+          "address",
+          "country"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "origination_account_id",
+        "path": [
+          "origination_account_id"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "iso_currency_code",
+        "path": [
+          "iso_currency_code"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "test_clock_id",
+        "path": [
+          "test_clock_id"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "facilitator_fee",
+        "path": [
+          "facilitator_fee"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/recurring/create (transferRecurringCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1recurring~1create/post",
+      "hint": "endpoints.transferRecurringCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/intent/create (transferIntentCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1intent~1create/post",
+      "hint": "endpoints.transferIntentCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/create (transferOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1originator~1create/post",
+      "hint": "endpoints.transferOriginatorCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/questionnaire/create (transferQuestionnaireCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1questionnaire~1create/post",
+      "hint": "endpoints.transferQuestionnaireCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/diligence/submit (transferDiligenceSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1diligence~1submit/post",
+      "hint": "endpoints.transferDiligenceSubmit: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/funding_account/create (transferOriginatorFundingAccountCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1originator~1funding_account~1create/post",
+      "hint": "endpoints.transferOriginatorFundingAccountCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/platform/requirement/submit (transferPlatformRequirementSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1platform~1requirement~1submit/post",
+      "hint": "endpoints.transferPlatformRequirementSubmit: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/platform/originator/create (transferPlatformOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1platform~1originator~1create/post",
+      "hint": "endpoints.transferPlatformOriginatorCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/platform/person/create (transferPlatformPersonCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1platform~1person~1create/post",
+      "hint": "endpoints.transferPlatformPersonCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/get (transferGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1get/post",
+      "hint": "endpoints.transferGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/list (transferList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1list/post",
+      "hint": "endpoints.transferList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/migrate_account (transferMigrateAccount) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1migrate_account/post",
+      "hint": "endpoints.transferMigrateAccount: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/recurring/get (transferRecurringGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1recurring~1get/post",
+      "hint": "endpoints.transferRecurringGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/balance/get (transferBalanceGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1balance~1get/post",
+      "hint": "endpoints.transferBalanceGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
+      "hint": "endpoints.transferCapabilitiesGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/configuration/get (transferConfigurationGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1configuration~1get/post",
+      "hint": "endpoints.transferConfigurationGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/get (transferLedgerGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1ledger~1get/post",
+      "hint": "endpoints.transferLedgerGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/distribute (transferLedgerDistribute) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1ledger~1distribute/post",
+      "hint": "endpoints.transferLedgerDistribute: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/deposit (transferLedgerDeposit) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1ledger~1deposit/post",
+      "hint": "endpoints.transferLedgerDeposit: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/withdraw (transferLedgerWithdraw) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1ledger~1withdraw/post",
+      "hint": "endpoints.transferLedgerWithdraw: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/metrics/get (transferMetricsGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1metrics~1get/post",
+      "hint": "endpoints.transferMetricsGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/recurring/list (transferRecurringList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1recurring~1list/post",
+      "hint": "endpoints.transferRecurringList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/event/list (transferEventList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1event~1list/post",
+      "hint": "endpoints.transferEventList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/event/sync (transferEventSync) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1event~1sync/post",
+      "hint": "endpoints.transferEventSync: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/sweep/get (transferSweepGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1sweep~1get/post",
+      "hint": "endpoints.transferSweepGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/sweep/list (transferSweepList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1sweep~1list/post",
+      "hint": "endpoints.transferSweepList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/intent/get (transferIntentGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1intent~1get/post",
+      "hint": "endpoints.transferIntentGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/repayment/list (transferRepaymentList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1repayment~1list/post",
+      "hint": "endpoints.transferRepaymentList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/get (transferOriginatorGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1originator~1get/post",
+      "hint": "endpoints.transferOriginatorGet: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/list (transferOriginatorList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1originator~1list/post",
+      "hint": "endpoints.transferOriginatorList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/return/recover (transferReturnRecover) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1return~1recover/post",
+      "hint": "endpoints.transferReturnRecover: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/funding_account/update (transferOriginatorFundingAccountUpdate) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1originator~1funding_account~1update/post",
+      "hint": "endpoints.transferOriginatorFundingAccountUpdate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/event/list (transferLedgerEventList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1ledger~1event~1list/post",
+      "hint": "endpoints.transferLedgerEventList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/repayment/return/list (transferRepaymentReturnList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1repayment~1return~1list/post",
+      "hint": "endpoints.transferRepaymentReturnList: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/diligence/document/upload (transferDiligenceDocumentUpload) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1diligence~1document~1upload/post",
+      "hint": "endpoints.transferDiligenceDocumentUpload: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/authorization/create (transferAuthorizationCreate) also looks like create (0.55); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1authorization~1create/post",
+      "hint": "endpoints.transferAuthorizationCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/refund/create (transferRefundCreate) also looks like create (0.55); POST /transfer/create (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1refund~1create/post",
+      "hint": "endpoints.transferRefundCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/recurring/cancel (transferRecurringCancel) also looks like cancel (0.85); POST /transfer/cancel (transferCancel) wins (0.85)",
+      "pointer": "#/paths/~1transfer~1recurring~1cancel/post",
+      "hint": "endpoints.transferRecurringCancel: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://production.plaid.com)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/cancel (transferCancel) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1transfer~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/get (transferGet) — not used",
+      "pointer": "#/paths/~1transfer~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/recurring/get (transferRecurringGet) — not used",
+      "pointer": "#/paths/~1transfer~1recurring~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/authorization/create (transferAuthorizationCreate) — not used",
+      "pointer": "#/paths/~1transfer~1authorization~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/authorization/cancel (transferAuthorizationCancel) — not used",
+      "pointer": "#/paths/~1transfer~1authorization~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/balance/get (transferBalanceGet) — not used",
+      "pointer": "#/paths/~1transfer~1balance~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) — not used",
+      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/configuration/get (transferConfigurationGet) — not used",
+      "pointer": "#/paths/~1transfer~1configuration~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/ledger/get (transferLedgerGet) — not used",
+      "pointer": "#/paths/~1transfer~1ledger~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/ledger/distribute (transferLedgerDistribute) — not used",
+      "pointer": "#/paths/~1transfer~1ledger~1distribute/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/ledger/deposit (transferLedgerDeposit) — not used",
+      "pointer": "#/paths/~1transfer~1ledger~1deposit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/ledger/withdraw (transferLedgerWithdraw) — not used",
+      "pointer": "#/paths/~1transfer~1ledger~1withdraw/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/originator/funding_account/update (transferOriginatorFundingAccountUpdate) — not used",
+      "pointer": "#/paths/~1transfer~1originator~1funding_account~1update/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/originator/funding_account/create (transferOriginatorFundingAccountCreate) — not used",
+      "pointer": "#/paths/~1transfer~1originator~1funding_account~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/metrics/get (transferMetricsGet) — not used",
+      "pointer": "#/paths/~1transfer~1metrics~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/recurring/create (transferRecurringCreate) — not used",
+      "pointer": "#/paths/~1transfer~1recurring~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/list (transferList) — not used",
+      "pointer": "#/paths/~1transfer~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/recurring/list (transferRecurringList) — not used",
+      "pointer": "#/paths/~1transfer~1recurring~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/recurring/cancel (transferRecurringCancel) — not used",
+      "pointer": "#/paths/~1transfer~1recurring~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/event/list (transferEventList) — not used",
+      "pointer": "#/paths/~1transfer~1event~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/ledger/event/list (transferLedgerEventList) — not used",
+      "pointer": "#/paths/~1transfer~1ledger~1event~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/event/sync (transferEventSync) — not used",
+      "pointer": "#/paths/~1transfer~1event~1sync/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/sweep/get (transferSweepGet) — not used",
+      "pointer": "#/paths/~1transfer~1sweep~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/sweep/list (transferSweepList) — not used",
+      "pointer": "#/paths/~1transfer~1sweep~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/migrate_account (transferMigrateAccount) — not used",
+      "pointer": "#/paths/~1transfer~1migrate_account/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/intent/create (transferIntentCreate) — not used",
+      "pointer": "#/paths/~1transfer~1intent~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/intent/get (transferIntentGet) — not used",
+      "pointer": "#/paths/~1transfer~1intent~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/repayment/list (transferRepaymentList) — not used",
+      "pointer": "#/paths/~1transfer~1repayment~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/repayment/return/list (transferRepaymentReturnList) — not used",
+      "pointer": "#/paths/~1transfer~1repayment~1return~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/platform/requirement/submit (transferPlatformRequirementSubmit) — not used",
+      "pointer": "#/paths/~1transfer~1platform~1requirement~1submit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/originator/create (transferOriginatorCreate) — not used",
+      "pointer": "#/paths/~1transfer~1originator~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/questionnaire/create (transferQuestionnaireCreate) — not used",
+      "pointer": "#/paths/~1transfer~1questionnaire~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/diligence/submit (transferDiligenceSubmit) — not used",
+      "pointer": "#/paths/~1transfer~1diligence~1submit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/diligence/document/upload (transferDiligenceDocumentUpload) — not used",
+      "pointer": "#/paths/~1transfer~1diligence~1document~1upload/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/originator/get (transferOriginatorGet) — not used",
+      "pointer": "#/paths/~1transfer~1originator~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/originator/list (transferOriginatorList) — not used",
+      "pointer": "#/paths/~1transfer~1originator~1list/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/refund/create (transferRefundCreate) — not used",
+      "pointer": "#/paths/~1transfer~1refund~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/return/recover (transferReturnRecover) — not used",
+      "pointer": "#/paths/~1transfer~1return~1recover/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/refund/get (transferRefundGet) — not used",
+      "pointer": "#/paths/~1transfer~1refund~1get/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/refund/cancel (transferRefundCancel) — not used",
+      "pointer": "#/paths/~1transfer~1refund~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/platform/originator/create (transferPlatformOriginatorCreate) — not used",
+      "pointer": "#/paths/~1transfer~1platform~1originator~1create/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/platform/person/create (transferPlatformPersonCreate) — not used",
+      "pointer": "#/paths/~1transfer~1platform~1person~1create/post",
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'posted' (posted) of transfer.status is unknown",
+      "pointer": null,
+      "hint": "statuses.posted: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'funds_available' (funds_available) of transfer.status is unknown",
+      "pointer": null,
+      "hint": "statuses.funds_available: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'returned' (returned) of transfer.status is unknown",
+      "pointer": null,
+      "hint": "statuses.returned: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "secret (string, Your Plaid API `secret`. The `secret` is required and may be provided either in the `PLAID-SECRET` header or as part of a request body.) has no source",
+      "pointer": null,
+      "hint": "fields.secret.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "access_token (string, The Plaid `access_token` for the account that will be debited or credited.) has no source",
+      "pointer": null,
+      "hint": "fields.access_token.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "credential_field",
+      "message": "account_id → credentials.account_id",
+      "pointer": null,
+      "hint": "fill it in credentials"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "authorization_id (string, Plaid's unique identifier for a transfer authorization. This parameter also serves the purpose of acting as an idempotency identifier.) has no source",
+      "pointer": null,
+      "hint": "fields.authorization_id.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "type (string, The type of transfer. This will be either `debit` or `credit`.  A `debit` indicates a transfer of money into the origination account; a `credit` indicates a transfer of money out of the origination account.) has no source",
+      "pointer": null,
+      "hint": "fields.type.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "network (string, The network or rails used for the transfer.\n\nFor transfers submitted as `ach` or `same-day-ach`, the Standard ACH cutoff is 8:30 PM Eastern Time.\n\nFor transfers submitted as `same-day-ach`, the Same Day ACH cutoff is 3:00 PM Eastern Time.  It is recommended to send the request 15 minutes prior to the cutoff to ensure that it will be processed in time for submission before the cutoff. If the transfer is processed after this cutoff but before the Standard ACH cutoff, it will be sent over Standard ACH rails and will not incur same-day charges; this will apply to both legs of the transfer if applicable. The transaction limit for a Same Day ACH transfer is $1,000,000. Authorization requests sent with an amount greater than $1,000,000 will fail.\n\nFor transfers submitted as `rtp`, Plaid will automatically route between the Real-Time Payments (RTP) rail by TCH or FedNow rails as necessary. If a transfer is submitted as `rtp` and the counterparty account is not eligible for RTP, the `/transfer/authorization/create` request will fail with an `INVALID_FIELD` error code. To pre-check to determine whether a counterparty account can support RTP, call `/transfer/capabilities/get` before calling `/transfer/authorization/create`.\n\nWire transfers are currently in early availability. To request access to `wire` as a payment network, contact your account manager. For transfers submitted as `wire`, the `type` must be `credit`; wire debits are not supported. The cutoff to submit a wire payment is 6:30 PM Eastern Time on a business day; wires submitted after that time will be processed on the next business day. The transaction limit for a wire is $999,999.99. Authorization requests sent with an amount greater than $999,999.99 will fail.\n\nSupport for `rfp` (request for payment) is currently in closed beta. To learn more, contact your Plaid account manager. For transfers submitted as `rfp`, the `type` must be `debit`.) has no source",
+      "pointer": null,
+      "hint": "fields.network.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ach_class (string, Specifies the use case of the transfer. Required for transfers on an ACH network. For more details, see [ACH SEC codes](https://plaid.com/docs/transfer/creating-transfers/#ach-sec-codes).\n\nCodes supported for credits: `ccd`, `ppd`\nCodes supported for debits: `ccd`, `ppd`, `tel`, `web`\n\n`\"ccd\"` - Corporate Credit or Debit - fund transfer between two corporate bank accounts\n\n`\"ppd\"` - Prearranged Payment or Deposit - The transfer is part of a pre-existing relationship with a consumer. Authorization was obtained in writing either in person or via an electronic document signing, e.g. Docusign, by the consumer. Can be used for credits or debits.\n\n`\"web\"` - Internet-Initiated Entry. The transfer debits a consumer's bank account. Authorization from the consumer is obtained over the Internet (e.g. a web or mobile application). Can be used for single debits or recurring debits.\n\n`\"tel\"` - Telephone-Initiated Entry. The transfer debits a consumer. Debit authorization has been received orally over the telephone via a recorded call.) has no source",
+      "pointer": null,
+      "hint": "fields.ach_class.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.legal_name (string, The user's legal name.) has no source",
+      "pointer": null,
+      "hint": "fields.user.legal_name.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.phone_number (string, The user's phone number.) has no source",
+      "pointer": null,
+      "hint": "fields.user.phone_number.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.email_address (string, The user's email address.) has no source",
+      "pointer": null,
+      "hint": "fields.user.email_address.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.address.street (string, The street number and name (i.e., \"100 Market St.\").) has no source",
+      "pointer": null,
+      "hint": "fields.user.address.street.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.address.city (string, Ex. \"San Francisco\") has no source",
+      "pointer": null,
+      "hint": "fields.user.address.city.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.address.region (string, The state or province (e.g., \"CA\").) has no source",
+      "pointer": null,
+      "hint": "fields.user.address.region.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.address.postal_code (string, The postal code (e.g., \"94103\").) has no source",
+      "pointer": null,
+      "hint": "fields.user.address.postal_code.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "user.address.country (string, A two-letter country code (e.g., \"US\").) has no source",
+      "pointer": null,
+      "hint": "fields.user.address.country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "origination_account_id (string, Plaid's unique identifier for the origination account for this transfer. If you have more than one origination account, this value must be specified. Otherwise, this field should be left blank.) has no source",
+      "pointer": null,
+      "hint": "fields.origination_account_id.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "iso_currency_code (string, The currency of the transfer amount. The default value is \"USD\".) has no source",
+      "pointer": null,
+      "hint": "fields.iso_currency_code.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "test_clock_id (string, Plaid's unique identifier for a test clock. This field may only be used when using `sandbox` environment. If provided, the `transfer` is created at the `virtual_time` on the provided `test_clock`.) has no source",
+      "pointer": null,
+      "hint": "fields.test_clock_id.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "facilitator_fee (string, The amount to deduct from `transfer.amount` and distribute to the platform's Ledger balance as a facilitator fee (decimal string with two digits of precision e.g. \"10.00\"). The remainder will go to the end-customer's Ledger balance. This must be value greater than 0 and less than or equal to the `transfer.amount`.) has no source",
+      "pointer": null,
+      "hint": "fields.facilitator_fee.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

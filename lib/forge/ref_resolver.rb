@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require 'uri'
+
 module Forge
-  # Разворачивает локальные `$ref` (JSON-pointer, `~0`/`~1`) на месте, рекурсивно.
+  # Разворачивает локальные `$ref` (JSON-pointer, `~0`/`~1`, percent-encoding) на месте, рекурсивно.
   # Внешние ссылки не резолвит: заменяет узел на `{'x-forge-unresolved' => ref}` (D-05).
-  # Схемы из `#/components/schemas/<Name>` получают `x-forge-ref-name`.
+  # Цикл (рекурсивная схема) обрывается маркером `{'x-forge-circular' => 'A -> B -> A'}`; критичность
+  # решает Analyzers::Fields (D-14). Схемы из `#/components/schemas/<Name>` получают `x-forge-ref-name`.
   class RefResolver
     SCHEMA_PREFIX = '#/components/schemas/'
 
@@ -13,6 +16,7 @@ module Forge
       @root = root
       @file = file
       @stack = []
+      @cache = {}
     end
 
     def resolve = walk(@root, '#')
@@ -33,19 +37,29 @@ module Forge
 
     def deref(ref, pointer)
       return { 'x-forge-unresolved' => ref } unless ref.start_with?('#/')
-      raise circular(ref, pointer) if @stack.include?(ref)
+      return circular(ref) if @stack.include?(ref)
+
+      annotate(resolved(ref, pointer), ref)
+    end
+
+    # Каждая цель резолвится один раз (большие спеки: тысячи ссылок на одни и те же схемы).
+    def resolved(ref, pointer)
+      return @cache[ref] if @cache.key?(ref)
 
       @stack.push(ref)
       target = walk(lookup(ref, pointer), ref)
       @stack.pop
-      annotate(target, ref)
+      @cache[ref] = target
     end
 
-    def lookup(ref, pointer)
+    # Несуществующая цель → маркер `{'x-forge-unresolved' => ref}`; критичность решает Analyzers::Fields.
+    def lookup(ref, _pointer)
       ref.delete_prefix('#/').split('/').reduce(@root) do |node, key|
-        key = unescape(key)
+        key = unescape(URI.decode_www_form_component(key))
         child = node.is_a?(Array) ? node[Integer(key, exception: false) || -1] : node&.[](key)
-        child.nil? ? raise(unresolved(ref, pointer)) : child
+        return { 'x-forge-unresolved' => ref } if child.nil?
+
+        child
       end
     end
 
@@ -55,15 +69,8 @@ module Forge
       target.merge('x-forge-ref-name' => ref.delete_prefix(SCHEMA_PREFIX))
     end
 
-    def unresolved(ref, pointer)
-      SpecError.new("unresolved $ref '#{ref}'", pointer: pointer, file: @file,
-                                                hint: 'check the pointer: the target must exist in this document')
-    end
-
-    def circular(ref, pointer)
-      chain = (@stack + [ref]).join(' -> ')
-      SpecError.new("circular $ref: #{chain}", pointer: pointer, file: @file,
-                                               hint: 'break the cycle: inline one side or drop the back-reference')
+    def circular(ref)
+      { 'x-forge-circular' => (@stack + [ref]).join(' -> '), 'x-forge-ref-name' => ref.delete_prefix(SCHEMA_PREFIX) }
     end
 
     def escape(key) = key.to_s.gsub('~', '~0').gsub('/', '~1')

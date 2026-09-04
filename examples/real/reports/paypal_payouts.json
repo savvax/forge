@@ -1,0 +1,374 @@
+{
+  "spec": {
+    "openapi": "3.0.3",
+    "title": "Payouts",
+    "version": "1.9",
+    "source": "examples/real/paypal_payouts.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "operation_id": "payouts.post",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v1/payments/payouts/{id}",
+      "operation_id": "payouts.get",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "POST",
+      "path": "/v1/payments/payouts-item/{payout_item_id}/cancel",
+      "operation_id": "payouts-item.cancel",
+      "confidence": 0.95,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "Oauth2"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 400,
+        "role": "create",
+        "pointer": "#/paths/~1v1~1payments~1payouts/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1v1~1payments~1payouts/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 500,
+        "role": "create",
+        "pointer": "#/paths/~1v1~1payments~1payouts/post/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1v1~1payments~1payouts~1{id}/get/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "status",
+        "pointer": "#/paths/~1v1~1payments~1payouts~1{id}/get/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      },
+      {
+        "status": 400,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}~1cancel/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 404,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}~1cancel/post/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}~1cancel/post/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      }
+    ],
+    "http": {
+      "400": "validation_error",
+      "403": "forbidden",
+      "404": "not_found",
+      "500": "internal_error"
+    },
+    "codes": [
+      "GET",
+      "POST",
+      "PUT",
+      "DELETE",
+      "HEAD",
+      "CONNECT",
+      "OPTIONS",
+      "PATCH"
+    ],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "sender_batch_id",
+        "path": [
+          "sender_batch_header",
+          "sender_batch_id"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "recipient_type",
+        "path": [
+          "sender_batch_header",
+          "recipient_type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "email_subject",
+        "path": [
+          "sender_batch_header",
+          "email_subject"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "email_message",
+        "path": [
+          "sender_batch_header",
+          "email_message"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "note",
+        "path": [
+          "sender_batch_header",
+          "note"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "items",
+        "path": [
+          "items"
+        ],
+        "source_expr": "[]",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/payments/payouts-item/{payout_item_id} (payouts-item.get) also looks like status (0.9); GET /v1/payments/payouts/{id} (payouts.get) wins (0.9)",
+      "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}/get",
+      "hint": "endpoints.payouts-item.get: status"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payments/payouts-item/{payout_item_id}/cancel (payouts-item.cancel) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payments/payouts-item/{payout_item_id} (payouts-item.get) — not used",
+      "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}/get",
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2_alternative",
+      "message": "alternative security scheme 'Oauth2' (oauth2) is ignored",
+      "pointer": "#/components/securitySchemes/Oauth2",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2",
+      "message": "security scheme 'Oauth2' (oauth2) is not supported; bearer token assumed",
+      "pointer": "#/components/securitySchemes/Oauth2",
+      "hint": "obtain the token out of band and put it into credentials.token"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "sender_batch_header.sender_batch_id (string, A sender-specified ID number. Tracks the payout in an accounting system.<blockquote><strong>Note:</strong> <p>PayPal does not process duplicate payouts. If you specify a <code>sender_batch_id</code> that was used in the last 30 days, the API rejects the request with an error message that shows the duplicate <code>sender_batch_id</code> and includes a HATEOAS link to the original payout with the same <code>sender_batch_id</code>.</p><p>If you receive an HTTP <code>5<i>nn</i></code> status code, you can safely retry the request with the same <code>sender_batch_id</code>. The API completes a payment only once for a <code>sender_batch_id</code> that is used within 30 days.</p></blockquote>) has no source",
+      "pointer": null,
+      "hint": "fields.sender_batch_header.sender_batch_id.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "sender_batch_header.recipient_type (string, The ID type that identifies the recipient of the payment. For example, <code>EMAIL</code>.) has no source",
+      "pointer": null,
+      "hint": "fields.sender_batch_header.recipient_type.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "sender_batch_header.email_subject (string, The subject line for the email that PayPal sends when payment for a payout item completes. The subject line is the same for all recipients. Value is an alphanumeric string of up to 255 single-byte characters.) has no source",
+      "pointer": null,
+      "hint": "fields.sender_batch_header.email_subject.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "sender_batch_header.email_message (string, The email message that PayPal sends when the payout item completes. The message is the same for all recipients.) has no source",
+      "pointer": null,
+      "hint": "fields.sender_batch_header.email_message.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "items is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.items.source: \"…\""
+    }
+  ],
+  "exit_code": 0
+}

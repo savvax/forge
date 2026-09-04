@@ -4,11 +4,17 @@ module Forge
   module IR
     Schema = Data.define(:ref_name, :type, :format, :description, :properties, :required, :items, :enum,
                          :minimum, :maximum, :min_length, :max_length, :pattern, :multiple_of, :example,
-                         :nullable, :one_of, :any_of, :all_of, :additional, :unresolved_ref) do
+                         :nullable, :one_of, :any_of, :all_of, :additional, :unresolved_ref, :circular_ref) do
       # Hash из спеки (после RefResolver) → Schema. allOf сливается, oneOf/anyOf остаются списками.
+      # Мемоизация по identity: RefResolver разделяет цели ссылок, без кэша большие спеки строятся экспоненциально.
       def self.from(hash)
         return nil unless hash.is_a?(Hash)
 
+        memo = (Thread.current[:forge_schema_memo] ||= {}.compare_by_identity)
+        memo[hash] ||= build(hash)
+      end
+
+      def self.build(hash)
         hash = merge_all_of(hash) if hash['allOf']
         type, nullable = split_type(hash['type'], hash['nullable'])
         new(**scalars(hash), type: type, nullable: nullable, ref_name: hash['x-forge-ref-name'],
@@ -16,7 +22,8 @@ module Forge
                                from(v)
                              end, items: from(hash['items']),
                              one_of: list(hash['oneOf']), any_of: list(hash['anyOf']), all_of: nil,
-                             additional: hash['additionalProperties'], unresolved_ref: hash['x-forge-unresolved'])
+                             additional: hash['additionalProperties'], unresolved_ref: hash['x-forge-unresolved'],
+                             circular_ref: hash['x-forge-circular'])
       end
 
       def self.scalars(hash)

@@ -11,8 +11,10 @@ SimpleCov.start do
   add_group 'Plan', 'lib/forge/plan'
   add_group 'Renderers', 'lib/forge/renderers'
   add_group 'Provider stub', 'lib/provider'
-  minimum_coverage line: 90, branch: 75
-  minimum_coverage_by_file 70
+  unless ENV['REAL'] # spec/real_specs_spec.rb гоняет CLI как подпроцесс — покрытие не считается
+    minimum_coverage line: 90, branch: 75
+    minimum_coverage_by_file 70
+  end
 end
 
 require 'webmock/rspec'

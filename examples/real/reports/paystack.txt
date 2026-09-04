@@ -1,0 +1,95 @@
+Parsing spec... ok (openapi 3.0.1, Paystack 1.0.0)
+Found 120 endpoints: POST /transaction/initialize, GET /transaction/verify/{reference},
+                     GET /transaction, GET /transaction/{id},
+                     GET /transaction/timeline/{id_or_reference}, GET /transaction/totals,
+                     GET /transaction/export, POST /transaction/charge_authorization,
+                     POST /transaction/check_authorization, POST /transaction/partial_debit,
+                     GET /transaction/{id}/event, GET /transaction/{id}/session, GET /split,
+                     POST /split, GET /split/{id}, PUT /split/{id}, POST /split/{id}/subaccount/add,
+                     POST /split/{id}/subaccount/remove, GET /customer, POST /customer,
+                     GET /customer/{code}, PUT /customer/{code}, POST /customer/set_risk_action,
+                     POST /customer/deactivate_authorization, POST /customer/{code}/identification,
+                     GET /dedicated_account, POST /dedicated_account,
+                     GET /dedicated_account/{account_id}, DELETE /dedicated_account/{account_id},
+                     GET /dedicated_account/available_providers, POST /dedicated_account/split,
+                     GET /subaccount, POST /subaccount, GET /subaccount/{code},
+                     PUT /subaccount/{code}, GET /plan, POST /plan, GET /plan/{code},
+                     PUT /plan/{code}, GET /subscription, POST /subscription,
+                     GET /subscription/{code}, POST /subscription/disable, POST /subscription/enable,
+                     POST /subscription/{code}/manage/link, POST /subscription/{code}/manage/email,
+                     GET /product, POST /product, GET /product/{id}, PUT /product/{id},
+                     DELETE /product/{id}, GET /page, POST /page, GET /page/{id}, PUT /page/{id},
+                     GET /page/check_slug_availability/{slug}, POST /page/{id}/product,
+                     GET /paymentrequest, POST /paymentrequest, GET /paymentrequest/{id},
+                     PUT /paymentrequest/{id}, GET /paymentrequest/verify/{id},
+                     POST /paymentrequest/notify/{id}, GET /paymentrequest/totals,
+                     POST /paymentrequest/finalize/{id}, POST /paymentrequest/archive/{id},
+                     GET /settlement, GET /settlement/{id}/transaction, GET /transferrecipient,
+                     POST /transferrecipient, POST /transferrecipient/bulk,
+                     GET /transferrecipient/{code}, PUT /transferrecipient/{code},
+                     DELETE /transferrecipient/{code}, GET /transfer, POST /transfer,
+                     POST /transfer/finalize_transfer, POST /transfer/bulk, GET /transfer/{code},
+                     GET /transfer/verify/{reference}, GET /transfer/export,
+                     POST /transfer/resend_otp, POST /transfer/disable_otp,
+                     POST /transfer/disable_otp_finalize, POST /transfer/enable_otp, GET /balance,
+                     GET /balance/ledger, POST /charge, POST /charge/submit_pin,
+                     POST /charge/submit_otp, POST /charge/submit_phone,
+                     POST /charge/submit_birthday, POST /charge/submit_address,
+                     GET /charge/{reference}, GET /bulkcharge, POST /bulkcharge,
+                     GET /bulkcharge/{code}, GET /bulkcharge/{code}/charges,
+                     GET /bulkcharge/pause/{code}, GET /bulkcharge/resume/{code},
+                     GET /integration/payment_session_timeout,
+                     PUT /integration/payment_session_timeout, GET /refund, POST /refund,
+                     GET /refund/{id}, GET /dispute, GET /dispute/{id}, PUT /dispute/{id},
+                     GET /dispute/{id}/upload_url, GET /dispute/export,
+                     GET /dispute/transaction/{id}, PUT /dispute/{id}/resolve,
+                     POST /dispute/{id}/evidence, POST /bvn/match, GET /bank/resolve_bvn/{bvn},
+                     GET /bank/resolve, GET /decision/bin/{bin}, GET /country, GET /bank,
+                     GET /address_verification/states
+  create   POST /transfer                             transfer_initiate        confidence 0.95
+  status   GET /transfer/{code}                       transfer_fetch           confidence 0.90
+  cancel   DELETE /transferrecipient/{code}                                    confidence 0.55   (outside contract → cancel_request)
+  balance  GET /balance                               balance_fetch            confidence 0.85   (outside contract → fetch_balance)
+Auth: bearerAuth (bearer, header: Authorization) → credentials.token
+Statuses (status): not found
+Errors: 401 (create) invalid_credentials → alert_block;
+        401 (status) invalid_credentials → alert_block;
+        401 (cancel) invalid_credentials → alert_block; 404 (status) not_found → reject;
+        404 (cancel) not_found → reject
+Webhook signature: no webhook found
+Amount: string, minor units (×100) — source: amount (string) → minor units: 'Amount to transfer in kobo if currency is NGN and pesewas if currency is GHS.'
+Fields: 6 request fields, 1 unmapped
+Warnings (10):
+  WARN         role_conflict              POST /transferrecipient (transferrecipient_create) also looks like create (0.7); POST /transfer (transfer_initiate) wins (0.95)
+        hint: endpoints.transferrecipient_create: create
+  WARN         role_conflict              POST /transfer/bulk (transfer_bulk) also looks like create (0.55); POST /transfer (transfer_initiate) wins (0.95)
+        hint: endpoints.transfer_bulk: create
+  WARN         role_conflict              GET /transfer/verify/{reference} (transfer_verify) also looks like status (0.9); GET /transfer/{code} (transfer_fetch) wins (0.9)
+        hint: endpoints.transfer_verify: status
+  WARN         role_conflict              GET /transferrecipient/{code} (transferrecipient_fetch) also looks like status (0.65); GET /transfer/{code} (transfer_fetch) wins (0.9)
+        hint: endpoints.transferrecipient_fetch: status
+  WARN         low_confidence             cancel: DELETE /transferrecipient/{code} scored 0.55
+        hint: endpoints./transferrecipient/{code}: cancel
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.paystack.co)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         response_id_not_found      no id field found in the response schema; `id` assumed
+        hint: statuses.response_id: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         unmapped_field             recipient (string, The transfer recipient's code) has no source
+        hint: fields.recipient.source: "…"  (overrides.yml)
+Info (17):
+  INFO         outside_contract           DELETE /transferrecipient/{code} () — generated as `cancel_request` helper
+  INFO         outside_contract           GET /balance (balance_fetch) — generated as `fetch_balance` helper
+  INFO         outside_contract           GET /transferrecipient (transferrecipient_list) — not used
+  INFO         outside_contract           POST /transferrecipient (transferrecipient_create) — not used
+  INFO         outside_contract           POST /transferrecipient/bulk (transferrecipient_bulk) — not used
+  INFO         outside_contract           GET /transferrecipient/{code} (transferrecipient_fetch) — not used
+  INFO         outside_contract           PUT /transferrecipient/{code} () — not used
+  INFO         outside_contract           GET /transfer (transfer_list) — not used
+  INFO         outside_contract           POST /transfer/finalize_transfer (transfer_finalize) — not used
+  INFO         outside_contract           POST /transfer/bulk (transfer_bulk) — not used
+  … and 7 more (see --format json)
+Done: 10 warnings, 0 unsupported. Exit 0.

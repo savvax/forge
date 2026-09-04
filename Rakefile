@@ -35,6 +35,14 @@ REAL_SPECS = {
   'plaid' => 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml'
 }.freeze
 
+# Флаги из docs/REAL_SPECS.md § 2 (большие спеки анализируем только по нужным путям).
+REAL_FLAGS = {
+  'paystack' => ['--include-paths', '/transfer*', '--include-paths', '/balance'],
+  'stripe' => ['--include-paths', '/v1/payouts*'],
+  'square' => ['--include-paths', '/v2/payouts*'],
+  'plaid' => ['--include-paths', '/transfer/*']
+}.freeze
+
 ALLOWED_LICENSES = %w[MIT Apache-2.0 BSD-2-Clause BSD-3-Clause Ruby BSD ISC].freeze
 
 RSpec::Core::RakeTask.new(:spec) do |t|
@@ -171,21 +179,24 @@ namespace :real do
     end
   end
 
-  desc 'bin/forge analyze для каждой реальной спеки → examples/real/reports/'
+  desc 'bin/forge analyze для каждой реальной спеки → examples/real/reports/<name>.{txt,json} + SUMMARY.md'
   task :analyze do
     FileUtils.mkdir_p('examples/real/reports')
     rows = REAL_SPECS.keys.map do |name|
       file = Dir["examples/real/#{name}.*"].first
-      next [name, 'missing (rake real:fetch)'] unless file
+      next "| #{name} | — | missing (rake real:fetch) |" unless file
 
-      %w[text json].each do |fmt|
-        out, status = Open3.capture2e("bin/forge analyze --spec #{file} --format #{fmt}")
-        File.write("examples/real/reports/#{name}.#{fmt == 'text' ? 'txt' : 'json'}", out)
-        rows << [name, "exit #{status.exitstatus}"] if fmt == 'text'
-      end
-      nil
-    end.compact
-    puts(rows.map { |r| r.join("\t") })
+      flags = REAL_FLAGS.fetch(name, [])
+      text, status = Open3.capture2e('bin/forge', 'analyze', '--spec', file, *flags)
+      File.write("examples/real/reports/#{name}.txt", text)
+      json, = Open3.capture2e('bin/forge', 'analyze', '--spec', file, '--format', 'json', *flags)
+      File.write("examples/real/reports/#{name}.json", json)
+      "| #{name} | #{flags.join(' ')} | exit #{status.exitstatus} | #{text[/Done: .*/] || text.lines.first&.strip} |"
+    end
+    header = "# Реальные спеки — сводка `rake real:analyze`\n\n| Спека | Флаги | Код | Итог |\n|---|---|---|---|\n"
+    summary = "#{header}#{rows.join("\n")}\n"
+    File.write('examples/real/reports/SUMMARY.md', summary)
+    puts summary
   end
 
   desc 'rspec spec/real_specs_spec.rb (REAL=1)'

@@ -1,0 +1,45 @@
+Parsing spec... ok (openapi 3.1.0, Adyen Payout API 68)
+Found 6 endpoints: POST /confirmThirdParty, POST /declineThirdParty, POST /payout, POST /storeDetail,
+                   POST /storeDetailAndSubmitThirdParty, POST /submitThirdParty
+  create   POST /payout                               post-payout              confidence 0.95
+Auth: BasicAuth (basic, header: Authorization) → credentials.login/password
+Statuses (status): not found
+Errors: 400 validation_error → reject; 401 invalid_credentials → alert_block;
+        403 forbidden → alert_block; 422 validation_error → reject; 500 internal_error → retry
+Webhook signature: no webhook found
+Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
+Fields: 49 request fields, 38 unmapped (card: card)
+Warnings (46):
+  WARN         role_conflict              POST /confirmThirdParty (post-confirmThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
+        hint: endpoints.post-confirmThirdParty: create
+  WARN         role_conflict              POST /declineThirdParty (post-declineThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
+        hint: endpoints.post-declineThirdParty: create
+  WARN         role_conflict              POST /storeDetail (post-storeDetail) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
+        hint: endpoints.post-storeDetail: create
+  WARN         role_conflict              POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
+        hint: endpoints.post-storeDetailAndSubmitThirdParty: create
+  WARN         role_conflict              POST /submitThirdParty (post-submitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
+        hint: endpoints.post-submitThirdParty: create
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         response_id_not_found      no id field found in the response schema; `id` assumed
+        hint: statuses.response_id: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         unmapped_field             billingAddress.city (string, The name of the city. Maximum length: 3000 characters.) has no source
+        hint: fields.billingAddress.city.source: "…"  (overrides.yml)
+  WARN         unmapped_field             billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.
+> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source
+        hint: fields.billingAddress.country.source: "…"  (overrides.yml)
+  … and 36 more (see --format json)
+Unsupported (1):
+  UNSUPPORTED  apiKey_alternative         alternative security scheme 'ApiKeyAuth' (apiKey) is ignored
+        hint: the first supported scheme is used
+Info (6):
+  INFO         outside_contract           POST /confirmThirdParty (post-confirmThirdParty) — not used
+  INFO         outside_contract           POST /declineThirdParty (post-declineThirdParty) — not used
+  INFO         outside_contract           POST /storeDetail (post-storeDetail) — not used
+  INFO         outside_contract           POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) — not used
+  INFO         outside_contract           POST /submitThirdParty (post-submitThirdParty) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+Done: 46 warnings, 1 unsupported. Exit 0.

@@ -1,0 +1,356 @@
+{
+  "spec": {
+    "openapi": "3.0.0",
+    "title": "Stripe API",
+    "version": "2026-08-26.dahlia",
+    "source": "examples/real/stripe.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/v1/payouts",
+      "operation_id": "PostPayouts",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v1/payouts/{payout}",
+      "operation_id": "GetPayoutsPayout",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "POST",
+      "path": "/v1/payouts/{payout}/cancel",
+      "operation_id": "PostPayoutsPayoutCancel",
+      "confidence": 0.95,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "scheme_name": "basicAuth",
+    "header": "Authorization",
+    "prefix": "Basic",
+    "credential_key": "login",
+    "credential_keys": [
+      "login",
+      "password"
+    ],
+    "location": "header"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {
+      "paid": "approved",
+      "pending": "in_progress",
+      "in_transit": "in_progress",
+      "canceled": "rejected",
+      "failed": "rejected"
+    },
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.95
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "amount",
+    "path": [
+      "amount"
+    ],
+    "unit": "minor",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": "currency",
+    "type": "integer",
+    "expr": "to_minor_units(operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "amount",
+        "path": [
+          "amount"
+        ],
+        "source_expr": "to_minor_units(operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "currency",
+        "path": [
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "description",
+        "path": [
+          "description"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "destination",
+        "path": [
+          "destination"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "expand",
+        "path": [
+          "expand"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "method",
+        "path": [
+          "method"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "instant",
+            "standard"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "payout_method",
+        "path": [
+          "payout_method"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "source_type",
+        "path": [
+          "source_type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "bank_account",
+            "card",
+            "fpx"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "statement_descriptor",
+        "path": [
+          "statement_descriptor"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/payouts/{payout} (PostPayoutsPayout) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)",
+      "pointer": "#/paths/~1v1~1payouts~1{payout}/post",
+      "hint": "endpoints.PostPayoutsPayout: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)",
+      "pointer": "#/paths/~1v1~1payouts~1{payout}~1reverse/post",
+      "hint": "endpoints.PostPayoutsPayoutReverse: create"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.stripe.com/)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payouts/{payout}/cancel (PostPayoutsPayoutCancel) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1v1~1payouts~1{payout}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payouts (GetPayouts) — not used",
+      "pointer": "#/paths/~1v1~1payouts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payouts/{payout} (PostPayoutsPayout) — not used",
+      "pointer": "#/paths/~1v1~1payouts~1{payout}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) — not used",
+      "pointer": "#/paths/~1v1~1payouts~1{payout}~1reverse/post",
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "http_alternative",
+      "message": "alternative security scheme 'bearerAuth' (http) is ignored",
+      "pointer": "#/components/securitySchemes/bearerAuth",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "warn",
+      "code": "status_from_description",
+      "message": "statuses of status taken from description: paid, pending, in_transit, canceled, failed",
+      "pointer": null,
+      "hint": "verify the list; statuses.<VALUE>: in_progress|approved|rejected (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "destination (string, The ID of a bank account or a card to send the payout to. If you don't provide a destination, we use the default external account for the specified currency.) has no source",
+      "pointer": null,
+      "hint": "fields.destination.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "expand is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.expand.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "method (string, The method used to send this payout, which is `standard` or `instant`. We support `instant` for payouts to debit cards and bank accounts in certain countries. Learn more about [bank support for Instant Payouts](https://stripe.com/docs/payouts/instant-payouts-banks).) has no source",
+      "pointer": null,
+      "hint": "fields.method.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "payout_method (string, The ID of a v2 FinancialAccount to send funds to.) has no source",
+      "pointer": null,
+      "hint": "fields.payout_method.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "source_type (string, The balance type of your Stripe balance to draw this payout from. Balances for different payment sources are kept separately. You can find the amounts with the Balances API. One of `bank_account`, `card`, or `fpx`.) has no source",
+      "pointer": null,
+      "hint": "fields.source_type.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

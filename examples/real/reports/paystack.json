@@ -1,0 +1,436 @@
+{
+  "spec": {
+    "openapi": "3.0.1",
+    "title": "Paystack",
+    "version": "1.0.0",
+    "source": "examples/real/paystack.yaml"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/transfer",
+      "operation_id": "transfer_initiate",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/transfer/{code}",
+      "operation_id": "transfer_fetch",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "DELETE",
+      "path": "/transferrecipient/{code}",
+      "operation_id": null,
+      "confidence": 0.55,
+      "outside_contract": true
+    },
+    {
+      "role": "balance",
+      "method": "GET",
+      "path": "/balance",
+      "operation_id": "balance_fetch",
+      "confidence": 0.85,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "bearerAuth"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1transfer/post/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 401,
+        "role": "status",
+        "pointer": "#/paths/~1transfer~1{code}/get/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1transfer~1{code}/get/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "cancel",
+        "pointer": "#/paths/~1transferrecipient~1{code}/delete/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "cancel",
+        "pointer": "#/paths/~1transferrecipient~1{code}/delete/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      }
+    ],
+    "http": {
+      "401": "invalid_credentials",
+      "404": "not_found"
+    },
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "amount",
+    "path": [
+      "amount"
+    ],
+    "unit": "minor",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": "currency",
+    "type": "string",
+    "expr": "to_minor_units(operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "source",
+        "path": [
+          "source"
+        ],
+        "source_expr": "credentials.fetch('source')",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "amount",
+        "path": [
+          "amount"
+        ],
+        "source_expr": "to_minor_units(operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "recipient",
+        "path": [
+          "recipient"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reason",
+        "path": [
+          "reason"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "currency",
+        "path": [
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transferrecipient (transferrecipient_create) also looks like create (0.7); POST /transfer (transfer_initiate) wins (0.95)",
+      "pointer": "#/paths/~1transferrecipient/post",
+      "hint": "endpoints.transferrecipient_create: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/bulk (transfer_bulk) also looks like create (0.55); POST /transfer (transfer_initiate) wins (0.95)",
+      "pointer": "#/paths/~1transfer~1bulk/post",
+      "hint": "endpoints.transfer_bulk: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transfer/verify/{reference} (transfer_verify) also looks like status (0.9); GET /transfer/{code} (transfer_fetch) wins (0.9)",
+      "pointer": "#/paths/~1transfer~1verify~1{reference}/get",
+      "hint": "endpoints.transfer_verify: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transferrecipient/{code} (transferrecipient_fetch) also looks like status (0.65); GET /transfer/{code} (transfer_fetch) wins (0.9)",
+      "pointer": "#/paths/~1transferrecipient~1{code}/get",
+      "hint": "endpoints.transferrecipient_fetch: status"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "cancel: DELETE /transferrecipient/{code} scored 0.55",
+      "pointer": "#/paths/~1transferrecipient~1{code}/delete",
+      "hint": "endpoints./transferrecipient/{code}: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.paystack.co)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /transferrecipient/{code} () — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1transferrecipient~1{code}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balance (balance_fetch) — generated as `fetch_balance` helper",
+      "pointer": "#/paths/~1balance/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transferrecipient (transferrecipient_list) — not used",
+      "pointer": "#/paths/~1transferrecipient/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transferrecipient (transferrecipient_create) — not used",
+      "pointer": "#/paths/~1transferrecipient/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transferrecipient/bulk (transferrecipient_bulk) — not used",
+      "pointer": "#/paths/~1transferrecipient~1bulk/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transferrecipient/{code} (transferrecipient_fetch) — not used",
+      "pointer": "#/paths/~1transferrecipient~1{code}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PUT /transferrecipient/{code} () — not used",
+      "pointer": "#/paths/~1transferrecipient~1{code}/put",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfer (transfer_list) — not used",
+      "pointer": "#/paths/~1transfer/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/finalize_transfer (transfer_finalize) — not used",
+      "pointer": "#/paths/~1transfer~1finalize_transfer/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/bulk (transfer_bulk) — not used",
+      "pointer": "#/paths/~1transfer~1bulk/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfer/verify/{reference} (transfer_verify) — not used",
+      "pointer": "#/paths/~1transfer~1verify~1{reference}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfer/export (transfer_download) — not used",
+      "pointer": "#/paths/~1transfer~1export/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/resend_otp (transfer_resendOtp) — not used",
+      "pointer": "#/paths/~1transfer~1resend_otp/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/disable_otp (transfer_disableOtp) — not used",
+      "pointer": "#/paths/~1transfer~1disable_otp/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/disable_otp_finalize (transfer_disableOtpFinalize) — not used",
+      "pointer": "#/paths/~1transfer~1disable_otp_finalize/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfer/enable_otp (transfer_enableOtp) — not used",
+      "pointer": "#/paths/~1transfer~1enable_otp/post",
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "credential_field",
+      "message": "source → credentials.source",
+      "pointer": null,
+      "hint": "fill it in credentials"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "recipient (string, The transfer recipient's code) has no source",
+      "pointer": null,
+      "hint": "fields.recipient.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

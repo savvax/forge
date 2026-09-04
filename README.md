@@ -200,6 +200,24 @@ paths:
 Ожидания и найденные ограничения — `docs/REAL_SPECS.md`. **WARN на чужой спеке — это честность
 инструмента, а не сбой.** **(план)** T18.
 
+## Проверено на реальных спецификациях
+
+`rake real` скачивает семь открытых спек (`examples/real/`, в git не попадают), прогоняет `analyze` и
+сравнивает отчёты со снапшотами `examples/real/reports/*.txt`. Ни одна не роняет инструмент; WARN — это
+честность, а не сбой: каждый закрывается строкой в `overrides.yml`.
+
+| Провайдер | Что распознано автоматически | Что требует overrides / ручного кода | Отчёт |
+|---|---|---|---|
+| Adyen Payout v68 | create `POST /payout`, basic auth (apiKey — альтернатива), сумма `amount.value` в minor units | нет status-эндпоинта и webhook (WARN); поля с большой вложенностью | [adyen_payout.txt](examples/real/reports/adyen_payout.txt) |
+| Adyen Transfers v4 | create/status, apiKey в query (WARN), 20+ статусов из enum по словарю | 100+ редких статусов → `statuses.<X>` (отчёт сворачивает список) | [adyen_transfers.txt](examples/real/reports/adyen_transfers.txt) |
+| PayPal Payouts | create/status/cancel, bearer с TODO вместо oauth2 (UNSUPPORTED) | batch `items[]` — массивы не мапятся (WARN) | [paypal_payouts.txt](examples/real/reports/paypal_payouts.txt) |
+| Paystack | `--include-paths /transfer*`: create `transfer_initiate`, status, balance; `$ref` на path-pointer с `~1` и `%7B` | конфликт status/verify и DELETE recipient как cancel → `endpoints.*` | [paystack.txt](examples/real/reports/paystack.txt) |
+| Stripe (8 МБ) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents; загрузка 0.1 с | form-urlencoded тела; webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
+| Square | статус-эндпоинт; create нет → WARN `no_create_endpoint` (`generate` → exit 2 с подсказкой); битые `$ref` вне контракта → UNSUPPORTED | — | [square.txt](examples/real/reports/square.txt) |
+| Plaid | `--include-paths /transfer/*`: create `/transfer/create`, cancel; apiKey в заголовках | статус через `POST /transfer/get` (id в теле) не поддержан | [plaid.txt](examples/real/reports/plaid.txt) |
+
+Сводка: [SUMMARY.md](examples/real/reports/SUMMARY.md).
+
 ## Критерий → где смотреть
 
 | Критерий (жюри/эксперты) | Где в репозитории |

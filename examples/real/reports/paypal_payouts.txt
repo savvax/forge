@@ -1,0 +1,46 @@
+Parsing spec... ok (openapi 3.0.3, Payouts 1.9)
+Found 4 endpoints: POST /v1/payments/payouts, GET /v1/payments/payouts/{id},
+                   GET /v1/payments/payouts-item/{payout_item_id},
+                   POST /v1/payments/payouts-item/{payout_item_id}/cancel
+  create   POST /v1/payments/payouts                  payouts.post             confidence 0.95
+  status   GET /v1/payments/payouts/{id}              payouts.get              confidence 0.90
+  cancel   POST /v1/payments/payouts-item/{payout_item_id}/cancel payouts-item.cancel      confidence 0.95   (outside contract → cancel_request)
+Auth: Oauth2 (bearer, header: Authorization) → credentials.token
+Statuses (status): not found
+Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
+        403 forbidden → alert_block; 404 (status) not_found → reject;
+        404 (cancel) not_found → reject; 500 (create) internal_error → retry;
+        500 (status) internal_error → retry; 500 (cancel) internal_error → retry
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 6 request fields, 4 unmapped
+Warnings (10):
+  WARN         role_conflict              GET /v1/payments/payouts-item/{payout_item_id} (payouts-item.get) also looks like status (0.9); GET /v1/payments/payouts/{id} (payouts.get) wins (0.9)
+        hint: endpoints.payouts-item.get: status
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         response_id_not_found      no id field found in the response schema; `id` assumed
+        hint: statuses.response_id: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         amount_field_not_found     no amount field in the create request schema
+        hint: fields.<path>.source: "…"
+  WARN         unmapped_field             sender_batch_header.sender_batch_id (string, A sender-specified ID number. Tracks the payout in an accounting system.<blockquote><strong>Note:</strong> <p>PayPal does not process duplicate payouts. If you specify a <code>sender_batch_id</code> that was used in the last 30 days, the API rejects the request with an error message that shows the duplicate <code>sender_batch_id</code> and includes a HATEOAS link to the original payout with the same <code>sender_batch_id</code>.</p><p>If you receive an HTTP <code>5<i>nn</i></code> status code, you can safely retry the request with the same <code>sender_batch_id</code>. The API completes a payment only once for a <code>sender_batch_id</code> that is used within 30 days.</p></blockquote>) has no source
+        hint: fields.sender_batch_header.sender_batch_id.source: "…"  (overrides.yml)
+  WARN         unmapped_field             sender_batch_header.recipient_type (string, The ID type that identifies the recipient of the payment. For example, <code>EMAIL</code>.) has no source
+        hint: fields.sender_batch_header.recipient_type.source: "…"  (overrides.yml)
+  WARN         unmapped_field             sender_batch_header.email_subject (string, The subject line for the email that PayPal sends when payment for a payout item completes. The subject line is the same for all recipients. Value is an alphanumeric string of up to 255 single-byte characters.) has no source
+        hint: fields.sender_batch_header.email_subject.source: "…"  (overrides.yml)
+  WARN         unmapped_field             sender_batch_header.email_message (string, The email message that PayPal sends when the payout item completes. The message is the same for all recipients.) has no source
+        hint: fields.sender_batch_header.email_message.source: "…"  (overrides.yml)
+  WARN         array_field_unsupported    items is an array; [] is generated
+        hint: fields.items.source: "…"
+Unsupported (2):
+  UNSUPPORTED  oauth2_alternative         alternative security scheme 'Oauth2' (oauth2) is ignored
+        hint: the first supported scheme is used
+  UNSUPPORTED  oauth2                     security scheme 'Oauth2' (oauth2) is not supported; bearer token assumed
+        hint: obtain the token out of band and put it into credentials.token
+Info (2):
+  INFO         outside_contract           POST /v1/payments/payouts-item/{payout_item_id}/cancel (payouts-item.cancel) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /v1/payments/payouts-item/{payout_item_id} (payouts-item.get) — not used
+Done: 10 warnings, 2 unsupported. Exit 0.

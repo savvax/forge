@@ -1,0 +1,231 @@
+Parsing spec... ok (openapi 3.0.0, The Plaid API 2020-09-14_1.740.1)
+Found 351 endpoints: POST /asset_report/create, POST /asset_report/get, POST /asset_report/pdf/get,
+                     POST /asset_report/refresh, POST /asset_report/filter,
+                     POST /asset_report/remove, POST /asset_report/audit_copy/create,
+                     POST /asset_report/audit_copy/get, POST /asset_report/audit_copy/pdf/get,
+                     POST /asset_report/audit_copy/remove, POST /cra/monitoring_insights/subscribe,
+                     POST /cra/monitoring_insights/unsubscribe, POST /cra/monitoring_insights/get,
+                     POST /credit/audit_copy_token/update, POST /cra/partner_insights/get,
+                     POST /cra/check_report/income_insights/get,
+                     POST /cra/check_report/base_report/get, POST /cra/check_report/pdf/get,
+                     POST /cra/check_report/create, POST /cra/check_report/partner_insights/get,
+                     POST /cra/check_report/cashflow_insights/get,
+                     POST /cra/check_report/lend_score/get,
+                     POST /cra/check_report/network_insights/get,
+                     POST /cra/check_report/verification/get,
+                     POST /cra/check_report/verification/pdf/get,
+                     POST /cra/loans/applications/register, POST /cra/loans/register,
+                     POST /cra/loans/update, POST /cra/loans/unregister,
+                     POST /cra/servicing/subscription/create,
+                     POST /cra/servicing/subscription/delete, POST /cra/servicing/subscription/get,
+                     POST /cra/servicing/subscription/list, POST /cra/servicing/subscription/update,
+                     POST /cra/report/get, POST /cra/credit_profile/report/get,
+                     POST /consumer_report/pdf/get, POST /oauth/token, POST /oauth/introspect,
+                     POST /oauth/revoke, POST /statements/list, POST /statements/download,
+                     POST /statements/refresh, POST /consent/events/get, POST /item/activity/list,
+                     POST /item/application/list, POST /item/application/unlink,
+                     POST /item/application/scopes/update, POST /application/get, POST /item/get,
+                     POST /user_account/session/get, POST /user_account/session/event/send,
+                     POST /profile/network_status/get, POST /network/status/get, POST /auth/get,
+                     POST /auth/verify, POST /transactions/get, POST /transactions/refresh,
+                     POST /sandbox/transactions/create, POST /cashflow_report/refresh,
+                     POST /cashflow_report/get, POST /cashflow_report/transactions/get,
+                     POST /cashflow_report/insights/get, POST /transactions/recurring/get,
+                     POST /transactions/sync, POST /transactions/enrich,
+                     POST /user/transactions/refresh, POST /user/financial_data/refresh,
+                     POST /institutions/get, POST /institutions/search, POST /institutions/get_by_id,
+                     POST /item/remove, POST /item/products/terminate, POST /accounts/get,
+                     POST /categories/get, POST /sandbox/processor_token/create,
+                     POST /sandbox/public_token/create, POST /sandbox/item/fire_webhook,
+                     POST /sandbox/user/fire_webhook, POST /accounts/balance/get, POST /identity/get,
+                     POST /identity/documents/uploads/get, POST /identity/match,
+                     POST /identity/match/list, POST /identity/refresh, POST /dashboard_user/get,
+                     POST /dashboard_user/list, POST /identity_verification/create,
+                     POST /identity_verification/get, POST /identity_verification/list,
+                     POST /identity_verification/retry, POST /watchlist_screening/entity/create,
+                     POST /watchlist_screening/entity/get,
+                     POST /watchlist_screening/entity/history/list,
+                     POST /watchlist_screening/entity/hit/list,
+                     POST /watchlist_screening/entity/list,
+                     POST /watchlist_screening/entity/program/get,
+                     POST /watchlist_screening/entity/program/list,
+                     POST /watchlist_screening/entity/review/create,
+                     POST /watchlist_screening/entity/review/list,
+                     POST /watchlist_screening/entity/update,
+                     POST /watchlist_screening/individual/create,
+                     POST /watchlist_screening/individual/get,
+                     POST /watchlist_screening/individual/history/list,
+                     POST /watchlist_screening/individual/hit/list,
+                     POST /watchlist_screening/individual/list,
+                     POST /watchlist_screening/individual/program/get,
+                     POST /watchlist_screening/individual/program/list,
+                     POST /watchlist_screening/individual/review/create,
+                     POST /watchlist_screening/individual/review/list,
+                     POST /watchlist_screening/individual/update,
+                     POST /beacon/account_risk/v1/evaluate, POST /beacon/user/create,
+                     POST /beacon/user/get, POST /beacon/user/review, POST /beacon/report/create,
+                     POST /beacon/report/list, POST /beacon/report_syndication/list,
+                     POST /beacon/report/get, POST /beacon/report_syndication/get,
+                     POST /beacon/user/update, POST /beacon/duplicate/get,
+                     POST /identity_verification/autofill/create, POST /beacon/user/history/list,
+                     POST /beacon/user/account_insights/get, POST /protect/user/insights/get,
+                     POST /protect/report/create, POST /protect/cash_advance/decision/create,
+                     POST /protect/cash_advance/repayment/create, POST /protect/compute,
+                     POST /protect/event/send, POST /protect/event/get,
+                     POST /business_verification/get, POST /business_verification/create,
+                     POST /processor/auth/get, POST /processor/account/get,
+                     POST /processor/investments/holdings/get, POST /processor/investments/auth/get,
+                     POST /processor/investments/transactions/get, POST /processor/transactions/get,
+                     POST /processor/transactions/sync, POST /processor/transactions/refresh,
+                     POST /processor/transactions/recurring/get, POST /processor/signal/evaluate,
+                     POST /processor/signal/decision/report, POST /processor/signal/return/report,
+                     POST /processor/signal/prepare, POST /processor/bank_transfer/create,
+                     POST /processor/liabilities/get, POST /processor/identity/get,
+                     POST /processor/identity/match, POST /processor/balance/get,
+                     POST /item/webhook/update, POST /item/access_token/invalidate,
+                     POST /beta/webhook_events/list, POST /webhook_verification_key/get,
+                     POST /liabilities/get, POST /payment_initiation/recipient/create,
+                     POST /payment_initiation/payment/reverse,
+                     POST /payment_initiation/recipient/get, POST /payment_initiation/recipient/list,
+                     POST /payment_initiation/payment/create,
+                     POST /payment_initiation/payment/token/create,
+                     POST /payment_initiation/consent/create, POST /payment_initiation/consent/get,
+                     POST /payment_initiation/consent/revoke,
+                     POST /payment_initiation/consent/payment/execute,
+                     POST /sandbox/item/reset_login, POST /sandbox/item/application/seed,
+                     POST /sandbox/fdx/consent/seed, POST /sandbox/item/set_verification_status,
+                     POST /sandbox/user/reset_login, POST /item/public_token/exchange,
+                     POST /item/public_token/create, POST /user/create, POST /user/get,
+                     POST /user/identity/remove, POST /user/update, POST /user/remove,
+                     POST /user/products/terminate, POST /user/items/get, POST /user/items/associate,
+                     POST /user/items/remove, POST /user/third_party_token/create,
+                     POST /user/third_party_token/remove, POST /credit/sessions/get,
+                     POST /payment_initiation/payment/get, POST /payment_initiation/payment/list,
+                     POST /investments/holdings/get, POST /investments/transactions/get,
+                     POST /investments/refresh, POST /investments/auth/get,
+                     POST /processor/token/create, POST /processor/token/permissions/set,
+                     POST /processor/token/permissions/get, POST /processor/token/webhook/update,
+                     POST /processor/stripe/bank_account_token/create,
+                     POST /processor/apex/processor_token/create, POST /item/import,
+                     POST /link/token/create, POST /link/token/get,
+                     POST /link/oauth/correlation_id/exchange, POST /session/token/create,
+                     POST /transfer/get, POST /transfer/recurring/get, POST /bank_transfer/get,
+                     POST /transfer/authorization/create, POST /transfer/authorization/cancel,
+                     POST /transfer/balance/get, POST /transfer/capabilities/get,
+                     POST /transfer/configuration/get, POST /transfer/ledger/get,
+                     POST /transfer/ledger/distribute, POST /transfer/ledger/deposit,
+                     POST /transfer/ledger/withdraw,
+                     POST /transfer/originator/funding_account/update,
+                     POST /transfer/originator/funding_account/create, POST /transfer/metrics/get,
+                     POST /transfer/create, POST /transfer/recurring/create,
+                     POST /bank_transfer/create, POST /transfer/list, POST /transfer/recurring/list,
+                     POST /bank_transfer/list, POST /transfer/cancel,
+                     POST /transfer/recurring/cancel, POST /bank_transfer/cancel,
+                     POST /transfer/event/list, POST /transfer/ledger/event/list,
+                     POST /bank_transfer/event/list, POST /transfer/event/sync,
+                     POST /bank_transfer/event/sync, POST /transfer/sweep/get,
+                     POST /bank_transfer/sweep/get, POST /transfer/sweep/list,
+                     POST /bank_transfer/sweep/list, POST /bank_transfer/balance/get,
+                     POST /bank_transfer/migrate_account, POST /transfer/migrate_account,
+                     POST /transfer/intent/create, POST /transfer/intent/get,
+                     POST /transfer/repayment/list, POST /transfer/repayment/return/list,
+                     POST /transfer/platform/requirement/submit, POST /transfer/originator/create,
+                     POST /transfer/questionnaire/create, POST /transfer/diligence/submit,
+                     POST /transfer/diligence/document/upload, POST /transfer/originator/get,
+                     POST /transfer/originator/list, POST /transfer/refund/create,
+                     POST /transfer/return/recover, POST /transfer/refund/get,
+                     POST /transfer/refund/cancel, POST /transfer/platform/originator/create,
+                     POST /transfer/platform/person/create, POST /sandbox/bank_transfer/simulate,
+                     POST /sandbox/transfer/sweep/simulate, POST /sandbox/transfer/simulate,
+                     POST /sandbox/transfer/refund/simulate,
+                     POST /sandbox/transfer/ledger/simulate_available,
+                     POST /sandbox/transfer/ledger/deposit/simulate,
+                     POST /sandbox/transfer/ledger/withdraw/simulate,
+                     POST /sandbox/transfer/repayment/simulate, POST /sandbox/transfer/fire_webhook,
+                     POST /sandbox/transfer/test_clock/create,
+                     POST /sandbox/transfer/test_clock/advance,
+                     POST /sandbox/transfer/test_clock/get, POST /sandbox/transfer/test_clock/list,
+                     POST /sandbox/payment_profile/reset_login, POST /sandbox/payment/simulate,
+                     POST /employers/search, POST /income/verification/create,
+                     POST /income/verification/paystubs/get,
+                     POST /income/verification/documents/download,
+                     POST /income/verification/taxforms/get, POST /income/verification/precheck,
+                     POST /employment/verification/get, POST /credit/audit_copy_token/create,
+                     POST /credit/audit_copy_token/remove, POST /credit/asset_report/freddie_mac/get,
+                     POST /credit/freddie_mac/reports/get, POST /beta/credit/v1/bank_employment/get,
+                     POST /credit/bank_income/get, POST /credit/bank_income/pdf/get,
+                     POST /credit/bank_income/refresh, POST /credit/bank_income/webhook/update,
+                     POST /credit/payroll_income/parsing_config/update,
+                     POST /credit/bank_statements/uploads/get, POST /credit/payroll_income/get,
+                     POST /credit/payroll_income/risk_signals/get,
+                     POST /credit/payroll_income/precheck, POST /credit/employment/get,
+                     POST /credit/payroll_income/refresh, POST /credit/relay/create,
+                     POST /credit/relay/get, POST /credit/relay/pdf/get, POST /credit/relay/refresh,
+                     POST /credit/relay/remove, POST /sandbox/bank_transfer/fire_webhook,
+                     POST /sandbox/income/fire_webhook, POST /sandbox/bank_income/fire_webhook,
+                     POST /sandbox/cra/cashflow_updates/update, POST /sandbox/cra/servicing/simulate,
+                     POST /sandbox/oauth/select_accounts, POST /signal/evaluate,
+                     POST /signal/schedule, POST /signal/decision/report, POST /signal/return/report,
+                     POST /signal/prepare, POST /wallet/create, POST /wallet/get, POST /wallet/list,
+                     POST /wallet/transaction/execute, POST /wallet/transaction/get,
+                     POST /wallet/transaction/list, POST /beta/transactions/v1/enhance,
+                     POST /beta/transactions/rules/v1/create, POST /beta/transactions/rules/v1/list,
+                     POST /beta/transactions/rules/v1/remove,
+                     POST /beta/transactions/user_insights/v1/get, POST /beta/ewa_report/v1/get,
+                     POST /beta/issues/v1/get, POST /beta/issues/v1/list, POST /beta/issues/v1/match,
+                     POST /beta/issues/v1/subscribe, POST /beta/issues/v1/unsubscribe,
+                     POST /issues/search, POST /issues/get, POST /issues/subscribe,
+                     POST /payment_profile/create, POST /payment_profile/get,
+                     POST /payment_profile/remove, POST /partner/customer/create,
+                     POST /partner/customer/get, POST /partner/customer/enable,
+                     POST /partner/customer/remove, POST /partner/customer/oauth_institutions/get,
+                     POST /beta/partner/customer/v1/create, POST /beta/partner/customer/v1/get,
+                     POST /beta/partner/customer/v1/update, POST /beta/partner/customer/v1/enable,
+                     POST /link_delivery/create, POST /link_delivery/get, POST /fdx/notifications,
+                     GET /fdx/recipients, GET /fdx/consents,
+                     GET /fdx/consents/{consentId}/revocation,
+                     PUT /fdx/consents/{consentId}/revocation, GET /fdx/consents/{consentId},
+                     GET /fdx/recipient/{recipientId}
+  create   POST /transfer/create                      transferCreate           confidence 0.95
+  cancel   POST /transfer/cancel                      transferCancel           confidence 0.85   (outside contract → cancel_request)
+Auth: clientId (api_key, header: PLAID-CLIENT-ID) → credentials.api_key
+Statuses (transfer.status): pending → in_progress; settled → approved; cancelled, failed → rejected; unmapped: posted, funds_available, returned
+Errors: none described
+Webhook signature: no webhook found
+Amount: string, major units (×100) — source: amount (string) → major units: 'The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). When calling `/transfer/authorization/create`, specify the maximum amount to authorize. When calling `/transfer/create`, specify the exact amount of the transfer, up to a maximum of the amount authorized. If this field is left blank when calling `/transfer/create`, the maximum amount authorized in the `authorization_id` will be sent.'
+Fields: 23 request fields, 18 unmapped
+Warnings (61):
+  WARN         role_conflict              POST /transfer/recurring/create (transferRecurringCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferRecurringCreate: create
+  WARN         role_conflict              POST /transfer/intent/create (transferIntentCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferIntentCreate: create
+  WARN         role_conflict              POST /transfer/originator/create (transferOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferOriginatorCreate: create
+  WARN         role_conflict              POST /transfer/questionnaire/create (transferQuestionnaireCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferQuestionnaireCreate: create
+  WARN         role_conflict              POST /transfer/diligence/submit (transferDiligenceSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferDiligenceSubmit: create
+  WARN         role_conflict              POST /transfer/originator/funding_account/create (transferOriginatorFundingAccountCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferOriginatorFundingAccountCreate: create
+  WARN         role_conflict              POST /transfer/platform/requirement/submit (transferPlatformRequirementSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformRequirementSubmit: create
+  WARN         role_conflict              POST /transfer/platform/originator/create (transferPlatformOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformOriginatorCreate: create
+  WARN         role_conflict              POST /transfer/platform/person/create (transferPlatformPersonCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformPersonCreate: create
+  WARN         role_conflict              POST /transfer/get (transferGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferGet: create
+  … and 51 more (see --format json)
+Info (43):
+  INFO         outside_contract           POST /transfer/cancel (transferCancel) — generated as `cancel_request` helper
+  INFO         outside_contract           POST /transfer/get (transferGet) — not used
+  INFO         outside_contract           POST /transfer/recurring/get (transferRecurringGet) — not used
+  INFO         outside_contract           POST /transfer/authorization/create (transferAuthorizationCreate) — not used
+  INFO         outside_contract           POST /transfer/authorization/cancel (transferAuthorizationCancel) — not used
+  INFO         outside_contract           POST /transfer/balance/get (transferBalanceGet) — not used
+  INFO         outside_contract           POST /transfer/capabilities/get (transferCapabilitiesGet) — not used
+  INFO         outside_contract           POST /transfer/configuration/get (transferConfigurationGet) — not used
+  INFO         outside_contract           POST /transfer/ledger/get (transferLedgerGet) — not used
+  INFO         outside_contract           POST /transfer/ledger/distribute (transferLedgerDistribute) — not used
+  … and 33 more (see --format json)
+Done: 61 warnings, 0 unsupported. Exit 0.

@@ -10,6 +10,10 @@ module Forge
   module Analyzers
     # Поля запроса create → выражения operation.* (rules/field_aliases.yml); реквизиты по типам; заголовки.
     class Fields < Base
+      HINT_MISSING = 'check the pointer: the target must exist in this document'
+      HINT_EXTERNAL = 'inline the referenced schema into the spec or bundle it with a resolver'
+      HINT_CYCLE = 'break the cycle in the request schema: inline one side or drop the back-reference'
+
       def call
         endpoint = role(:create)
         schema = endpoint&.request_body&.schema
@@ -74,15 +78,39 @@ module Forge
         end
       end
 
-      # Внешний $ref: в схеме запроса create — фатально (D-05); в ответах — UNSUPPORTED (один на эндпоинт).
+      # Внешний или циклический $ref: в схеме запроса create — фатально (D-05, D-14); в ответах — UNSUPPORTED/INFO.
       def check_external_refs(create, schema)
         path, ref = unresolved(schema).first
-        if ref
-          raise UnsupportedError.new("external $ref '#{ref}' in the create request schema (#{path.join('.')})",
-                                     pointer: "#{create.pointer}/requestBody", file: spec.source_path,
-                                     hint: 'inline the referenced schema into the spec or bundle it with a resolver')
-        end
+        raise_unresolved(create, path, ref) if ref
+        check_circular(create, schema)
         (spec.endpoints + spec.webhooks).each { |ep| external_in_responses(ep) }
+      end
+
+      def raise_unresolved(create, path, ref)
+        pointer = "#{create.pointer}/requestBody/#{path.join('/')}"
+        if ref.start_with?('#/')
+          raise SpecError.new("unresolved $ref '#{ref}' in the create request schema",
+                              pointer: pointer, file: spec.source_path, hint: HINT_MISSING)
+        end
+        message = "external $ref '#{ref}' in the create request schema (#{path.join('.')})"
+        raise UnsupportedError.new(message, pointer: pointer, file: spec.source_path, hint: HINT_EXTERNAL)
+      end
+
+      def check_circular(create, schema)
+        path, chain = circular(schema).first
+        return unless chain
+
+        raise SpecError.new("circular $ref: #{chain}", pointer: "#{create.pointer}/requestBody/#{path.join('/')}",
+                                                       file: spec.source_path, hint: HINT_CYCLE)
+      end
+
+      def circular(schema, prefix = [])
+        return [] unless schema
+        return [[prefix, schema.circular_ref]] if schema.circular_ref
+
+        children = schema.properties.to_h.map { |n, p| [prefix + [n], p] } + [[prefix + ['[]'], schema.items]]
+        children += (schema.one_of.to_a + schema.any_of.to_a).map { |v| [prefix, v] }
+        children.flat_map { |pre, child| circular(child, pre) }
       end
 
       def external_in_responses(endpoint)

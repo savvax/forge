@@ -1,0 +1,2261 @@
+{
+  "spec": {
+    "openapi": "3.1.0",
+    "title": "Transfers API",
+    "version": "4",
+    "source": "examples/real/adyen_transfers.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/transfers",
+      "operation_id": "post-transfers",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/transfers/{id}",
+      "operation_id": "get-transfers-id",
+      "confidence": 0.9,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "api_key",
+    "scheme_name": "clientKey",
+    "header": null,
+    "prefix": null,
+    "credential_key": "api_key",
+    "credential_keys": [
+      "api_key"
+    ],
+    "location": "query",
+    "param_name": "clientKey"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {
+      "authorised": "in_progress",
+      "booked": "in_progress",
+      "cancelled": "rejected",
+      "captured": "approved",
+      "credited": "approved",
+      "error": "rejected",
+      "expired": "rejected",
+      "failed": "rejected",
+      "pending": "in_progress",
+      "received": "in_progress",
+      "refused": "rejected",
+      "rejected": "rejected"
+    },
+    "unmapped": [
+      "approvalPending",
+      "atmWithdrawal",
+      "atmWithdrawalReversalPending",
+      "atmWithdrawalReversed",
+      "authAdjustmentAuthorised",
+      "authAdjustmentError",
+      "authAdjustmentRefused",
+      "bankTransfer",
+      "bankTransferPending",
+      "bookingPending",
+      "capturePending",
+      "captureReversalPending",
+      "captureReversed",
+      "capturedExternally",
+      "chargeback",
+      "chargebackExternally",
+      "chargebackPending",
+      "chargebackReversalPending",
+      "chargebackReversed",
+      "depositCorrection",
+      "depositCorrectionPending",
+      "dispute",
+      "disputeClosed",
+      "disputeExpired",
+      "disputeNeedsReview",
+      "fee",
+      "feePending",
+      "interchangeAdjusted",
+      "internalTransfer",
+      "internalTransferPending",
+      "invoiceDeduction",
+      "invoiceDeductionPending",
+      "manualCorrectionPending",
+      "manuallyCorrected",
+      "matchedStatement",
+      "matchedStatementPending",
+      "merchantPayin",
+      "merchantPayinPending",
+      "merchantPayinReversed",
+      "merchantPayinReversedPending",
+      "miscCost",
+      "miscCostPending",
+      "paymentCost",
+      "paymentCostPending",
+      "pendingApproval",
+      "pendingExecution",
+      "refundPending",
+      "refundReversalPending",
+      "refundReversed",
+      "refunded",
+      "refundedExternally",
+      "reserveAdjustment",
+      "reserveAdjustmentPending",
+      "returned",
+      "reversed",
+      "secondChargeback",
+      "secondChargebackPending",
+      "undefined"
+    ],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.95
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/401",
+        "headers": [
+          "auth-param1"
+        ],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 422,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/422",
+        "headers": [
+          "Idempotency-Key"
+        ],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      },
+      {
+        "status": 401,
+        "role": "status",
+        "pointer": "#/paths/~1transfers~1{id}/get/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "status",
+        "pointer": "#/paths/~1transfers~1{id}/get/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 422,
+        "role": "status",
+        "pointer": "#/paths/~1transfers~1{id}/get/responses/422",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "status",
+        "pointer": "#/paths/~1transfers~1{id}/get/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      }
+    ],
+    "http": {
+      "401": "invalid_credentials",
+      "403": "forbidden",
+      "422": "validation_error",
+      "500": "internal_error"
+    },
+    "codes": [
+      "crossBorder",
+      "fast",
+      "instant",
+      "internal",
+      "regular",
+      "wire"
+    ],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "value",
+    "path": [
+      "amount",
+      "value"
+    ],
+    "unit": "minor",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": "amount.currency",
+    "type": "integer",
+    "expr": "to_minor_units(operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "currency",
+        "path": [
+          "amount",
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "value",
+        "path": [
+          "amount",
+          "value"
+        ],
+        "source_expr": "to_minor_units(operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "balanceAccountId",
+        "path": [
+          "balanceAccountId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "category",
+        "path": [
+          "category"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "bank",
+            "card",
+            "internal",
+            "issuedCard",
+            "platformPayment",
+            "topUp"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "balanceAccountId",
+        "path": [
+          "counterparty",
+          "balanceAccountId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "city",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "city"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "country",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "country"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "line1",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "line1"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "line2",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "line2"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "postalCode",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "postalCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "stateOrProvince",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "address",
+          "stateOrProvince"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "dateOfBirth",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "dateOfBirth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "email",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "email"
+        ],
+        "source_expr": "operation.customer&.dig('email')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "firstName",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "firstName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "fullName",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "fullName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "lastName",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "lastName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "type",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "individual",
+            "organization",
+            "unknown"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "url",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountHolder",
+          "url"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "accountNumber",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountIdentification",
+          "accountNumber"
+        ],
+        "source_expr": "operation.payout_requisite.dig('bank_account', 'account_number')",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": "bank_account"
+      },
+      {
+        "provider_field": "bsbCode",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountIdentification",
+          "bsbCode"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "type",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "accountIdentification",
+          "type"
+        ],
+        "source_expr": "requisite_type",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "auLocal"
+          ]
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "storedPaymentMethodId",
+        "path": [
+          "counterparty",
+          "bankAccount",
+          "storedPaymentMethodId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "cardHolder",
+        "path": [
+          "counterparty",
+          "card",
+          "cardHolder"
+        ],
+        "source_expr": "operation.payout_requisite.dig('card', 'holder')",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "object"
+        },
+        "confidence": 0.9,
+        "requisite_type": "card"
+      },
+      {
+        "provider_field": "cardIdentification",
+        "path": [
+          "counterparty",
+          "card",
+          "cardIdentification"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "object"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "transferInstrumentId",
+        "path": [
+          "counterparty",
+          "transferInstrumentId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "description",
+        "path": [
+          "description"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "date",
+        "path": [
+          "executionDate",
+          "date"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "timezone",
+        "path": [
+          "executionDate",
+          "timezone"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "paymentInstrumentId",
+        "path": [
+          "paymentInstrumentId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "priorities",
+        "path": [
+          "priorities"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "priority",
+        "path": [
+          "priority"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "crossBorder",
+            "fast",
+            "instant",
+            "internal",
+            "regular",
+            "wire"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "referenceForBeneficiary",
+        "path": [
+          "referenceForBeneficiary"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "numberOfApprovalsRequired",
+        "path": [
+          "review",
+          "numberOfApprovalsRequired"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "scaOnApproval",
+        "path": [
+          "review",
+          "scaOnApproval"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "boolean"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "type",
+        "path": [
+          "type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "bankTransfer",
+            "internalTransfer",
+            "internalDirectDebit"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "city",
+        "path": [
+          "ultimateParty",
+          "address",
+          "city"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "country",
+        "path": [
+          "ultimateParty",
+          "address",
+          "country"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "line1",
+        "path": [
+          "ultimateParty",
+          "address",
+          "line1"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "line2",
+        "path": [
+          "ultimateParty",
+          "address",
+          "line2"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "postalCode",
+        "path": [
+          "ultimateParty",
+          "address",
+          "postalCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "stateOrProvince",
+        "path": [
+          "ultimateParty",
+          "address",
+          "stateOrProvince"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "dateOfBirth",
+        "path": [
+          "ultimateParty",
+          "dateOfBirth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "email",
+        "path": [
+          "ultimateParty",
+          "email"
+        ],
+        "source_expr": "operation.customer&.dig('email')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "firstName",
+        "path": [
+          "ultimateParty",
+          "firstName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "fullName",
+        "path": [
+          "ultimateParty",
+          "fullName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "expiryMonth",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "expiryMonth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "expiryYear",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "expiryYear"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "issueNumber",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "issueNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "number",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "number"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "startMonth",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "startMonth"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "startYear",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "startYear"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "storedPaymentMethodId",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "cardIdentification",
+          "storedPaymentMethodId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "networkPaymentReference",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "networkPaymentReference"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "sourceOfFunds",
+        "path": [
+          "ultimateParty",
+          "fundingInstrument",
+          "sourceOfFunds"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "DEBIT",
+            "DEPOSIT_ACCOUNT"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "lastName",
+        "path": [
+          "ultimateParty",
+          "lastName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "ultimateParty",
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "type",
+        "path": [
+          "ultimateParty",
+          "type"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "individual",
+            "organization",
+            "unknown"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "url",
+        "path": [
+          "ultimateParty",
+          "url"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [
+      "auLocal"
+    ],
+    "requisite_container": "counterparty.bankAccount.accountIdentification",
+    "headers": [
+      {
+        "provider_field": "Idempotency-Key",
+        "path": [
+          "Idempotency-Key"
+        ],
+        "source_expr": "operation.idempotency_key",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": null
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/approve (post-transfers-approve) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1approve/post",
+      "hint": "endpoints.post-transfers-approve: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/cancel (post-transfers-cancel) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1cancel/post",
+      "hint": "endpoints.post-transfers-cancel: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/{transferId}/returns (post-transfers-transferId-returns) also looks like create (0.85); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1{transferId}~1returns/post",
+      "hint": "endpoints.post-transfers-transferId-returns: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /grants (post-grants) also looks like create (0.7); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1grants/post",
+      "hint": "endpoints.post-grants: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /cashouts (post-cashouts) also looks like create (0.7); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1cashouts/post",
+      "hint": "endpoints.post-cashouts: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transfers (get-transfers) also looks like status (0.7); GET /transfers/{id} (get-transfers-id) wins (0.9)",
+      "pointer": "#/paths/~1transfers/get",
+      "hint": "endpoints.get-transfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /grants/{id} (get-grants-id) also looks like status (0.65); GET /transfers/{id} (get-transfers-id) wins (0.9)",
+      "pointer": "#/paths/~1grants~1{id}/get",
+      "hint": "endpoints.get-grants-id: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transactions/{id} (get-transactions-id) also looks like status (0.65); GET /transfers/{id} (get-transfers-id) wins (0.9)",
+      "pointer": "#/paths/~1transactions~1{id}/get",
+      "hint": "endpoints.get-transactions-id: status"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /grants (get-grants) — not used",
+      "pointer": "#/paths/~1grants/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /grants (post-grants) — not used",
+      "pointer": "#/paths/~1grants/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /grants/{id} (get-grants-id) — not used",
+      "pointer": "#/paths/~1grants~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transactions (get-transactions) — not used",
+      "pointer": "#/paths/~1transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transactions/{id} (get-transactions-id) — not used",
+      "pointer": "#/paths/~1transactions~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfers (get-transfers) — not used",
+      "pointer": "#/paths/~1transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfers/approve (post-transfers-approve) — not used",
+      "pointer": "#/paths/~1transfers~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfers/cancel (post-transfers-cancel) — not used",
+      "pointer": "#/paths/~1transfers~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfers/{transferId}/returns (post-transfers-transferId-returns) — not used",
+      "pointer": "#/paths/~1transfers~1{transferId}~1returns/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /cashouts (post-cashouts) — not used",
+      "pointer": "#/paths/~1cashouts/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "http_alternative",
+      "message": "alternative security scheme 'BasicAuth' (http) is ignored",
+      "pointer": "#/components/securitySchemes/BasicAuth",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "unsupported",
+      "code": "apiKey_alternative",
+      "message": "alternative security scheme 'ApiKeyAuth' (apiKey) is ignored",
+      "pointer": "#/components/securitySchemes/ApiKeyAuth",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "warn",
+      "code": "api_key_in_query",
+      "message": "apiKey 'clientKey' is sent in query, not header",
+      "pointer": "#/components/securitySchemes/clientKey",
+      "hint": "the generated client passes it as a query param"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'approvalPending' (approval_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.approvalPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'atmWithdrawal' (atm_withdrawal) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.atmWithdrawal: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'atmWithdrawalReversalPending' (atm_withdrawal_reversal_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.atmWithdrawalReversalPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'atmWithdrawalReversed' (atm_withdrawal_reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.atmWithdrawalReversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'authAdjustmentAuthorised' (auth_adjustment_authorised) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.authAdjustmentAuthorised: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'authAdjustmentError' (auth_adjustment_error) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.authAdjustmentError: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'authAdjustmentRefused' (auth_adjustment_refused) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.authAdjustmentRefused: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'bankTransfer' (bank_transfer) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.bankTransfer: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'bankTransferPending' (bank_transfer_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.bankTransferPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'bookingPending' (booking_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.bookingPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'capturePending' (capture_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.capturePending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'captureReversalPending' (capture_reversal_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.captureReversalPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'captureReversed' (capture_reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.captureReversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'capturedExternally' (captured_externally) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.capturedExternally: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'chargeback' (chargeback) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.chargeback: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'chargebackExternally' (chargeback_externally) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.chargebackExternally: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'chargebackPending' (chargeback_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.chargebackPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'chargebackReversalPending' (chargeback_reversal_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.chargebackReversalPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'chargebackReversed' (chargeback_reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.chargebackReversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'depositCorrection' (deposit_correction) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.depositCorrection: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'depositCorrectionPending' (deposit_correction_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.depositCorrectionPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'dispute' (dispute) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.dispute: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'disputeClosed' (dispute_closed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.disputeClosed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'disputeExpired' (dispute_expired) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.disputeExpired: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'disputeNeedsReview' (dispute_needs_review) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.disputeNeedsReview: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'fee' (fee) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.fee: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'feePending' (fee_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.feePending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'interchangeAdjusted' (interchange_adjusted) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.interchangeAdjusted: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'internalTransfer' (internal_transfer) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.internalTransfer: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'internalTransferPending' (internal_transfer_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.internalTransferPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'invoiceDeduction' (invoice_deduction) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.invoiceDeduction: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'invoiceDeductionPending' (invoice_deduction_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.invoiceDeductionPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'manualCorrectionPending' (manual_correction_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.manualCorrectionPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'manuallyCorrected' (manually_corrected) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.manuallyCorrected: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'matchedStatement' (matched_statement) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.matchedStatement: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'matchedStatementPending' (matched_statement_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.matchedStatementPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'merchantPayin' (merchant_payin) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.merchantPayin: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'merchantPayinPending' (merchant_payin_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.merchantPayinPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'merchantPayinReversed' (merchant_payin_reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.merchantPayinReversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'merchantPayinReversedPending' (merchant_payin_reversed_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.merchantPayinReversedPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'miscCost' (misc_cost) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.miscCost: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'miscCostPending' (misc_cost_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.miscCostPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'paymentCost' (payment_cost) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.paymentCost: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'paymentCostPending' (payment_cost_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.paymentCostPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'pendingApproval' (pending_approval) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.pendingApproval: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'pendingExecution' (pending_execution) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.pendingExecution: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'refundPending' (refund_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.refundPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'refundReversalPending' (refund_reversal_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.refundReversalPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'refundReversed' (refund_reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.refundReversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'refunded' (refunded) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.refunded: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'refundedExternally' (refunded_externally) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.refundedExternally: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'reserveAdjustment' (reserve_adjustment) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.reserveAdjustment: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'reserveAdjustmentPending' (reserve_adjustment_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.reserveAdjustmentPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'returned' (returned) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.returned: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'reversed' (reversed) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.reversed: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'secondChargeback' (second_chargeback) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.secondChargeback: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'secondChargebackPending' (second_chargeback_pending) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.secondChargebackPending: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'undefined' (undefined) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.undefined: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "balanceAccountId (string, The unique identifier of the source [balance account](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id).\n\nIf you want to make a transfer using a **virtual** **bankAccount** assigned to the balance account, you must specify the [payment instrument ID](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/paymentInstruments#responses-200-id) of the **virtual** **bankAccount**. If you only specify a balance account ID, Adyen uses the default **physical** **bankAccount** payment instrument assigned to the balance account.) has no source",
+      "pointer": null,
+      "hint": "fields.balanceAccountId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "category (string, The category of the transfer.\n\nPossible values:\n\n - **bank**: A transfer involving a [transfer instrument](https://docs.adyen.com/api-explorer/legalentity/latest/post/transferInstruments#responses-200-id) or a bank account.\n\n- **card**: A transfer involving a third-party card.\n\n- **internal**: A transfer between [balance accounts](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id) within your platform.\n\n- **issuedCard**: A transfer initiated by an Adyen-issued card.\n\n- **platformPayment**: Funds movements related to payments that are acquired for your users.\n\n- **topUp**: An incoming transfer initiated by your user to top up their balance account.) has no source",
+      "pointer": null,
+      "hint": "fields.category.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.balanceAccountId (string, The unique identifier of the counterparty [balance account](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id).) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.balanceAccountId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.city (string, The name of the city.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.city.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.country (string, The two-character ISO 3166-1 alpha-2 country code. For example, **US**, **NL**, or **GB**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.line1 (string, The first line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.line1.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.line2 (string, The second line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.line2.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.postalCode (string, The postal code.\nMaximum length:\n* 5 digits for an address in the US.\n* 10 characters for an address in all other countries.\n\nSupported characters: **[a-z] [A-Z] [0-9]** and Space.\n\n> Required for addresses in the US.\n) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.postalCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.address.stateOrProvince (string,    The two-letter ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n\n   > Required for the US and Canada.\n) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.address.stateOrProvince.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.dateOfBirth (string, The date of birth of the individual in [ISO-8601](https://www.w3.org/TR/NOTE-datetime) format. For example, **YYYY-MM-DD**.\n\nAllowed only when `type` is **individual**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.dateOfBirth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.firstName (string, The first name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.firstName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.fullName (string, The full name of the entity that owns the bank account or card.\n\nSupported characters: [a-z] [A-Z] [0-9] , . ; : - — / \\ + & ! ? @ ( ) \" ' and space.\n\nRequired when `category` is **bank**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.fullName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.lastName (string, The last name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.lastName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.type (string, The type of entity that owns the bank account or card.\n\nPossible values: **individual**, **organization**, or **unknown**.\n\nRequired when `category` is **card**. In this case, the value must be **individual**.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.type.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.url (string, The URL of the organization or individual. Maximum length: 255 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.url.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "one_of_first_variant",
+      "message": "counterparty.bankAccount.accountIdentification: 16 variants (AULocalAccountIdentification, BRLocalAccountIdentification, CALocalAccountIdentification, CZLocalAccountIdentification, DKLocalAccountIdentification, HKLocalAccountIdentification, HULocalAccountIdentification, IbanAccountIdentification, NOLocalAccountIdentification, NZLocalAccountIdentification, NumberAndBicAccountIdentification, PLLocalAccountIdentification, SELocalAccountIdentification, SGLocalAccountIdentification, UKLocalAccountIdentification, USLocalAccountIdentification); first (AULocalAccountIdentification) is used",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountIdentification.variant: <SchemaName>  (overrides.yml, not implemented yet)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountIdentification.bsbCode (string, The 6-digit [Bank State Branch (BSB) code](https://en.wikipedia.org/wiki/Bank_state_branch), without separators or whitespace.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountIdentification.bsbCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.storedPaymentMethodId (string, The unique token that identifies the stored bank account details of the counterparty for a payout.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.storedPaymentMethodId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.card.cardIdentification (object) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.card.cardIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.transferInstrumentId (string, The unique identifier of the counterparty [transfer instrument](https://docs.adyen.com/api-explorer/legalentity/latest/post/transferInstruments#responses-200-id).) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.transferInstrumentId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "executionDate.date (string, The date when the transfer will be processed. This date must be:\n* Within 30 days of the current date.\n* In the [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html) **YYYY-MM-DD**. For example: 2025-01-31) has no source",
+      "pointer": null,
+      "hint": "fields.executionDate.date.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "executionDate.timezone (string, The timezone that applies to the execution date. Use a timezone identifier from the [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).\n\nExample: **America/Los_Angeles**.\n Default value: **Europe/Amsterdam**.) has no source",
+      "pointer": null,
+      "hint": "fields.executionDate.timezone.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "paymentInstrumentId (string, The unique identifier of the source [payment instrument](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/paymentInstruments#responses-200-id).\n\nIf you want to make a transfer using a **virtual** **bankAccount**, you must specify the payment instrument ID of the **virtual** **bankAccount**. If you only specify a balance account ID, Adyen uses the default **physical** **bankAccount** payment instrument assigned to the balance account.) has no source",
+      "pointer": null,
+      "hint": "fields.paymentInstrumentId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "priorities is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.priorities.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "priority (string, The priority for the bank transfer. This sets the speed at which the transfer is sent and the fees that you have to pay. Required for transfers with `category` **bank**.\n\nPossible values:\n\n* **regular**: For normal, low-value transactions.\n\n* **fast**: A faster way to transfer funds, but the fees are higher. Recommended for high-priority, low-value transactions.\n\n* **wire**: The fastest way to transfer funds, but this has the highest fees. Recommended for high-priority, high-value transactions.\n\n* **instant**: For instant funds transfers within the United States and in [SEPA locations](https://www.ecb.europa.eu/paym/integration/retail/sepa/html/index.en.html).\n\n* **crossBorder**: For high-value transfers to a recipient in a different country.\n\n* **internal**: For transfers to an Adyen-issued business bank account (by bank account number/IBAN).) has no source",
+      "pointer": null,
+      "hint": "fields.priority.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "referenceForBeneficiary (string,  A reference that is sent to the recipient. This reference is also sent in all webhooks related to the transfer, so you can use it to track statuses for both parties involved in the funds movement.\n\n Supported characters: **a-z**, **A-Z**, **0-9**. The maximum length depends on the `category`.\n\n- **internal**: 80 characters\n\n- **bank**: 35 characters when transferring to an IBAN, 15 characters for others.) has no source",
+      "pointer": null,
+      "hint": "fields.referenceForBeneficiary.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "review.numberOfApprovalsRequired (integer, Specifies the number of [approvals](https://docs.adyen.com/api-explorer/transfers/latest/post/transfers/approve) required to process the transfer.) has no source",
+      "pointer": null,
+      "hint": "fields.review.numberOfApprovalsRequired.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "review.scaOnApproval (boolean, Specifies whether you will initiate Strong Customer Authentication (SCA) in thePOST [/transfers/approve](https://docs.adyen.com/api-explorer/transfers/latest/post/transfers/approve) request.\n\nOnly applies to transfers made with an Adyen [business account](https://docs.adyen.com/platforms/business-accounts).) has no source",
+      "pointer": null,
+      "hint": "fields.review.scaOnApproval.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "type (string, The type of transfer.\n\nPossible values:\n\n - **bankTransfer**: for push transfers to a transfer instrument or a bank account. The `category` must be **bank**.\n- **internalTransfer**: for push transfers between balance accounts. The `category` must be **internal**.\n- **internalDirectDebit**: for pull transfers (direct debits) between balance accounts. The `category` must be **internal**. \n\n) has no source",
+      "pointer": null,
+      "hint": "fields.type.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.city (string, The name of the city.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.city.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.country (string, The two-character ISO 3166-1 alpha-2 country code. For example, **US**, **NL**, or **GB**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.line1 (string, The first line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.line1.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.line2 (string, The second line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.line2.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.postalCode (string, The postal code.\nMaximum length:\n* 5 digits for an address in the US.\n* 10 characters for an address in all other countries.\n\nSupported characters: **[a-z] [A-Z] [0-9]** and Space.\n\n> Required for addresses in the US.\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.postalCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.address.stateOrProvince (string,    The two-letter ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n\n   > Required for the US and Canada.\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.address.stateOrProvince.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.dateOfBirth (string, The date of birth of the individual in [ISO-8601](https://www.w3.org/TR/NOTE-datetime) format. For example, **YYYY-MM-DD**.\n\nAllowed only when `type` is **individual**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.dateOfBirth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.firstName (string, The first name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.firstName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fullName (string, The full name of the entity that owns the bank account or card.\n\nSupported characters: [a-z] [A-Z] [0-9] , . ; : - — / \\ + & ! ? @ ( ) \" ' and space.\n\nRequired when `category` is **bank**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fullName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryMonth (string, The expiry month of the card.\n\nFormat: two digits. Add a leading zero for single-digit months. For example:\n* 03 = March\n* 11 = November) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.expiryMonth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryYear (string, The expiry year of the card.\n\nFormat: four digits. For example: 2020) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.expiryYear.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.issueNumber (string, The issue number of the card. Applies only to some UK debit cards.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.issueNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.number (string, The card number without any separators.\n\nFor security, the response only includes the last four digits of the card number.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.number.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.startMonth (string, The month when the card was issued. Applies only to some UK debit cards.\n\nFormat: two digits. Add a leading zero for single-digit months. For example:\n* 03 = March\n* 11 = November) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.startMonth.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.startYear (string, The year when the card was issued. Applies only to some UK debit cards.\n\nFormat: four digits. For example: 2020) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.startYear.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.storedPaymentMethodId (string, The unique [token](/payouts/payout-service/pay-out-to-cards/manage-card-information#save-card-details) created to identify the counterparty.\n\n) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.storedPaymentMethodId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.networkPaymentReference (string, The unique reference assigned by the card network for the pay-in transaction.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.networkPaymentReference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.sourceOfFunds (string, Indicates where the funds used for the transfer originated. Possible values are:\n- **DEBIT** for card-to-card transfers.\n- **DEPOSIT_ACCOUNT** for wallet-to-card transfers.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.sourceOfFunds.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.lastName (string, The last name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.lastName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.type (string, The type of entity that owns the bank account or card.\n\nPossible values: **individual**, **organization**, or **unknown**.\n\nRequired when `category` is **card**. In this case, the value must be **individual**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.type.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.url (string, The URL of the organization or individual. Maximum length: 255 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.url.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

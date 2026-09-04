@@ -32,9 +32,9 @@ RSpec.describe Forge::RefResolver do
     expect(schema).to eq('x-forge-unresolved' => 'http://x/schema.json#/B')
   end
 
-  it 'reports an unresolved local ref with pointer and file' do
-    expect { described_class.resolve({ 'a' => { '$ref' => '#/nope' } }, file: 'f.yaml') }
-      .to raise_error(Forge::SpecError) { |e| expect(e.message).to include('unresolved $ref', '#/a', 'f.yaml') }
+  it 'marks an unresolved local ref instead of raising' do
+    expect(described_class.resolve({ 'a' => { '$ref' => '#/nope' } }, file: 'f.yaml')['a'])
+      .to eq('x-forge-unresolved' => '#/nope')
   end
 
   it 'allows a self-referencing schema through a sibling (no false cycle)' do

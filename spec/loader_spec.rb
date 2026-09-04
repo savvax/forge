@@ -9,9 +9,7 @@ RSpec.describe Forge::Loader do
     'not_object.yaml' => 'root must be an object',
     'swagger2.yaml' => 'Swagger 2.0 is not supported; convert to OpenAPI 3',
     'no_openapi_key.json' => "missing 'openapi'",
-    'no_paths.yaml' => 'no paths',
-    'bad_ref.yaml' => 'unresolved $ref',
-    'cyclic_ref.yaml' => 'circular $ref'
+    'no_paths.yaml' => 'no paths'
   }.each do |file, text|
     it "#{file} raises SpecError with '#{text}' and the file name" do
       expect { described_class.load(broken(file)) }
@@ -19,16 +17,21 @@ RSpec.describe Forge::Loader do
     end
   end
 
-  it 'reports the pointer for a bad $ref' do
-    expect { described_class.load(broken('bad_ref.yaml')) }.to raise_error(Forge::SpecError) do |e|
-      expect(e.pointer).to start_with('#/paths/~1payouts/post/requestBody/')
-    end
+  it 'marks a missing local $ref target (analyzer decides, D-14)' do
+    spec = described_class.load(broken('bad_ref.yaml'))
+    schema = spec.dig('paths', '/payouts', 'post', 'requestBody', 'content', 'application/json', 'schema')
+    expect(schema).to include('x-forge-unresolved' => '#/components/schemas/Missing')
   end
 
-  it 'reports the chain for a circular $ref' do
-    expect { described_class.load(broken('cyclic_ref.yaml')) }.to raise_error(Forge::SpecError) do |e|
-      expect(e.message).to include('#/components/schemas/A -> #/components/schemas/B -> #/components/schemas/A')
-    end
+  it 'marks a circular $ref with the chain instead of raising (D-14)' do
+    spec = described_class.load(broken('cyclic_ref.yaml'))
+    markers = spec.to_s.scan(/"x-forge-circular"\s*=>\s*"([^"]+)"/).flatten.uniq
+    expect(markers).to include('#/components/schemas/A -> #/components/schemas/B -> #/components/schemas/A')
+  end
+
+  it 'decodes percent-encoded pointers (#/paths/~1split~1%7Bid%7D)' do
+    spec = { 'paths' => { '/split/{id}' => { 'x' => 1 } }, 'a' => { '$ref' => '#/paths/~1split~1%7Bid%7D' } }
+    expect(Forge::RefResolver.resolve(spec)['a']).to eq('x' => 1)
   end
 
   it 'does not raise on an external $ref in create (analyzer decides, D-05)' do

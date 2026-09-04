@@ -14,7 +14,7 @@ module Forge
     desc 'analyze', 'Разобрать OpenAPI-спеку и напечатать отчёт'
     option :spec, required: true, desc: 'OpenAPI 3.x файл (YAML/JSON)'
     option :overrides, desc: 'overrides.yml — переопределения решений анализа (docs/RULES.md § 9)'
-    option :include_paths, type: :array, default: [], desc: 'glob по path, ограничивает анализ'
+    option :include_paths, type: :array, default: [], repeatable: true, desc: 'glob по path (повторяемый)'
     option :format, default: 'text', enum: %w[text json]
     def analyze
       guarded do
@@ -28,7 +28,7 @@ module Forge
     option :provider, desc: 'имя провайдера (иначе из info.title)'
     option :out, default: 'output', desc: 'каталог вывода'
     option :overrides
-    option :include_paths, type: :array, default: []
+    option :include_paths, type: :array, default: [], repeatable: true
     option :templates_dir, desc: 'каталог с переопределёнными шаблонами *.erb'
     option :lang, default: 'ruby', enum: %w[ruby]
     option :format, default: 'text', enum: %w[text json]
