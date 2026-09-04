@@ -24,7 +24,13 @@ RSpec.describe 'golden output' do
 
   def read(path) = File.read(path).gsub("\r\n", "\n")
 
-  { 'novapay' => ['examples/specs/novapay.yaml', nil] }.each do |name, (spec_file, overrides)|
+  {
+    'novapay' => ['examples/specs/novapay.yaml', nil],
+    'cardpay' => ['examples/specs/cardpay.yaml', nil],
+    'cardpay_overrides' => ['examples/specs/cardpay.yaml', 'examples/overrides/cardpay.yml'],
+    'swiftpay' => ['examples/specs/swiftpay.json', nil],
+    'swiftpay_overrides' => ['examples/specs/swiftpay.json', 'examples/overrides/swiftpay.yml']
+  }.each do |name, (spec_file, overrides)|
     it "produces exactly the golden files for #{name}" do
       out = generate_golden(name, spec_file, overrides: overrides)
       golden_dir = "spec/golden/#{name}"

@@ -1,0 +1,175 @@
+{
+  "meta": {
+    "provider": "cardpay",
+    "spec": "CardPay Transfers API 2.3.0",
+    "forge": "1.0.0"
+  },
+  "auth": {
+    "headers": {
+      "Authorization": "Bearer <credentials.token>"
+    }
+  },
+  "create_request": {
+    "endpoint": "POST /transfers",
+    "request": {
+      "merchant_id": "m_10042",
+      "reference": "op_abc123",
+      "amount": "1500.00",
+      "currency": "RUB",
+      "description": "Payout op_abc123",
+      "callback_url": "https://spacepayments.example/webhooks/cardpay",
+      "destination": {
+        "card": {
+          "pan": "4111111111111111",
+          "holder": "IVAN IVANOV",
+          "expiry": "12/29"
+        }
+      }
+    },
+    "operation": {
+      "id": "op_abc123",
+      "amount": "1500.00",
+      "currency": "RUB",
+      "payout_requisite": {
+        "card": {
+          "number": "4111111111111111",
+          "holder": "IVAN IVANOV",
+          "expiry_month": 12,
+          "expiry_year": 2030,
+          "phone": "79000000000"
+        }
+      },
+      "description": "Payout op_abc123"
+    },
+    "credentials": {
+      "merchant_id": "m_10042"
+    },
+    "config": {
+      "callback_url": "https://spacepayments.example/webhooks/cardpay"
+    },
+    "response_201": {
+      "data": {
+        "transfer_id": "tr_9c1e4f",
+        "reference": "op_abc123",
+        "state": "NEW",
+        "amount": "1500.00",
+        "currency": "RUB"
+      }
+    },
+    "response_400": {
+      "errors": [
+        {
+          "code": "validation_error",
+          "message": "amount must match ^\\d+\\.\\d{2}$"
+        }
+      ]
+    },
+    "response_401": {
+      "errors": [
+        {
+          "code": "unauthorized",
+          "message": "Invalid token"
+        }
+      ]
+    },
+    "response_403": {
+      "errors": [
+        {
+          "code": "forbidden",
+          "message": "Transfers are disabled for this merchant"
+        }
+      ]
+    },
+    "response_422": {
+      "errors": [
+        {
+          "code": "validation_error",
+          "message": "destination.card.pan is invalid"
+        }
+      ]
+    },
+    "response_500": {
+      "errors": [
+        {
+          "code": "internal_error",
+          "message": "Unexpected error"
+        }
+      ]
+    },
+    "response_503": {
+      "headers": {
+        "Retry-After": 60
+      },
+      "body": {
+        "errors": [
+          {
+            "code": "issuer_unavailable",
+            "message": "Try again later"
+          }
+        ]
+      }
+    },
+    "expected_operation_status": "in_progress"
+  },
+  "fetch_status": {
+    "endpoint": "GET /transfers/{transfer_id}",
+    "response_200": {
+      "data": {
+        "transfer_id": "tr_9c1e4f",
+        "reference": "op_abc123",
+        "state": "SUCCESS",
+        "amount": "1500.00",
+        "currency": "RUB"
+      }
+    },
+    "response_401": {
+      "errors": [
+        {
+          "code": "unauthorized",
+          "message": "Invalid token"
+        }
+      ]
+    },
+    "response_404": {
+      "errors": [
+        {
+          "code": "not_found",
+          "message": "Transfer not found"
+        }
+      ]
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback": {
+    "headers": {
+      "X-Signature": "<HMAC-SHA512(raw_body, callback_secret) base64>"
+    },
+    "payload": {
+      "type": "transfer.settled",
+      "data": {
+        "transfer_id": "tr_9c1e4f",
+        "reference": "op_abc123",
+        "state": "SUCCESS"
+      }
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback_failed": {
+    "headers": {
+      "X-Signature": "<HMAC-SHA512(raw_body, callback_secret) base64>"
+    },
+    "payload": {
+      "type": "transfer.declined",
+      "data": {
+        "transfer_id": "tr_9c1e4f",
+        "reference": "op_abc123",
+        "state": "DECLINED",
+        "error": {
+          "code": "card_declined",
+          "message": "Issuer declined the transfer"
+        }
+      }
+    },
+    "expected_operation_status": "rejected"
+  }
+}

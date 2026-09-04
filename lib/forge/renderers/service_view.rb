@@ -82,7 +82,7 @@ module Forge
       def pattern_check(validation)
         name = validation[:field].split('.').last
         expr = validation[:expr].sub('requisite_type', 'requisite_type_for(operation, request_method)')
-        regexp = validation[:value].sub(/\A\^/, '\A').sub(/\$\z/, '\z')
+        regexp = validation[:value].sub(/\A\^/, '\A').sub(/\$\z/, '\z').gsub('/', '\/')
         check = "#{name}.to_s.match?(/#{regexp}/)"
         type = validation[:requisite_type]
         guard = "requisite_type_for(operation, request_method) == '#{type}'"

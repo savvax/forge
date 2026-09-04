@@ -39,6 +39,7 @@ ALLOWED_LICENSES = %w[MIT Apache-2.0 BSD-2-Clause BSD-3-Clause Ruby BSD ISC].fre
 
 RSpec::Core::RakeTask.new(:spec) do |t|
   t.pattern = 'spec/**/*_spec.rb'
+  t.exclude_pattern = 'spec/golden/**/*_spec.rb' # golden — это вывод генератора, не тесты forge
 end
 
 RuboCop::RakeTask.new(:rubocop)

@@ -33,3 +33,9 @@ requisite_fields:    # хвост пути → поле реквизита; type
 conditional_required_patterns:   # regex по description → required_if
   - "(?:for|when|if|при|для)\\s+(?<field>\\w+)\\s*=\\s*(?<value>\\w+)"
   - "required\\s+(?:only\\s+)?(?:for|when)\\s+(?<field>\\w+)\\s+(?:is|=)\\s*(?<value>\\w+)"
+requisite_defaults:  # канонические реквизиты docs/CONTRACT.md § 3 — значения для fixtures, когда пример спеки их не содержит
+  sbp:          { phone: "79000000000", bank_code: "044525225", bank_name: "Bank" }
+  card:         { number: "4111111111111111", holder: "CARD HOLDER", expiry_month: 12, expiry_year: 2030, phone: "79000000000" }
+  bank_account: { account_number: "40817810000000000001", bank_code: "044525225", bank_name: "Bank", iban: "DE89370400440532013000",
+                  bic: "COBADEFFXXX", holder: "ACCOUNT HOLDER", country: "DE" }
+  wallet:       { id: "wallet_0001", provider: "wallet", phone: "79000000000" }

@@ -35,7 +35,7 @@ module Forge
 
       def type_field = @plan.fields[:request].find { |m| m.source_expr == 'requisite_type' }
       def inside_container?(mapping) = container? && mapping.path.first(@container.size) == @container
-      def requisite_expr(mapping) = mapping.source_expr.sub(DIG, "requisite['\\1']")
+      def requisite_expr(mapping) = mapping.source_expr.gsub(DIG, "requisite['\\1']")
 
       # Вложенные объекты → многострочный hash; листья → `key: expr,` (последний без запятой).
       def tree(mappings, prefix, requisite: false)

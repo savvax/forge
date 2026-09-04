@@ -8,7 +8,7 @@ module Forge
     # fixtures.json из examples спеки; недостающее синтезируется по схемам (docs/OUTPUT_FORMAT.md § 4).
     class Fixtures
       Synth = Forge::Fixtures::Synthesizer
-      REQUISITE_EXPR = /payout_requisite\.dig\((.+?), '(.+?)'\)/
+      REQUISITE_EXPR = /\Aoperation\.payout_requisite\.dig\((.+?), '(.+?)'\)\z/
       CALLBACK_KEYS = { 'approved' => 'callback', 'rejected' => 'callback_failed',
                         'in_progress' => 'callback_processing' }.freeze
 
@@ -125,7 +125,16 @@ module Forge
           value = dig(request, m.path)
           assign(op, m, value, type) unless value.nil?
         end
+        fill_requisite_defaults(op['payout_requisite'])
         op.compact
+      end
+
+      # Канонические поля типа (CONTRACT § 3), которых нет в примере: чтобы override-выражения имели данные.
+      def fill_requisite_defaults(requisites)
+        defaults = Rules.load.fetch(:field_aliases)['requisite_defaults'].to_h
+        requisites.each do |type, fields|
+          defaults.fetch(type, {}).each { |key, value| fields[key] = value unless fields.key?(key) }
+        end
       end
 
       def assign(operation, mapping, value, type)

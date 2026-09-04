@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "provider": "swiftpay",
+    "spec": "SwiftPay Outbound Payments 3.0.1",
+    "forge": "1.0.0"
+  },
+  "auth": {
+    "headers": {
+      "Authorization": "Basic PGxvZ2luPjo8cGFzc3dvcmQ+"
+    }
+  },
+  "create_request": {
+    "endpoint": "POST /v1/payments/outbound",
+    "request": {
+      "reference": "op_abc123",
+      "amount": 1500.5,
+      "currency": "EUR",
+      "purpose": "Payout op_abc123",
+      "beneficiary": {
+        "name": "Ivan Ivanov",
+        "iban": "DE89370400440532013000",
+        "bic": "COBADEFFXXX",
+        "address": {
+          "country": "DE",
+          "city": "Berlin",
+          "line1": "Unter den Linden 1"
+        }
+      }
+    },
+    "operation": {
+      "id": "op_abc123",
+      "amount": "1500.50",
+      "currency": "EUR",
+      "payout_requisite": {
+        "bank_account": {
+          "holder": "Ivan Ivanov",
+          "iban": "DE89370400440532013000",
+          "bic": "COBADEFFXXX",
+          "account_number": "40817810000000000001",
+          "bank_code": "044525225",
+          "bank_name": "Bank",
+          "country": "DE"
+        }
+      },
+      "description": "Payout op_abc123"
+    },
+    "response_201": {
+      "payment_id": "pay_01H9",
+      "reference": "op_abc123",
+      "status": "CREATED",
+      "amount": 1500.5,
+      "currency": "EUR"
+    },
+    "response_400": {
+      "type": "https://swiftpay.example/problems/bad-request",
+      "title": "Bad request",
+      "status": 400,
+      "code": "validation_error"
+    },
+    "response_401": {
+      "type": "https://swiftpay.example/problems/unauthorized",
+      "title": "Unauthorized",
+      "status": 401,
+      "code": "unauthorized"
+    },
+    "response_409": {
+      "type": "https://swiftpay.example/problems/duplicate",
+      "title": "Duplicate",
+      "status": 409,
+      "code": "duplicate_request"
+    },
+    "response_422": {
+      "type": "https://swiftpay.example/problems/validation",
+      "title": "Validation failed",
+      "status": 422,
+      "code": "validation_error",
+      "detail": "beneficiary.iban is invalid"
+    },
+    "response_500": {
+      "type": "https://swiftpay.example/problems/internal",
+      "title": "Internal error",
+      "status": 500,
+      "code": "internal_error"
+    },
+    "expected_operation_status": "in_progress"
+  },
+  "fetch_status": {
+    "endpoint": "GET /v1/payments/outbound/{payment_id}",
+    "response_200": {
+      "payment_id": "pay_01H9",
+      "reference": "op_abc123",
+      "status": "SETTLED",
+      "amount": 1500.5,
+      "currency": "EUR"
+    },
+    "response_401": {
+      "type": "https://swiftpay.example/problems/unauthorized",
+      "title": "Unauthorized",
+      "status": 401,
+      "code": "unauthorized"
+    },
+    "response_404": {
+      "type": "https://swiftpay.example/problems/not-found",
+      "title": "Not found",
+      "status": 404,
+      "code": "not_found"
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback": {
+    "headers": {
+      "Swift-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+    },
+    "payload": {
+      "id": "evt_5f1",
+      "type": "payment.status_changed",
+      "occurred_at": "2026-07-30T10:05:00Z",
+      "data": {
+        "payment_id": "pay_01H9",
+        "reference": "op_abc123",
+        "status": "SETTLED"
+      }
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback_failed": {
+    "headers": {
+      "Swift-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+    },
+    "payload": {
+      "id": "evt_5f2",
+      "type": "payment.status_changed",
+      "occurred_at": "2026-07-30T10:06:00Z",
+      "data": {
+        "payment_id": "pay_01H9",
+        "reference": "op_abc123",
+        "status": "REJECTED",
+        "reason": {
+          "code": "account_closed",
+          "detail": "Beneficiary account is closed"
+        }
+      }
+    },
+    "expected_operation_status": "rejected"
+  },
+  "cancel": {
+    "endpoint": "DELETE /v1/payments/outbound/{payment_id}",
+    "response_200": {
+      "payment_id": "pay_01H9",
+      "reference": "op_abc123",
+      "status": "REJECTED",
+      "amount": 1500.5,
+      "currency": "EUR"
+    },
+    "response_409": {
+      "type": "https://swiftpay.example/problems/invalid-state",
+      "title": "Invalid state",
+      "status": 409,
+      "code": "invalid_status"
+    }
+  },
+  "balance": {
+    "endpoint": "GET /v1/accounts/balance",
+    "response_200": {
+      "available": "available_example",
+      "reserved": "reserved_example"
+    }
+  }
+}

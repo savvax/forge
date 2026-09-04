@@ -114,7 +114,7 @@ module Forge
       def requisite_leaf(path, prop, req, requisite)
         return mapping(path, 'requisite_type', req, prop, 0.95) if type_field?(path)
 
-        _key, rule = @dict['requisite_fields'].find { |_n, r| self.class.match?(r['names'], path) }
+        rule = requisite_rule(path)
         return unmapped(path, prop, req) unless rule
 
         condition = required_if(path, prop)
@@ -124,6 +124,13 @@ module Forge
       end
 
       def dig_expr(type, field) = "operation.payout_requisite.dig(#{type ? "'#{type}'" : 'requisite_type'}, '#{field}')"
+
+      # Точное совпадение ключа словаря (bic → bic) важнее первого совпадения по names (bank_code включает bic).
+      def requisite_rule(path)
+        fields = @dict['requisite_fields']
+        exact = fields[Rules.normalize(path.last)]
+        exact || fields.find { |_n, r| self.class.match?(r['names'], path) }&.last
+      end
 
       def type_field?(path) = self.class.match?(@dict.dig('requisite_type', 'names'), path)
 

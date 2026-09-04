@@ -1,0 +1,37 @@
+Parsing spec... ok (openapi 3.0.3, CardPay Transfers API 2.3.0)
+Found 3 endpoints: GET /transfers, POST /transfers, GET /transfers/{transfer_id}
+  create   POST /transfers                            createTransfer           confidence 0.95
+  status   GET /transfers/{transfer_id}               getTransfer              confidence 0.90
+  webhook  POST {$request.body#/callback_url}                                  confidence 0.95
+Auth: bearerAuth (bearer, header: Authorization) → credentials.token
+Statuses (data.state): NEW, PROCESSING, ON_HOLD → in_progress; SUCCESS → approved; DECLINED → rejected
+Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_block;
+        401 (status) unauthorized → alert_block; 403 forbidden → alert_block; 404 not_found → reject;
+        422 validation_error → reject; 500 internal_error → retry;
+        503 issuer_unavailable → retry_backoff (Retry-After)
+Webhook signature: X-Signature (HMAC-SHA512, raw body, base64) → credentials.callback_secret
+Webhook events: transfer.settled → approved; transfer.declined → rejected; transfer.on_hold → in_progress
+Amount: string, major units (×100) — source: amount (string) → major units: 'Amount as a decimal string with two decimals (major units), e.g. "1500.00"'
+Fields: 9 request fields, 0 unmapped (destination: card)
+Generating service...
+Generating integration guide...
+Generating test fixtures...
+Generating service spec...
+Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Output:
+  ./cardpay_service.rb
+  ./INTEGRATION.md
+  ./fixtures.json
+  ./cardpay_service_spec.rb
+  ./report.txt
+Info (8):
+  INFO         webhook_source_callbacks   webhook taken from callbacks: POST {$request.body#/callback_url}
+  INFO         outside_contract           GET /transfers (listTransfers) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+  INFO         override_applied           statuses.ON_HOLD → in_progress
+  INFO         override_applied           webhook → signature_payload
+  INFO         override_applied           fields.destination.card.expiry → source
+  INFO         override_applied           base_url → default, production
+  INFO         credential_field           merchant_id → credentials.merchant_id
+        hint: fill it in credentials
+Done: 5 files, 0 warnings, 0 unsupported. Exit 0.

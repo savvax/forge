@@ -12,7 +12,9 @@ RSpec.describe Provider::<%= class_name %> do
   let(:create_fixture) { fixtures['create_request'] }
   let(:provider_id) { dig_path(create_fixture['<%= create_response_key %>'], <%= provider_id_path %>) }
   let(:create_url) { "#{described_class::BASE_URL}<%= op(:create).path %>" }
-  let(:unmapped) { <%= unmapped_paths.inspect %> } # поля без источника не сравниваются
+<% unless overridden_paths.empty? -%>
+  let(:overridden) { <%= overridden_paths.inspect %> } # source задан в overrides.yml — не сравнивается
+<% end -%>
 <% if auth_header_expectation -%>
   let(:auth_headers) { { <%= auth_header_expectation %> } }
 <% else -%>
@@ -34,8 +36,12 @@ RSpec.describe Provider::<%= class_name %> do
 
   describe '#create_request' do
     it 'creates payout (<%= create_response_status %>)' do
-      expected_body = without_paths(create_fixture['request'], unmapped)
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| without_paths(JSON.parse(req.body), unmapped) == expected_body }
+<% if overridden_paths.empty? -%>
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(JSON.parse(req.body), create_fixture['request']) }
+<% else -%>
+      expected_body = without_paths(create_fixture['request'], overridden)
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(JSON.parse(req.body), overridden), expected_body) }
+<% end -%>
                                             .to_return(status: <%= create_response_status %>, body: create_fixture['<%= create_response_key %>'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
       result = service.create_request(operation, 'create')

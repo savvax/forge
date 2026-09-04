@@ -38,7 +38,12 @@ module Forge
       def provider_id_path = op(:create).response_id_path.inspect
       def error_code(status) = plan.error_map[status] && "provider.#{plan.error_map[status][:internal_code]}"
       def min? = plan.validations.any? { |v| v[:rule] == :min }
-      def unmapped_paths = plan.fields[:request].select { |m| m.source_expr.nil? || m.source_expr == '[]' }.map(&:path)
+
+      def overridden_paths
+        plan.warnings.filter_map { |w| w.code == :override_applied && w.message[/\Afields\.(\S+) → .*source/, 1] }
+            .map { |path| path.split('.') }
+      end
+
       def callback_id_path = (plan.webhook[:id_field] || ['id']).inspect
       def event_of(key) = fx.dig(key, 'payload', plan.webhook[:event_field].to_s)
 

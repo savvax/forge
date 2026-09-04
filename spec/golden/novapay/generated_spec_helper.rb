@@ -32,7 +32,23 @@ module GeneratedSpecHelper
                             customer: fixture['customer'])
   end
 
-  # Сравнение тела запроса без полей, которые forge не смог отобразить (TODO/массивы).
+  # Тело запроса ⊆ пример из спеки: каждое отправленное значение совпадает с примером; поля, которые forge
+  # не смог отобразить (nil/TODO), и необязательные пропуски допускаются.
+  def subset_of?(actual, expected)
+    case actual
+    when Hash then hash_subset?(actual, expected)
+    when Array then expected.is_a?(Array) && actual.each_with_index.all? { |v, i| subset_of?(v, expected[i]) }
+    else actual == expected
+    end
+  end
+
+  def hash_subset?(actual, expected)
+    return false unless expected.is_a?(Hash)
+
+    actual.all? { |k, v| v.nil? || (expected.key?(k) && subset_of?(v, expected[k])) }
+  end
+
+  # Поля с пользовательским source из overrides.yml сравнивать нельзя (их значения не выводятся из примера).
   def without_paths(hash, paths)
     copy = Marshal.load(Marshal.dump(hash))
     paths.each do |path|
