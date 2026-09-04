@@ -11,10 +11,6 @@ SimpleCov.start do
   add_group 'Plan', 'lib/forge/plan'
   add_group 'Renderers', 'lib/forge/renderers'
   add_group 'Provider stub', 'lib/provider'
-  unless ENV['REAL'] # spec/real_specs_spec.rb гоняет CLI как подпроцесс — покрытие не считается
-    minimum_coverage line: 90, branch: 75
-    minimum_coverage_by_file 70
-  end
 end
 
 require 'webmock/rspec'
@@ -34,5 +30,14 @@ RSpec.configure do |config|
 
   WebMock.disable_net_connect!(allow_localhost: true)
 
-  config.before(:suite) { FileUtils.mkdir_p('tmp') }
+  config.before(:suite) do
+    FileUtils.mkdir_p('tmp')
+    # Пороги — только для собственного набора forge. Сгенерированные spec (tmp/out/…) и REAL=1 (CLI в подпроцессе)
+    # запускаются через тот же .rspec, но покрытие lib/ там не измеряется.
+    own = config.files_to_run.all? { |f| f.start_with?(File.expand_path(__dir__)) }
+    if own && !ENV['REAL']
+      SimpleCov.minimum_coverage line: 90, branch: 75
+      SimpleCov.minimum_coverage_by_file 70
+    end
+  end
 end
