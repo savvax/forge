@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 RSpec.describe Forge::Loader do
+  it 'hints that an overrides file was passed as a spec' do
+    expect { described_class.load('examples/overrides/raiffeisen.yml') }
+      .to raise_error(Forge::SpecError, /looks like overrides.yml/)
+  end
+
   def broken(name) = "spec/fixtures/broken/#{name}"
 
   {

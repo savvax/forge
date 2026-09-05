@@ -8,6 +8,7 @@ require_relative 'ref_resolver'
 module Forge
   # Файл → Hash: парсинг YAML/JSON, базовые проверки OpenAPI 3, server variables, резолв `$ref`.
   class Loader
+    OVERRIDES_KEYS = %w[statuses fields endpoints webhook amount auth].freeze
     def self.load(path) = new(path).load
 
     def initialize(path)
@@ -56,7 +57,7 @@ module Forge
         raise error('Swagger 2.0 is not supported; convert to OpenAPI 3', 'use swagger2openapi or similar', '#/swagger')
       end
 
-      validate_version(spec['openapi'])
+      validate_version(spec['openapi'], spec)
       paths = spec['paths']
       return if paths.is_a?(Hash) && !paths.empty?
 
@@ -69,8 +70,16 @@ module Forge
       'this document describes only webhooks; payout endpoints (paths) are needed'
     end
 
-    def validate_version(version)
-      raise error("missing 'openapi'", 'add `openapi: 3.0.3` to the root', '#/openapi') unless version
+    def version_hint(spec)
+      if spec.is_a?(Hash) && spec.keys.intersect?(OVERRIDES_KEYS)
+        'this looks like overrides.yml, not a spec; pass it via --overrides (UI: block «overrides.yml»)'
+      else
+        'add `openapi: 3.0.3` to the root'
+      end
+    end
+
+    def validate_version(version, spec = {})
+      raise error("missing 'openapi'", version_hint(spec), '#/openapi') unless version
       return if version.to_s.start_with?('3.')
 
       raise error("unsupported openapi version #{version}", 'only 3.x is supported', '#/openapi')
