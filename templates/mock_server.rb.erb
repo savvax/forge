@@ -129,8 +129,13 @@ class <%= class_name %> < Sinatra::Base
   end
 <% if op(:status) -%>
 
+<% if op(:status).status_request_field -%>
+  post '<%= sinatra_path(:status) %>' do
+    payout = find_payout(json_body['<%= op(:status).status_request_field %>'])
+<% else -%>
   get '<%= sinatra_path(:status) %>' do
     payout = find_payout(params[:<%= op(:status).path_params.first %>])
+<% end -%>
     halt(*reply(404, fixture('fetch_status', 'response_404') || error_body(404, 'not_found'))) unless payout
     reply(<%= op(:status).success_statuses.first %>, payout_response(fixture('fetch_status', 'response_<%= op(:status).success_statuses.first %>'), payout))
   end

@@ -26,7 +26,7 @@ module Forge
       # Overrides: endpoints — сразу после ролей (остальные анализаторы зависят от них), прочее — в конце.
       def run
         findings = ORDER.each_with_object({}) do |klass, acc|
-          finding = klass.new(@spec, @rules, include_paths: @include_paths, findings: acc).call
+          finding = klass.new(@spec, @rules, include_paths: @include_paths, findings: acc, overrides: @overrides).call
           finding = Plan::OverridesApply.roles(finding, @overrides, @spec) if finding.key == :endpoint_roles
           acc[finding.key] = finding
         end

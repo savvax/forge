@@ -31,9 +31,6 @@ Output:
   ./swiftpay_extras.rb
   ./mock_server.rb
   ./report.txt
-Warnings (1):
-  WARN         one_of_first_variant       beneficiary: 2 variants (IbanBeneficiary, AccountBeneficiary); first (IbanBeneficiary) is used
-        hint: fields.beneficiary.variant: <SchemaName>  (overrides.yml, not implemented yet)
 Unsupported (3):
   UNSUPPORTED  oauth2_alternative         alternative security scheme 'oauth2' (oauth2) is ignored
         hint: the first supported scheme is used
@@ -48,4 +45,4 @@ Info (6):
   INFO         override_applied           statuses.PENDING_APPROVAL → in_progress
   INFO         override_applied           statuses.RETURNED → rejected
   INFO         override_applied           fields.beneficiary.address → source
-Done: 7 files, 1 warnings, 3 unsupported. Exit 0.
+Done: 7 files, 0 warnings, 3 unsupported. Exit 0.

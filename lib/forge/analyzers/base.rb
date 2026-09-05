@@ -7,14 +7,16 @@ module Forge
   module Analyzers
     # Общее для анализаторов: доступ к spec/rules, пороги, накопление предупреждений, нормализация.
     class Base
-      attr_reader :spec, :rules, :warnings, :roles, :findings
+      attr_reader :spec, :rules, :warnings, :roles, :findings, :overrides
 
-      # roles: значение Finding из EndpointRoles; findings: результаты предыдущих анализаторов ({key => Finding}).
-      def initialize(spec, rules, include_paths: [], roles: nil, findings: {})
+      # roles: значение Finding из EndpointRoles; findings: результаты предыдущих анализаторов ({key => Finding});
+      # overrides: Hash overrides.yml (анализаторам нужны только ключи, влияющие на обход, например fields.*.variant).
+      def initialize(spec, rules, include_paths: [], roles: nil, findings: {}, overrides: {})
         @spec = spec
         @rules = rules
         @include_paths = include_paths
         @findings = findings
+        @overrides = overrides || {}
         @roles = roles || findings[:endpoint_roles]&.value || {}
         @warnings = []
       end

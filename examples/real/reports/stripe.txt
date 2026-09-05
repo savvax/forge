@@ -390,7 +390,7 @@ Errors: none described
 Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount (integer) → minor units: 'A positive integer in cents representing how much to payout.'
 Fields: 9 request fields, 4 unmapped
-Warnings (10):
+Warnings (11):
   WARN         role_conflict              POST /v1/payouts/{payout} (PostPayoutsPayout) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)
         hint: endpoints.PostPayoutsPayout: create
   WARN         role_conflict              POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)
@@ -401,6 +401,8 @@ Warnings (10):
         hint: verify the list; statuses.<VALUE>: in_progress|approved|rejected (overrides.yml)
   WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
         hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         media_type_form            create request body is application/x-www-form-urlencoded; sent as form-urlencoded (nested flattened)
+        hint: nested keys are encoded as parent[child]; verify
   WARN         unmapped_field             destination (string, The ID of a bank account or a card to send the payout to. If you don't provide a destination, we use the default external account for the specified currency.) has no source
         hint: fields.destination.source: "…"  (overrides.yml)
   WARN         array_field_unsupported    expand is an array; [] is generated
@@ -409,8 +411,7 @@ Warnings (10):
         hint: fields.method.source: "…"  (overrides.yml)
   WARN         unmapped_field             payout_method (string, The ID of a v2 FinancialAccount to send funds to.) has no source
         hint: fields.payout_method.source: "…"  (overrides.yml)
-  WARN         unmapped_field             source_type (string, The balance type of your Stripe balance to draw this payout from. Balances for different payment sources are kept separately. You can find the amounts with the Balances API. One of `bank_account`, `card`, or `fpx`.) has no source
-        hint: fields.source_type.source: "…"  (overrides.yml)
+  … and 1 more (see --format json)
 Unsupported (1):
   UNSUPPORTED  http_alternative           alternative security scheme 'bearerAuth' (http) is ignored
         hint: the first supported scheme is used
@@ -419,4 +420,4 @@ Info (4):
   INFO         outside_contract           GET /v1/payouts (GetPayouts) — not used
   INFO         outside_contract           POST /v1/payouts/{payout} (PostPayoutsPayout) — not used
   INFO         outside_contract           POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) — not used
-Done: 10 warnings, 1 unsupported. Exit 0.
+Done: 11 warnings, 1 unsupported. Exit 0.

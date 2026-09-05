@@ -43,7 +43,7 @@ RSpec.describe Forge::Plan::Overrides do
 
   it 'swiftpay.yml closes the closable WARNs' do
     _spec, findings, = analyze('examples/specs/swiftpay.json', described_class.load('examples/overrides/swiftpay.yml'))
-    expect(warnings(findings).select { |w| w.level == :warn }.map(&:code)).to eq([:one_of_first_variant])
+    expect(warnings(findings).select { |w| w.level == :warn }).to eq([])
   end
 
   it 'novapay.yml confirms conditional requirements and encoding' do
@@ -100,6 +100,19 @@ RSpec.describe Forge::Plan::Overrides do
       expect(by_path['recipient.bank_name']).to have_attributes(source_expr: "'X'", required: true)
       expect(by_path['recipient.bank_code'].required_if).to eq(field: 'type', equals: 'card')
       expect(warnings(findings).count { |w| w.code == :conditional_required }).to eq(1)
+    end
+
+    it 'fields variant picks a oneOf option and closes the WARN' do
+      spec = Forge::IR::Builder.build(Forge::Loader.load('examples/specs/swiftpay.json'))
+      pick = { 'fields' => { 'beneficiary' => { 'variant' => 'AccountBeneficiary' } } }
+      findings = Forge::Analyzers::Runner.run(spec, rules: rules, overrides: pick)
+      paths = findings[:fields].value[:request].map { |m| m.path.join('.') }
+      expect(paths).to include('beneficiary.account_number', 'beneficiary.sort_code')
+      expect(paths).not_to include('beneficiary.iban')
+      expect(warnings(findings).map(&:code)).not_to include(:one_of_first_variant)
+      bad = { 'fields' => { 'beneficiary' => { 'variant' => 'Nope' } } }
+      missing = Forge::Analyzers::Runner.run(spec, rules: rules, overrides: bad)
+      expect(warnings(missing).map(&:code)).to include(:variant_not_found, :one_of_first_variant)
     end
 
     it 'webhook keys' do

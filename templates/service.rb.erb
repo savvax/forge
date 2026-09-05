@@ -75,10 +75,10 @@ module Provider
       payload = build_payout_payload(operation)
 <% end -%>
 <% if view.idempotency? -%>
-      response = client.post(<%= view.paths.url(:create) %>, json: payload,
+      response = client.post(<%= view.paths.url(:create) %>, <%= view.body_kw %>: payload,
                              <%= ' ' * (view.paths.url(:create).size + 2) %>headers: auth_headers.merge(idempotency_headers(operation)))
 <% else -%>
-      response = client.post(<%= view.paths.url(:create) %>, json: payload, headers: auth_headers)
+      response = client.post(<%= view.paths.url(:create) %>, <%= view.body_kw %>: payload, headers: auth_headers)
 <% end -%>
       parse_create_response(operation, response)
 <%= partial('_rescues.erb') -%>
@@ -86,7 +86,12 @@ module Provider
 
 <% if view.op(:status) -%>
     def fetch_status(operation)
+<% if view.op(:status).status_request_field -%>
+      body = { '<%= view.op(:status).status_request_field %>' => operation.provider_operation_id }
+      response = client.post(<%= view.paths.url(:status) %>, json: body, headers: auth_headers)
+<% else -%>
       response = client.get(<%= view.paths.url(:status) %>, headers: auth_headers)
+<% end -%>
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == <%= view.op(:status).success_statuses.first %>
 
       apply_status(operation, <%= view.paths.body(view.op(:status).response_status_path) %>)

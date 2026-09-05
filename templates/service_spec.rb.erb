@@ -37,10 +37,10 @@ RSpec.describe Provider::<%= class_name %> do
   describe '#create_request' do
     it 'creates payout (<%= create_response_status %>)' do
 <% if overridden_paths.empty? -%>
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(JSON.parse(req.body), create_fixture['request']) }
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(parse_body(req), create_fixture['request']) }
 <% else -%>
       expected_body = without_paths(create_fixture['request'], overridden)
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(JSON.parse(req.body), overridden), expected_body) }
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(parse_body(req), overridden), expected_body) }
 <% end -%>
                                             .to_return(status: <%= create_response_status %>, body: create_fixture['<%= create_response_key %>'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
@@ -79,7 +79,7 @@ RSpec.describe Provider::<%= class_name %> do
 
     it 'delegates status request_method to fetch_status' do
       operation.provider_operation_id = provider_id
-      stub = stub_request(:get, <%= url(:status) %>)
+      stub = stub_request(:<%= status_verb %>, <%= url(:status) %>)
              .to_return(status: <%= op(:status).success_statuses.first %>, body: fixtures.dig('fetch_status', '<%= status_response_key %>').to_json,
                         headers: { 'Content-Type' => 'application/json' })
       service.create_request(operation, 'status')
@@ -92,7 +92,7 @@ RSpec.describe Provider::<%= class_name %> do
   describe '#fetch_status' do
     it 'maps the provider status to <%= fx.dig('fetch_status', 'expected_operation_status') || 'an internal status' %>' do
       operation.provider_operation_id = provider_id
-      stub_request(:get, <%= url(:status) %>)
+      stub_request(:<%= status_verb %>, <%= url(:status) %>)
         .to_return(status: <%= op(:status).success_statuses.first %>, body: fixtures.dig('fetch_status', '<%= status_response_key %>').to_json,
                    headers: { 'Content-Type' => 'application/json' })
       result = service.fetch_status(operation)

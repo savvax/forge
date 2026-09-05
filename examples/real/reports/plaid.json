@@ -15,6 +15,14 @@
       "outside_contract": false
     },
     {
+      "role": "status",
+      "method": "POST",
+      "path": "/transfer/get",
+      "operation_id": "transferGet",
+      "confidence": 0.8,
+      "outside_contract": false
+    },
+    {
       "role": "cancel",
       "method": "POST",
       "path": "/transfer/cancel",
@@ -478,6 +486,76 @@
     {
       "level": "warn",
       "code": "role_conflict",
+      "message": "POST /transfer/recurring/get (transferRecurringGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1recurring~1get/post",
+      "hint": "endpoints.transferRecurringGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/balance/get (transferBalanceGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1balance~1get/post",
+      "hint": "endpoints.transferBalanceGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
+      "hint": "endpoints.transferCapabilitiesGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/configuration/get (transferConfigurationGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1configuration~1get/post",
+      "hint": "endpoints.transferConfigurationGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/get (transferLedgerGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1ledger~1get/post",
+      "hint": "endpoints.transferLedgerGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/metrics/get (transferMetricsGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1metrics~1get/post",
+      "hint": "endpoints.transferMetricsGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/sweep/get (transferSweepGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1sweep~1get/post",
+      "hint": "endpoints.transferSweepGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/intent/get (transferIntentGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1intent~1get/post",
+      "hint": "endpoints.transferIntentGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/get (transferOriginatorGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1originator~1get/post",
+      "hint": "endpoints.transferOriginatorGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/list (transferOriginatorList) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1originator~1list/post",
+      "hint": "endpoints.transferOriginatorList: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
       "message": "POST /transfer/recurring/create (transferRecurringCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1recurring~1create/post",
       "hint": "endpoints.transferRecurringCreate: create"
@@ -541,13 +619,6 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfer/get (transferGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1get/post",
-      "hint": "endpoints.transferGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "POST /transfer/list (transferList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1list/post",
       "hint": "endpoints.transferList: create"
@@ -558,41 +629,6 @@
       "message": "POST /transfer/migrate_account (transferMigrateAccount) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1migrate_account/post",
       "hint": "endpoints.transferMigrateAccount: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/recurring/get (transferRecurringGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1recurring~1get/post",
-      "hint": "endpoints.transferRecurringGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/balance/get (transferBalanceGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1balance~1get/post",
-      "hint": "endpoints.transferBalanceGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
-      "hint": "endpoints.transferCapabilitiesGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/configuration/get (transferConfigurationGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1configuration~1get/post",
-      "hint": "endpoints.transferConfigurationGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/ledger/get (transferLedgerGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1ledger~1get/post",
-      "hint": "endpoints.transferLedgerGet: create"
     },
     {
       "level": "warn",
@@ -618,13 +654,6 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfer/metrics/get (transferMetricsGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1metrics~1get/post",
-      "hint": "endpoints.transferMetricsGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "POST /transfer/recurring/list (transferRecurringList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1recurring~1list/post",
       "hint": "endpoints.transferRecurringList: create"
@@ -646,13 +675,6 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfer/sweep/get (transferSweepGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1sweep~1get/post",
-      "hint": "endpoints.transferSweepGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "POST /transfer/sweep/list (transferSweepList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1sweep~1list/post",
       "hint": "endpoints.transferSweepList: create"
@@ -660,30 +682,9 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfer/intent/get (transferIntentGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1intent~1get/post",
-      "hint": "endpoints.transferIntentGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "POST /transfer/repayment/list (transferRepaymentList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1repayment~1list/post",
       "hint": "endpoints.transferRepaymentList: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/originator/get (transferOriginatorGet) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1originator~1get/post",
-      "hint": "endpoints.transferOriginatorGet: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/originator/list (transferOriginatorList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1originator~1list/post",
-      "hint": "endpoints.transferOriginatorList: create"
     },
     {
       "level": "warn",
@@ -753,13 +754,6 @@
       "code": "outside_contract",
       "message": "POST /transfer/cancel (transferCancel) — generated as `cancel_request` helper",
       "pointer": "#/paths/~1transfer~1cancel/post",
-      "hint": null
-    },
-    {
-      "level": "info",
-      "code": "outside_contract",
-      "message": "POST /transfer/get (transferGet) — not used",
-      "pointer": "#/paths/~1transfer~1get/post",
       "hint": null
     },
     {

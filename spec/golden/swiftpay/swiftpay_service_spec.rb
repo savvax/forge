@@ -27,7 +27,7 @@ RSpec.describe Provider::SwiftpayService do
 
   describe '#create_request' do
     it 'creates payout (201)' do
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(JSON.parse(req.body), create_fixture['request']) }
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(parse_body(req), create_fixture['request']) }
                                             .to_return(status: 201, body: create_fixture['response_201'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
       result = service.create_request(operation, 'create')

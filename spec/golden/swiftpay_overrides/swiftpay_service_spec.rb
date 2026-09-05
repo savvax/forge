@@ -29,7 +29,7 @@ RSpec.describe Provider::SwiftpayService do
   describe '#create_request' do
     it 'creates payout (201)' do
       expected_body = without_paths(create_fixture['request'], overridden)
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(JSON.parse(req.body), overridden), expected_body) }
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(parse_body(req), overridden), expected_body) }
                                             .to_return(status: 201, body: create_fixture['response_201'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
       result = service.create_request(operation, 'create')

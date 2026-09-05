@@ -16,6 +16,8 @@ module Forge
 
       def url(role)
         path = op(role).path.gsub(/\{\w+\}/, ID_EXPR)
+        return "\"\#{BASE_URL}#{path}\"" if role == :status && op(role).status_request_field
+
         "\"\#{BASE_URL}#{path}\""
       end
 

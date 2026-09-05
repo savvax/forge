@@ -28,7 +28,9 @@ module Forge
       def build
         ensure_create!
         parts = base_parts.merge(operations_parts).merge(errors_parts)
-        parts[:fixtures] = Fixtures.new(@spec, @f, parts).build
+        fixtures = Fixtures.new(@spec, @f, parts)
+        parts[:fixtures] = fixtures.build
+        parts[:warnings] += fixture_warnings(fixtures.mismatches)
         IntegrationPlan.new(**parts)
       end
 
@@ -96,11 +98,33 @@ module Forge
         statuses = value(:statuses)
         OperationPlan.new(role: role, method: endpoint.method, path: endpoint.path, endpoint: endpoint,
                           path_params: endpoint.path.scan(/\{(\w+)\}/).flatten,
-                          headers: role == :create ? value(:fields)[:headers] : [], body_encoding: 'json',
+                          headers: role == :create ? value(:fields)[:headers] : [], body_encoding: encoding(endpoint),
                           success_statuses: success_statuses(endpoint, own),
                           response_id_path: statuses[:response_id_path],
                           response_status_path: statuses[:response_status_path],
-                          error_statuses: own.reject { |r| r[:action] == 'treat_as_success' }.map { |r| r[:status] })
+                          error_statuses: own.reject { |r| r[:action] == 'treat_as_success' }.map { |r| r[:status] },
+                          status_request_field: status_request_field(role, endpoint))
+      end
+
+      # status через POST без path-параметра: имя поля тела с id провайдера.
+      def status_request_field(role, endpoint)
+        return nil unless role == :status && endpoint.method == 'post' && !endpoint.path.include?('{')
+
+        id_key(endpoint.request_body&.schema&.properties.to_h.keys)
+      end
+
+      def id_key(keys) = keys.find { |n| n.end_with?('_id') || n == 'id' }
+
+      # application/json → json; только form-urlencoded → form (HttpClient form:).
+      def encoding(endpoint)
+        types = endpoint.request_body&.media_types.to_a
+        if types.any? && types.none? { |t| t.include?('json') } && types.any? do |t|
+          t.include?('x-www-form-urlencoded')
+        end
+          'form'
+        else
+          'json'
+        end
       end
 
       def success_statuses(endpoint, own)
@@ -118,6 +142,14 @@ module Forge
       def outside_contract
         named = HELPERS.filter_map { |role, helper| roles[role] && { endpoint: roles[role], helper: helper } }
         named + roles[:other].map { |ep| { endpoint: ep, helper: nil } }
+      end
+
+      def fixture_warnings(mismatches)
+        mismatches.map do |text|
+          Warning.new(level: :info, code: :fixture_schema_mismatch, pointer: nil,
+                      message: "spec example disagrees with its schema: #{text}",
+                      hint: 'fix the example in the spec or check the schema; the fixture is kept as written')
+        end
       end
 
       def meta

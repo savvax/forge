@@ -3,12 +3,14 @@
 require 'base64'
 require_relative '../fixtures/synthesizer'
 require_relative 'fixtures_operation'
+require_relative '../fixtures/validator'
 
 module Forge
   module Plan
     # fixtures.json из examples спеки; недостающее синтезируется по схемам (docs/OUTPUT_FORMAT.md § 4).
     class Fixtures
       Synth = Forge::Fixtures::Synthesizer
+      Validator = Forge::Fixtures::Validator
       CALLBACK_KEYS = { 'approved' => 'callback', 'rejected' => 'callback_failed',
                         'in_progress' => 'callback_processing' }.freeze
 
@@ -18,13 +20,34 @@ module Forge
         @p = plan_parts
       end
 
+      attr_reader :mismatches
+
       def build
+        @mismatches = []
         fixtures = { 'meta' => meta, 'auth' => auth, 'create_request' => create }
         fixtures['fetch_status'] = status_fixture if role(:status)
         fixtures.merge!(callbacks)
         fixtures['cancel'] = operation_fixture(:cancel) if role(:cancel)
         fixtures['balance'] = operation_fixture(:balance) if role(:balance)
+        validate!(fixtures)
         fixtures
+      end
+
+      # Примеры из спеки сверяются с её же схемами: расхождение → INFO fixture_schema_mismatch (в Builder).
+      def validate!(fixtures)
+        @mismatches += Validator.check(fixtures.dig('create_request', 'request'), role(:create).request_body&.schema,
+                                       'create_request.request')
+        role(:create).responses.each { |res| @mismatches += response_mismatches(fixtures, res) }
+        schema = @f[:webhooks].value[:endpoint]&.request_body&.schema
+        %w[callback callback_failed callback_processing].each do |key|
+          @mismatches += Validator.check(fixtures.dig(key, 'payload'), schema, "#{key}.payload")
+        end
+      end
+
+      def response_mismatches(fixtures, res)
+        example = fixtures.dig('create_request', "response_#{res.status}")
+        example = example['body'] if example.is_a?(Hash) && example.key?('body') && example.key?('headers')
+        Validator.check(example, res.schema, "create_request.response_#{res.status}")
       end
 
       private

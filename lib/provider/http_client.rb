@@ -46,9 +46,17 @@ module Provider
 
     def encode_body(json, form)
       return JSON.generate(json) if json
-      return URI.encode_www_form(form) if form
+      return URI.encode_www_form(flatten_form(form)) if form
 
       nil
+    end
+
+    # {destination: {account: 'x'}} → [['destination[account]', 'x']] (Rails-стиль вложенных ключей).
+    def flatten_form(hash, prefix = nil)
+      hash.flat_map do |key, value|
+        name = prefix ? "#{prefix}[#{key}]" : key.to_s
+        value.is_a?(Hash) ? flatten_form(value, name) : [[name, value]]
+      end
     end
 
     def content_headers(json, form)

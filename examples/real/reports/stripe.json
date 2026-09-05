@@ -318,6 +318,13 @@
     },
     {
       "level": "warn",
+      "code": "media_type_form",
+      "message": "create request body is application/x-www-form-urlencoded; sent as form-urlencoded (nested flattened)",
+      "pointer": "#/paths/~1v1~1payouts/post/requestBody",
+      "hint": "nested keys are encoded as parent[child]; verify"
+    },
+    {
+      "level": "warn",
       "code": "unmapped_field",
       "message": "destination (string, The ID of a bank account or a card to send the payout to. If you don't provide a destination, we use the default external account for the specified currency.) has no source",
       "pointer": null,

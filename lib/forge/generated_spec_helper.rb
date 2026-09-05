@@ -4,6 +4,7 @@
 require 'bigdecimal'
 require 'bigdecimal/util'
 require 'json'
+require 'uri'
 require 'base64'
 require 'openssl'
 require 'provider'
@@ -38,7 +39,7 @@ module GeneratedSpecHelper
     case actual
     when Hash then hash_subset?(actual, expected)
     when Array then expected.is_a?(Array) && actual.each_with_index.all? { |v, i| subset_of?(v, expected[i]) }
-    else actual == expected
+    else actual == expected || actual.to_s == expected.to_s # form-тела приходят строками
     end
   end
 
@@ -63,6 +64,17 @@ module GeneratedSpecHelper
   def sign(body, algorithm:, encoding:, secret: TEST_CREDENTIALS['callback_secret'])
     digest = OpenSSL::HMAC.digest(algorithm.upcase, secret, body)
     encoding == 'base64' ? Base64.strict_encode64(digest) : digest.unpack1('H*')
+  end
+
+  # Тело запроса → Hash: JSON или form-urlencoded (parent[child] → вложенный Hash, числа как строки).
+  def parse_body(req)
+    return JSON.parse(req.body) if req.headers['Content-Type'].to_s.include?('json')
+
+    URI.decode_www_form(req.body).each_with_object({}) do |(key, value), acc|
+      path = key.scan(/[^\[\]]+/)
+      *head, last = path
+      head.reduce(acc) { |node, k| node[k] ||= {} }[last] = value
+    end
   end
 
   def dig_path(hash, path) = path.reduce(hash) { |node, key| node.is_a?(Hash) ? node[key] : nil }

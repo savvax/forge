@@ -11,10 +11,11 @@ module Forge
         names.any? { |n| n == normalized.last || n == normalized.last(2).join('.') }
       end
 
-      def initialize(analyzer, dict, amount_expr)
+      def initialize(analyzer, dict, amount_expr, variants: {})
         @analyzer = analyzer
         @dict = dict
         @amount_expr = amount_expr
+        @variants = variants
       end
 
       # requisite: nil (вне контейнера) | :any (тип неизвестен) | 'sbp' | 'card' | ...
@@ -75,10 +76,18 @@ module Forge
 
       def variant(path, prop, requisite)
         options = prop.one_of || prop.any_of
-        first = options.first
-        @analyzer.warn_variant(path, options, first)
+        chosen = chosen_variant(path, options)
+        @analyzer.warn_variant(path, options, options.first) unless chosen
+        chosen ||= options.first
         @container ||= path.join('.')
-        backfill(walk(first, path, first.required.to_a, requisite || :any))
+        backfill(walk(chosen, path, chosen.required.to_a, requisite || :any))
+      end
+
+      def chosen_variant(path, options)
+        name = @variants[path.join('.')]
+        return nil unless name
+
+        options.find { |o| o.ref_name == name } || @analyzer.warn_variant_missing(path, name, options)
       end
 
       # Контейнер без поля типа и с единственным выведенным типом: нетипизированные поля получают его же.

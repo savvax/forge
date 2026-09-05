@@ -24,6 +24,7 @@ RSpec.describe Forge::Renderers do
     it 'has the assumptions section with 3 WARN rows and lists INFO-free' do
       section = doc[/## Допущения.*?## Проверка/m]
       expect(section.scan('| WARN |').size).to eq(3)
+      expect(section.scan('| INFO |').size).to eq(0)
       expect(doc).to include('## Поля запроса', '## Вне контракта', '`credentials.api_key`',
                              '`credentials.callback_secret`')
     end

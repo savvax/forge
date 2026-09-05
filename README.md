@@ -214,9 +214,9 @@ paths:
 
 | Спека | Что отличается от NovaPay | Результат без overrides | С overrides |
 |---|---|---|---|
-| `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 3 INFO, exit 0 | не нужны |
+| `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 4 INFO (один — расхождение примера 401 с enum в самом ТЗ), exit 0 | не нужны |
 | `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
-| `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 1 WARN |
+| `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 0 WARN (3 UNSUPPORTED) |
 
 Все три покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без).
 
@@ -237,9 +237,9 @@ paths:
 | Adyen Transfers v4 | create/status, apiKey в query (WARN), 20+ статусов из enum по словарю | 100+ редких статусов → `statuses.<X>` (отчёт сворачивает список) | [adyen_transfers.txt](examples/real/reports/adyen_transfers.txt) |
 | PayPal Payouts | create/status/cancel, bearer с TODO вместо oauth2 (UNSUPPORTED) | batch `items[]` — массивы не мапятся (WARN) | [paypal_payouts.txt](examples/real/reports/paypal_payouts.txt) |
 | Paystack | `--include-paths /transfer*`: create `transfer_initiate`, status, balance; `$ref` на path-pointer с `~1` и `%7B` | конфликт status/verify и DELETE recipient как cancel → `endpoints.*` | [paystack.txt](examples/real/reports/paystack.txt) |
-| Stripe (8 МБ) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents; загрузка 0.1 с | form-urlencoded тела; webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
+| Stripe (8 МБ) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents, form-urlencoded тело (WARN); загрузка 0.1 с | webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
 | Square | статус-эндпоинт; create нет → WARN `no_create_endpoint` (`generate` → exit 2 с подсказкой); битые `$ref` вне контракта → UNSUPPORTED | — | [square.txt](examples/real/reports/square.txt) |
-| Plaid | `--include-paths /transfer/*`: create `/transfer/create`, cancel; apiKey в заголовках | статус через `POST /transfer/get` (id в теле) не поддержан | [plaid.txt](examples/real/reports/plaid.txt) |
+| Plaid | `--include-paths /transfer/*`: create `/transfer/create`, status `POST /transfer/get` (id в теле), cancel; apiKey в заголовках | 40+ полей запроса без источника → overrides | [plaid.txt](examples/real/reports/plaid.txt) |
 
 Сводка: [SUMMARY.md](examples/real/reports/SUMMARY.md).
 
@@ -262,11 +262,17 @@ paths:
 
 - Только OpenAPI 3.0/3.1 (Swagger 2.0 → понятная ошибка exit 1). Только выплаты (payout); pay-in —
   «что дальше».
-- Внешние `$ref` (`other.yaml#/…`, `http…`): в критичном месте — ошибка, иначе UNSUPPORTED + заглушка.
-- OAuth2-флоу не генерируется (bearer с `TODO`), `oneOf` — берётся первый вариант + WARN
-  (выбор — через overrides, резерв R2). Подпись с timestamp (`t=…,v1=…`) → `NotImplementedError` в
-  `verify_signature!` с пояснением.
-- Статус-запрос только через GET с id в path (POST с id в теле — резерв R3, вскрыт на Plaid).
+- Внешние `$ref` (`other.yaml#/…`, `http…`) и циклы: в схеме запроса create — ошибка exit 1, иначе
+  UNSUPPORTED + заглушка `{}`.
+- OAuth2-флоу не генерируется (bearer с `TODO`). Подпись с timestamp (`t=…,v1=…`) →
+  `NotImplementedError` в `verify_signature!` с пояснением.
+- `oneOf` получателя: по умолчанию первый вариант + WARN; выбор — `fields.<path>.variant: <SchemaName>`.
+- Form-urlencoded тела (Stripe): отправляются как `form:` с плоскими ключами `parent[child]` + WARN
+  `media_type_form`; Stripe-стиль вложенности совпадает, другие кодировки — проверить с провайдером.
+- Статус через `POST` с id в теле (Plaid `/transfer/get`) поддержан; статус через query-параметр — только
+  если параметр назван id/code/reference.
+- Массивы полей (PayPal `items[]`) не мапятся автоматически (WARN + `[]`).
+- Примеры из спеки сверяются с её схемами (`INFO fixture_schema_mismatch`), но берутся как есть.
 - Секреты (API-ключ, HMAC secret) в документации нет — генерируются как `credentials.*` с пометкой
   для ручного заполнения.
 
@@ -287,9 +293,9 @@ paths:
 
 ## Что дальше
 
-Pay-in (депозиты) тем же пайплайном; Swagger 2.0 через конвертацию; выбор варианта `oneOf` в
-overrides; статус-запрос POST-ом; валидация фикстур по JSON Schema (`json_schemer`); интеграция с
-CI Space Payments как шаг «новый провайдер → PR с сервисом и тестами».
+Pay-in (депозиты) тем же пайплайном; Swagger 2.0 через конвертацию; batch-выплаты (массивы полей);
+полная JSON-Schema-валидация фикстур (`json_schemer`, сейчас — встроенная проверка типов/required/enum);
+интеграция с CI Space Payments как шаг «новый провайдер → PR с сервисом и тестами».
 
 ## Лицензия
 

@@ -125,7 +125,8 @@ module Forge
           mapping = mapping.with(required_if: condition(rules['required_if']),
                                  confidence: 1.0)
         end
-        [[:unmapped_field, "#{name} "], [:array_field_unsupported, "#{name} "], [:conditional_required, "#{name}:"]]
+        [[:unmapped_field, "#{name} "], [:array_field_unsupported, "#{name} "], [:conditional_required, "#{name}:"],
+         [:one_of_first_variant, "#{name}:"]]
           .each { |code, frag| @log.close(code, frag) }
         @log.applied("fields.#{name}", rules.keys.join(', '))
         mapping

@@ -21,6 +21,7 @@ module Forge
           assign(op, m, value, type) unless value.nil?
         end
         fill_requisite_defaults(op['payout_requisite'])
+        op['payout_requisite'] = { 'default' => {} } if op['payout_requisite'].empty? # BaseService требует реквизиты
         [op.compact, @extras]
       end
 

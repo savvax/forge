@@ -18,7 +18,8 @@ module Forge
         endpoint = role(:create)
         schema = endpoint&.request_body&.schema
         check_external_refs(endpoint, schema)
-        walker = FieldWalker.new(self, dict, amount_expr)
+        check_media_type(endpoint)
+        walker = FieldWalker.new(self, dict, amount_expr, variants: variant_overrides)
         request = schema ? walker.walk(schema, [], schema.required.to_a, nil) : []
         value = { request: request, requisite_types: requisite_types(request), requisite_container: walker.container,
                   headers: headers(endpoint) }
@@ -42,7 +43,14 @@ module Forge
         names = options.map(&:ref_name).compact.join(', ')
         warn(:one_of_first_variant, "#{path.join('.')}: #{options.size} variants (#{names}); " \
                                     "first (#{first.ref_name || 'inline'}) is used",
-             hint: "fields.#{path.join('.')}.variant: <SchemaName>  (overrides.yml, not implemented yet)")
+             hint: "fields.#{path.join('.')}.variant: <SchemaName>  (overrides.yml)")
+      end
+
+      def warn_variant_missing(path, name, options)
+        names = options.map(&:ref_name).compact.join(', ')
+        warn(:variant_not_found, "#{path.join('.')}: variant '#{name}' is not among #{names}",
+             hint: "fields.#{path.join('.')}.variant: <one of the names above>")
+        nil
       end
 
       def warn_conditional(path, match)
@@ -58,6 +66,14 @@ module Forge
       private
 
       def dict = rules.fetch(:field_aliases)
+
+      # fields.<path>.variant: <SchemaName> — выбор варианта oneOf/anyOf без WARN.
+      def variant_overrides
+        overrides.fetch('fields', {}).to_h.filter_map do |path, rules|
+          rules.is_a?(Hash) && rules['variant'] && [path, rules['variant'].to_s]
+        end.to_h
+      end
+
       def amount_expr = findings[:amount]&.value&.[](:expr) || 'operation.amount'
 
       def requisite_types(request)
@@ -120,6 +136,18 @@ module Forge
         places = refs.map { |path, ref| "#{path.join('.')} → #{ref}" }.uniq.join(', ')
         unsupported(:external_ref, "#{endpoint.method.upcase} #{endpoint.path}: external $ref → {} (#{places})",
                     pointer: endpoint.pointer, hint: 'inline the schema if this response matters')
+      end
+
+      def check_media_type(endpoint)
+        types = endpoint&.request_body&.media_types.to_a
+        return unless form_only?(types)
+
+        warn(:media_type_form, "create request body is #{types.join(', ')}; sent as form-urlencoded (nested flattened)",
+             pointer: "#{endpoint.pointer}/requestBody", hint: 'nested keys are encoded as parent[child]; verify')
+      end
+
+      def form_only?(types)
+        types.none? { |t| t.include?('json') } && types.any? { |t| t.include?('x-www-form-urlencoded') }
       end
 
       def unresolved(schema, prefix = [])

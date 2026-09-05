@@ -26,6 +26,7 @@ module Forge
       def currency = plan.amount[:currencies].first
       def requisites? = !plan.requisite_types.empty?
       def idempotency? = !op(:create).headers.empty?
+      def body_kw = op(:create).body_encoding == 'form' ? 'form' : 'json'
 
       def requires
         base64 = plan.auth[:type] == 'basic' || signature&.dig(:encoding) == 'base64'

@@ -79,7 +79,6 @@ HMAC-SHA256(body, callback_secret) → hex → Swift-Signature
 | alternative security scheme 'oauth2' (oauth2) is ignored | oauth2_alternative at `#/components/securitySchemes/oauth2` | UNSUPPORTED | `the first supported scheme is used` |
 | Swift-Signature: signature includes a timestamp/nonce; verify is a TODO | signature_with_timestamp | UNSUPPORTED | `implement verify_signature! by hand following the provider docs` |
 | GET /v1/accounts/balance: external $ref → {} (available → https://schemas.swiftpay.example/common/Money.json, reserved → https://schemas.swiftpay.example/common/Money.json) | external_ref at `#/paths/~1v1~1accounts~1balance/get` | UNSUPPORTED | `inline the schema if this response matters` |
-| beneficiary: 2 variants (IbanBeneficiary, AccountBeneficiary); first (IbanBeneficiary) is used | one_of_first_variant | WARN | `fields.beneficiary.variant: <SchemaName>  (overrides.yml, not implemented yet)` |
 
 ## Проверка
 

@@ -26,12 +26,14 @@ roles:
       no_path_param: 0.10
       has_request_body: 0.10
   status:
-    requires: { any: [has_path_param, id_query_param] }
+    requires: { any: [has_path_param, id_query_param, id_body_field] }
     signals:
       method_get: 0.30
       payout_word_in_path: 0.25
       has_path_param: 0.20
       status_word: 0.15
+      id_body_field: 0.30          # POST /transfer/get с {transfer_id} в теле (Plaid-стиль)
+      method_post_with_id_body: 0.10
   cancel:
     requires: { any: [has_path_param, has_request_body] }
     signals:

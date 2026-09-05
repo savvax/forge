@@ -90,6 +90,28 @@ Pay-in — только в «Что дальше».
 WARN/UNSUPPORTED; строка `Done:` явно это сообщает. По умолчанию exit 0 — команда ТЗ `bin/integrate` не
 краснеет на допущениях.
 
+### D-17 · `fields.<path>.variant` — выбор варианта oneOf/anyOf
+Overrides передаются в `Analyzers::Runner` (только ключи, влияющие на обход: `fields.*.variant`);
+`FieldWalker` берёт вариант по `x-forge-ref-name`, WARN `one_of_first_variant` не выдаётся; несуществующее имя →
+WARN `variant_not_found` + первый вариант. SwiftPay с overrides — 0 WARN.
+
+### D-18 · Form-urlencoded тела
+`OperationPlan#body_encoding = 'form'`, когда у запроса create нет JSON media type, но есть
+`application/x-www-form-urlencoded`; сервис шлёт `form: payload`, `HttpClient` кодирует вложенные ключи как
+`parent[child]` (Stripe-стиль); WARN `media_type_form`. Сгенерированный spec парсит form-тело и сравнивает
+значения как строки.
+
+### D-19 · Статус через POST с id в теле
+Сигнал `id_body_field` (0.30) + `method_post_with_id_body` (0.10) в `roles.status`; `OperationPlan#status_request_field`
+— имя поля (`*_id`/`id`); шаблоны сервиса, spec и мока переключаются на `POST` с телом `{field => provider_operation_id}`.
+Plaid: `POST /transfer/get` → status 0.80.
+
+### D-20 · Валидация фикстур по IR-схеме без нового гема
+`Fixtures::Validator` проверяет типы, `required`, `enum` примеров запроса/ответов/webhook по схемам той же спеки;
+расхождение → `INFO fixture_schema_mismatch` (пример берётся как есть). На NovaPay найдено настоящее расхождение
+в ТЗ: пример 401 `error.code: unauthorized` не входит в enum `PayoutError.code`. Уровень INFO, чтобы канон
+«3 WARN + 3 INFO» остался; json_schemer не добавлен (новый гем — только с согласия).
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

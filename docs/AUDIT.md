@@ -2,8 +2,8 @@
 
 Документ для независимого проверяющего (человека или агента): что требовалось, что реализовано, где это
 лежит, как проверить каждое утверждение командой и какие отклонения от документов приняты осознанно.
-Актуально на коммит `44fcf07` (тег `v1.0.0`, 4.09.2026). Первоисточники: `docs/TASK.md`, `docs/QA_SESSION_1.md`,
-`docs/CRITERIA.md`, `CLAUDE.md`, `docs/AGENT_TASKS.md`, `NOTES.md` (решения D-01…D-14).
+Актуально на тег `v1.0.0` (5.09.2026). Первоисточники: `docs/TASK.md`, `docs/QA_SESSION_1.md`,
+`docs/CRITERIA.md`, `CLAUDE.md`, `docs/AGENT_TASKS.md`, `NOTES.md` (решения D-01…D-20).
 
 ## 1. Требования
 
@@ -113,7 +113,7 @@ golden (5 наборов), determinism, generate_command, reference (элеме�
 mise install && bundle install            # Ruby 3.3 (.mise.toml)
 bundle exec rake ci                       # ~15 с: rubocop 0; 216 examples, 0 failures; guard:vendor ok;
                                           # generated specs зелёные; determinism ok (21 files); licenses ok; readme:check ok
-bin/forge analyze --spec examples/specs/novapay.yaml         # 5 ролей 0.95/0.90/0.95/0.90/0.85; 3 WARN + 3 INFO; exit 0
+bin/forge analyze --spec examples/specs/novapay.yaml         # 5 ролей 0.95/0.90/0.95/0.90/0.85; 3 WARN + 4 INFO; exit 0
 bin/forge generate --spec examples/specs/novapay.yaml --out tmp/out/novapay --force
                                           # Verifying… ok (ruby -c ×4, rspec 13 examples, 0 failures); Done: 7 files
 bin/forge generate --spec examples/specs/cardpay.yaml --overrides examples/overrides/cardpay.yml --out tmp/out/c --force --strict; echo $?   # 0 (0 WARN)
@@ -145,16 +145,17 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 | 8 | AGENT_TASKS T01: Thor в `lib/forge/cli.rb` | так и есть (после T07) | — |
 | 9 | Карточка T15: Rack::Test | `Rack::MockRequest` из rack | гем `rack-test` не в Gemfile, новый гем требует согласия |
 | 10 | ТЗ пример `report.txt`: «Done: 6 files» | `report.txt` содержит пути относительно каталога вывода (`./novapay_service.rb`), stdout — полные | детерминизм между каталогами (`rake determinism`) |
-| 11 | RULES § 9: `fields.<path>.variant` для `oneOf` | не реализовано, в hint помечено «not implemented yet» | резерв R2, README «Что дальше» |
+| 11 | RULES § 9: `fields.<path>.variant` для `oneOf` | реализовано (D-17) | — |
 | 12 | OUTPUT_FORMAT § 1: `cancel_request`/`fetch_balance` внутри сервиса | отдельный файл `<p>_extras.rb`, класс `<P>Extras < <P>Service`; сервис — только контракт | D-15, замечание экспертов |
 | 13 | ARCHITECTURE: `--strict` → exit 4 | так и есть, но режим «комбинированный»: все файлы и отчёт создаются, код 4 только в конце | D-16, замечание экспертов |
 
 ## 5. Известные ограничения (README «Ограничения»)
 
-Только OpenAPI 3.x; только payout; OAuth2-флоу не генерируется (bearer + TODO); `oneOf` — первый вариант +
-WARN; подпись с timestamp → `NotImplementedError` с TODO; статус-запрос только GET с id в path (Plaid);
-массивы полей (PayPal `items[]`) не мапятся; form-urlencoded тела генерируются как JSON (Stripe) — WARN
-`media_type_form` **не** реализован, тело шлётся как `json:`.
+Только OpenAPI 3.x; только payout; OAuth2-флоу не генерируется (bearer + TODO); подпись с timestamp →
+`NotImplementedError` с TODO; массивы полей (PayPal `items[]`) не мапятся. Закрыто 5.09 (D-17…D-20): выбор
+варианта `oneOf` через overrides, form-urlencoded тела (`form:` + WARN), статус через POST с id в теле,
+валидация фикстур по схемам спеки (INFO). NovaPay теперь даёт 3 WARN + 4 INFO: четвёртый INFO —
+`fixture_schema_mismatch` (пример 401 в ТЗ не входит в enum кодов ошибок).
 
 ## 6. Что не входит в проверенное состояние
 

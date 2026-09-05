@@ -109,6 +109,8 @@ module Forge
           'no_path_param' => ->(f) { !f.path_param? },
           'security_explicitly_empty' => ->(f) { f.endpoint.security == [] },
           'id_query_param' => ->(f) { f.param_word?('query', 'id') },
+          'id_body_field' => ->(f) { !f.id_body_field.nil? },
+          'method_post_with_id_body' => ->(f) { f.method == 'post' && !f.id_body_field.nil? },
           'signature_header_param' => ->(f) { f.param_word?('header', 'signature') }
         }.freeze
 
@@ -133,6 +135,14 @@ module Forge
 
         def method = endpoint.method
         def path_param? = endpoint.path.include?('{')
+
+        # Поле тела с id-словом в имени и без других обязательных полей кроме credentials-подобных.
+        def id_body_field
+          return nil unless endpoint.method == 'post' && !path_param?
+
+          props = endpoint.request_body&.schema&.properties.to_h
+          props.keys.find { |name| name.end_with?('_id') || name == 'id' }
+        end
 
         def param_word?(location, list)
           endpoint.parameters.any? { |p| p.location == location && word?(list, p.name) }

@@ -33,6 +33,7 @@ module Forge
 
       def url(role) = "\"\#{described_class::BASE_URL}#{op(role).path.gsub(/\{\w+\}/, ID_EXPR)}\""
       def create_response_status = op(:create).success_statuses.first
+      def status_verb = op(:status).status_request_field ? 'post' : 'get'
       def create_response_key = "response_#{create_response_status}"
       def status_response_key = fx['fetch_status']&.keys&.find { |k| k.start_with?('response_2') }
       def provider_id_path = op(:create).response_id_path.inspect

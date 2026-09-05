@@ -44,7 +44,7 @@ RSpec.describe Forge::Plan::Builder do
       expect(plan.outside_contract.map { |o| o[:helper] }).to eq(%w[cancel_request fetch_balance])
       expect(plan.gateway_config).to eq([{ external_method: 'sbp_payout', gateway: 'RUB_SBP_WITHDRAW' },
                                          { external_method: 'card_payout', gateway: 'RUB_CARD_WITHDRAW' }])
-      expect(plan.warnings.size).to eq(6)
+      expect(plan.warnings.size).to eq(7) # 6 канонических + INFO fixture_schema_mismatch (401 example vs enum)
       expect(plan.meta).to eq(spec_title: 'NovaPay Payout API', spec_version: '1.0.0',
                               spec_file: 'examples/specs/novapay.yaml', forge_version: '1.0.0')
     end

@@ -17,7 +17,7 @@ module Forge
                         id_field status_field],
         'errors' => :any
       }.freeze
-      FIELD_KEYS = %w[source required required_if].freeze
+      FIELD_KEYS = %w[source required required_if variant].freeze
       ROLES = %w[create status cancel balance webhook other].freeze
 
       module_function

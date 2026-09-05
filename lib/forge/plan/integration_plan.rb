@@ -9,6 +9,7 @@ module Forge
 
     # rubocop:disable-next Lint/DataDefineOverride -- `method` задан docs/ARCHITECTURE.md (HTTP-verb)
     OperationPlan = Data.define(:role, :method, :path, :path_params, :headers, :body_encoding, :success_statuses,
-                                :response_id_path, :response_status_path, :error_statuses, :endpoint)
+                                :response_id_path, :response_status_path, :error_statuses, :endpoint,
+                                :status_request_field)
   end
 end

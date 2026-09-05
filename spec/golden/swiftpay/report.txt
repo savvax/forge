@@ -37,7 +37,7 @@ Warnings (4):
   WARN         unmapped_status            status 'RETURNED' (returned) of status is unknown
         hint: statuses.RETURNED: in_progress|approved|rejected  (overrides.yml)
   WARN         one_of_first_variant       beneficiary: 2 variants (IbanBeneficiary, AccountBeneficiary); first (IbanBeneficiary) is used
-        hint: fields.beneficiary.variant: <SchemaName>  (overrides.yml, not implemented yet)
+        hint: fields.beneficiary.variant: <SchemaName>  (overrides.yml)
   WARN         unmapped_field             beneficiary.address (object) has no source
         hint: fields.beneficiary.address.source: "…"  (overrides.yml)
 Unsupported (3):

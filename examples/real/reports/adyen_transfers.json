@@ -2016,7 +2016,7 @@
       "code": "one_of_first_variant",
       "message": "counterparty.bankAccount.accountIdentification: 16 variants (AULocalAccountIdentification, BRLocalAccountIdentification, CALocalAccountIdentification, CZLocalAccountIdentification, DKLocalAccountIdentification, HKLocalAccountIdentification, HULocalAccountIdentification, IbanAccountIdentification, NOLocalAccountIdentification, NZLocalAccountIdentification, NumberAndBicAccountIdentification, PLLocalAccountIdentification, SELocalAccountIdentification, SGLocalAccountIdentification, UKLocalAccountIdentification, USLocalAccountIdentification); first (AULocalAccountIdentification) is used",
       "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountIdentification.variant: <SchemaName>  (overrides.yml, not implemented yet)"
+      "hint": "fields.counterparty.bankAccount.accountIdentification.variant: <SchemaName>  (overrides.yml)"
     },
     {
       "level": "warn",

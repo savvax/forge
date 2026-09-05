@@ -73,6 +73,37 @@ RSpec.describe Forge::Renderers::Service do
                                                                           'client.delete(')
   end
 
+  def form_status_spec
+    body = { 'required' => true, 'content' => { 'application/x-www-form-urlencoded' => { 'schema' => {
+      'type' => 'object', 'properties' => { 'amount' => { 'type' => 'integer', 'description' => 'in cents' },
+                                            'currency' => { 'type' => 'string' } }
+    } } } }
+    ok = response_json(200, { 'id' => { 'type' => 'string' }, 'status' => { 'type' => 'string', 'enum' => %w[paid] } })
+    create = { 'operationId' => 'transferCreate', 'requestBody' => body, 'responses' => ok }
+    status = { 'operationId' => 'transferGet', 'requestBody' => body_json({ 'transfer_id' => { 'type' => 'string' } }),
+               'responses' => ok }
+    build_spec(security_schemes: { 'b' => { 'type' => 'http', 'scheme' => 'bearer' } }, security: [{ 'b' => [] }],
+               paths: { '/transfer/create' => { 'post' => create }, '/transfer/get' => { 'post' => status } })
+  end
+
+  context 'with a form-urlencoded create and a POST status (id in the body)' do
+    let(:plan) { plan_for_hash(form_status_spec) }
+
+    it 'plans form encoding and the status request field' do
+      expect(plan.operations[:create].body_encoding).to eq('form')
+      expect(plan.operations[:status].status_request_field).to eq('transfer_id')
+      expect(plan.warnings.map(&:code)).to include(:media_type_form)
+    end
+
+    it 'renders form: payload and a POST fetch_status, and the generated spec is green' do
+      expect(render(plan)).to include('form: payload', "body = { 'transfer_id' => operation.provider_operation_id }",
+                                      '/transfer/get", json: body, headers: auth_headers)')
+      dir = 'tmp/form_status'
+      Forge::Renderers::Runner.render(plan, out_dir: dir, force: true)
+      expect(Forge::Verifier.spec!("#{dir}/test_service_spec.rb", load_paths: ['lib', dir])).to include('0 failures')
+    end
+  end
+
   it 'raises VerificationError with compiler output for a broken template' do
     FileUtils.mkdir_p('tmp/templates')
     File.write('tmp/templates/service.rb.erb', "class Broken\n  def x(\nend\n")
