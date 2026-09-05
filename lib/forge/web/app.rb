@@ -11,6 +11,8 @@ require 'stringio'
 require_relative '../../forge'
 require_relative '../generate_command'
 require_relative 'runs'
+require_relative 'presenters'
+require_relative 'overview'
 
 module Forge
   module Web
@@ -29,6 +31,12 @@ module Forge
       helpers do
         def h(text) = Rack::Utils.escape_html(text.to_s)
         def run = @run ||= Runs.find(params[:id]) || halt(404, erb(:not_found))
+
+        def overview
+          json = run.report_json
+          json == '{}' ? nil : Overview.from(json)
+        end
+
         def examples = Dir[File.expand_path('../../../examples/specs/*', __dir__)]
         def overrides_examples = Dir[File.expand_path('../../../examples/overrides/*.yml', __dir__)]
       end

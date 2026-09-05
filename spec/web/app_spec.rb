@@ -25,7 +25,10 @@ RSpec.describe Forge::Web::App do
   it 'creates a run from an example spec, shows report and files, serves json and tar' do
     id = create_run
     page = client.get("/runs/#{id}").body
-    expect(page).to include('Parsing spec... ok', 'novapay_service.rb', 'INTEGRATION.md', 'Done: 7 files')
+    expect(page).to include('Parsing spec... ok', 'novapay_service.rb', 'Done: 7 files', 'Эндпоинты и роли',
+                            'Создание выплаты', 'X-NovaPay-Signature', 'Поля запроса')
+    expect(page).to include('<span class="t-k">class</span>', '<h3>Авторизация</h3>',
+                            '<span class="jk">create_request</span>')
     expect(client.get("/runs/#{id}/files/novapay_service.rb").body).to include('class NovapayService < BaseService')
     expect(JSON.parse(client.get("/runs/#{id}/report.json").body)['exit_code']).to eq(0)
     expect(client.get("/runs/#{id}/download.tar").body).to include('novapay/fixtures.json')

@@ -1,44 +1,125 @@
-<section class="card">
-  <h1><%= h run.provider %> <small>· <%= h run.id %> · exit <span class="exit-<%= run.exit_code %>"><%= run.exit_code %></span></small></h1>
+<% ov = overview %>
+<section class="card head">
+  <div>
+    <h1><%= h run.provider %> <small>· <%= h ov&.spec&.dig('title') || File.basename(run.spec_path.to_s) %> <%= h ov&.spec&.dig('version') %> · <%= h run.id %></small></h1>
+    <p class="muted">exit <span class="pill exit-<%= run.exit_code %>"><%= run.exit_code %></span>
+      <% if ov %>· WARN <b><%= ov.warnings.fetch('warn', []).size %></b> · UNSUPPORTED <b><%= ov.warnings.fetch('unsupported', []).size %></b> · INFO <b><%= ov.warnings.fetch('info', []).size %></b><% end %></p>
+  </div>
   <p class="actions">
-    <a class="btn" href="/">← новый прогон</a>
+    <a class="btn ghost" href="/">← новый прогон</a>
     <% unless run.files.empty? %><a class="btn" href="/runs/<%= h run.id %>/download.tar">скачать всё (.tar)</a><% end %>
-    <a class="btn" href="/runs/<%= h run.id %>/report.json">report.json</a>
+    <a class="btn ghost" href="/runs/<%= h run.id %>/report.json">report.json</a>
     <% unless run.files.empty? %>
-    <form method="post" action="/runs/<%= h run.id %>/spec" class="inline"><button>▶ rspec сгенерированного</button></form>
-    <form method="post" action="/runs/<%= h run.id %>/e2e" class="inline"><button>▶ e2e (мок + webhook)</button></form>
+    <form method="post" action="/runs/<%= h run.id %>/spec" class="inline"><button>▶ rspec</button></form>
+    <form method="post" action="/runs/<%= h run.id %>/e2e" class="inline"><button>▶ e2e</button></form>
     <% end %>
   </p>
 </section>
 
-<section class="card">
-  <h2>Отчёт</h2>
-  <pre class="report"><%= h run.report %></pre>
-</section>
+<% if run.files.empty? %>
+<section class="card"><h2>Ошибка</h2><pre class="report"><%= h run.report %></pre></section>
+<% else %>
+<div class="tabs top">
+  <input type="radio" name="top" id="t-overview" checked><label for="t-overview">Обзор</label>
+  <input type="radio" name="top" id="t-service"><label for="t-service">Сервис</label>
+  <input type="radio" name="top" id="t-guide"><label for="t-guide">INTEGRATION.md</label>
+  <input type="radio" name="top" id="t-fixtures"><label for="t-fixtures">fixtures.json</label>
+  <input type="radio" name="top" id="t-spec"><label for="t-spec">RSpec</label>
+  <input type="radio" name="top" id="t-mock"><label for="t-mock">Мок</label>
+  <input type="radio" name="top" id="t-report"><label for="t-report">Отчёт</label>
+  <% if run.step_output('spec') || run.step_output('e2e') %><input type="radio" name="top" id="t-runs"><label for="t-runs">Запуски</label><% end %>
 
-<% unless run.files.empty? %>
-<section class="card">
-  <h2>Файлы</h2>
-  <div class="tabs">
-    <% run.files.each_with_index do |name, i| %>
-      <input type="radio" name="tab" id="tab<%= i %>" <%= 'checked' if i.zero? %>>
-      <label for="tab<%= i %>"><%= h name %></label>
-    <% end %>
-    <% run.files.each_with_index do |name, i| %>
-      <div class="pane" data-for="tab<%= i %>">
-        <p class="file-actions"><a href="/runs/<%= h run.id %>/files/<%= h name %>" target="_blank">открыть</a> · <a href="/runs/<%= h run.id %>/files/<%= h name %>?download=1">скачать</a></p>
-        <pre><%= h File.read(run.file(name)) %></pre>
-      </div>
+  <div class="pane" data-for="t-overview">
+  <% if ov %>
+    <div class="grid2">
+      <section class="card">
+        <h2>Эндпоинты и роли</h2>
+        <table class="kv">
+          <% ov.endpoints.each do |e| %>
+          <tr><th><%= h e['title'] %><% if e['outside_contract'] %><span class="tag">вне контракта</span><% end %></th>
+              <td><code><%= h e['method'] %> <%= h e['path'] %></code> <span class="muted"><%= h e['operation_id'] %></span></td>
+              <td><span class="conf <%= ov.confidence_class(e['confidence']) %>"><%= format('%.2f', e['confidence']) %></span></td></tr>
+          <% end %>
+        </table>
+      </section>
+      <section class="card">
+        <h2>Авторизация и webhook</h2>
+        <table class="kv">
+          <tr><th>Auth</th><td colspan="2"><%= h ov.auth_line %></td></tr>
+          <tr><th>Подпись</th><td colspan="2"><%= h ov.signature_line %></td></tr>
+          <% unless (ov.webhook['event_map'] || {}).empty? %>
+          <tr><th>События</th><td colspan="2"><% ov.webhook['event_map'].each do |ev, st| %><code><%= h ev %></code> → <span class="st st-<%= st %>"><%= st %></span><br><% end %></td></tr>
+          <% end %>
+          <tr><th>Сумма</th><td colspan="2"><%= h ov.amount_line %></td></tr>
+        </table>
+      </section>
+      <section class="card">
+        <h2>Статусы <span class="muted">поле <code><%= h Array(ov.statuses['field_path']).join('.') %></code></span></h2>
+        <table class="kv">
+          <% ov.status_groups.each do |internal, raws| %>
+          <tr><th><span class="st st-<%= internal %>"><%= internal %></span></th><td colspan="2"><%= raws.empty? ? '—' : raws.map { |r| "<code>#{h r}</code>" }.join(' ') %></td></tr>
+          <% end %>
+          <% unless Array(ov.statuses['unmapped']).empty? %>
+          <tr><th><span class="st st-unmapped">не распознаны</span></th><td colspan="2"><%= Array(ov.statuses['unmapped']).map { |r| "<code>#{h r}</code>" }.join(' ') %></td></tr>
+          <% end %>
+        </table>
+      </section>
+      <section class="card">
+        <h2>Ошибки провайдера</h2>
+        <table class="md">
+          <tr><th>HTTP</th><th>Роль</th><th>Код</th><th>Действие</th></tr>
+          <% ov.errors.each do |r| %>
+          <tr><td><%= r['status'] %></td><td><%= h r['role'] %></td><td><code><%= h(r['provider_code'] || r['internal_code']) %></code></td><td><span class="act act-<%= r['action'] %>"><%= h r['action'] %></span></td></tr>
+          <% end %>
+        </table>
+      </section>
+      <section class="card wide">
+        <h2>Поля запроса → источник на стороне Space Payments</h2>
+        <table class="md">
+          <tr><th>Поле провайдера</th><th>Источник</th><th>Обязательно</th><th>Confidence</th></tr>
+          <% ov.fields.each do |f| %>
+          <tr><td><code><%= h Array(f['path']).join('.') %></code></td>
+              <td><% if f['source_expr'] %><code><%= h f['source_expr'] %></code><% else %><span class="tag warn">TODO · overrides.yml</span><% end %></td>
+              <td><%= f['required_if'] ? "если #{h f['required_if']['field']}=#{h f['required_if']['equals']}" : (f['required'] ? 'да' : 'нет') %></td>
+              <td><span class="conf <%= ov.confidence_class(f['confidence']) %>"><%= format('%.2f', f['confidence'].to_f) %></span></td></tr>
+          <% end %>
+        </table>
+      </section>
+      <section class="card wide">
+        <h2>Допущения и предупреждения</h2>
+        <% if ov.warnings.empty? %><p class="muted">Все решения приняты с confidence ≥ 0.8; предупреждений нет.</p><% end %>
+        <% { 'warn' => 'WARN', 'unsupported' => 'UNSUPPORTED', 'info' => 'INFO' }.each do |level, label| %>
+          <% ov.warnings.fetch(level, []).each do |w| %>
+          <div class="warn-row lvl-<%= level %>"><span class="lvl"><%= label %></span> <code><%= h w['code'] %></code> <%= h w['message'] %>
+            <% if w['hint'] %><div class="hint">→ <%= h w['hint'] %></div><% end %></div>
+          <% end %>
+        <% end %>
+      </section>
+    </div>
+  <% else %>
+    <section class="card"><pre class="report"><%= h run.report %></pre></section>
+  <% end %>
+  </div>
+
+  <div class="pane" data-for="t-service">
+    <% run.files.grep(/_service\.rb\z|_extras\.rb\z/).each do |name| %>
+    <section class="card"><h2><%= h name %> <span class="file-actions"><a href="/runs/<%= h run.id %>/files/<%= h name %>" target="_blank">открыть</a> · <a href="/runs/<%= h run.id %>/files/<%= h name %>?download=1">скачать</a></span></h2>
+      <%= Forge::Web::Presenters.ruby(File.read(run.file(name))) %></section>
     <% end %>
   </div>
-</section>
-<% end %>
-
-<% %w[spec e2e].each do |step| %>
-<% if (out = run.step_output(step)) %>
-<section class="card" id="<%= step %>">
-  <h2><%= step == 'spec' ? 'Сгенерированный RSpec' : 'e2e: мок провайдера → сервис → webhook' %></h2>
-  <pre class="report"><%= h out %></pre>
-</section>
-<% end %>
+  <div class="pane" data-for="t-guide"><section class="card doc"><%= Forge::Web::Presenters.markdown(File.read(run.file('INTEGRATION.md'))) %></section></div>
+  <div class="pane" data-for="t-fixtures"><section class="card"><div class="tree"><%= Forge::Web::Presenters.json_tree(File.read(run.file('fixtures.json'))) %></div></section></div>
+  <div class="pane" data-for="t-spec">
+    <% run.files.grep(/_service_spec\.rb\z/).each do |name| %>
+    <section class="card"><h2><%= h name %></h2><%= Forge::Web::Presenters.ruby(File.read(run.file(name))) %></section>
+    <% end %>
+  </div>
+  <div class="pane" data-for="t-mock"><section class="card"><h2>mock_server.rb</h2><%= Forge::Web::Presenters.ruby(File.read(run.file('mock_server.rb'))) %></section></div>
+  <div class="pane" data-for="t-report"><section class="card"><pre class="report"><%= h run.report %></pre></section></div>
+  <div class="pane" data-for="t-runs">
+    <% %w[spec e2e].each do |step| %><% if (out = run.step_output(step)) %>
+    <section class="card" id="<%= step %>"><h2><%= step == 'spec' ? 'Сгенерированный RSpec' : 'e2e: мок → сервис → webhook → approved' %></h2><pre class="report"><%= h out %></pre></section>
+    <% end %><% end %>
+  </div>
+</div>
 <% end %>
