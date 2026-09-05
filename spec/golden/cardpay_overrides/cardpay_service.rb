@@ -63,6 +63,8 @@ module Provider
       return fetch_status(operation) if STATUS_METHODS.include?(request_method)
 
       requisite_type = requisite_type_for(operation, request_method)
+      return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type
+
       payload = build_payout_payload(operation, requisite_type)
       response = client.post("#{BASE_URL}/transfers", json: payload, headers: auth_headers)
       parse_create_response(operation, response)

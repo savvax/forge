@@ -15,7 +15,7 @@
 >
 > Ранее: **M3 (спеки) закрыт** — golden для NovaPay, CardPay и SwiftPay (с overrides и без), `generate --overrides … --strict` для CardPay даёт exit 0. Далее — реальные спеки (T18), мок и e2e (T15).
 >
-> Ранее: **M2 Generate закрыт** — `bin/forge generate` для NovaPay даёт сервис, spec (13 примеров, зелёный), `INTEGRATION.md`, `fixtures.json`, `report.txt`; golden и determinism зелёные. Дальше — M3 Universal (CardPay/SwiftPay golden, реальные спеки).
+> Ранее: **M2 Generate закрыт** — `bin/forge generate` для NovaPay даёт сервис, spec (14 примеров, зелёный), `INTEGRATION.md`, `fixtures.json`, `report.txt`; golden и determinism зелёные. Дальше — M3 Universal (CardPay/SwiftPay golden, реальные спеки).
 
 ## Быстрый старт
 
@@ -71,12 +71,16 @@ Generating service...
 Generating integration guide...
 Generating test fixtures...
 Generating service spec...
-Verifying generated code... ok (ruby -c ×2, rspec skipped: --no-verify)
+Generating extras...
+Generating mock server...
+Verifying generated code... ok (ruby -c ×4, rspec skipped: --no-verify)
 Output:
   ./novapay_service.rb
   ./INTEGRATION.md
   ./fixtures.json
   ./novapay_service_spec.rb
+  ./novapay_extras.rb
+  ./mock_server.rb
   ./report.txt
 Warnings (3):
   WARN         signature_encoding_assumed X-NovaPay-Signature: encoding not stated; hex assumed
@@ -90,7 +94,7 @@ Info (3):
   INFO         outside_contract           GET /balance (getBalance) — generated as `fetch_balance` helper
   INFO         duplicate_as_success       HTTP 409 returns the success schema (PayoutResponse); treated as success
         hint: the service reads the payout from the body
-Done: 5 files, 3 warnings, 0 unsupported. Exit 0.
+Done: 7 files, 3 warnings, 0 unsupported. Exit 0.
 ```
 
 </details>
@@ -242,6 +246,10 @@ paths:
 | Plaid | `--include-paths /transfer/*`: create `/transfer/create`, status `POST /transfer/get` (id в теле), cancel; apiKey в заголовках | 40+ полей запроса без источника → overrides | [plaid.txt](examples/real/reports/plaid.txt) |
 
 Сводка: [SUMMARY.md](examples/real/reports/SUMMARY.md).
+
+Живые API: сгенерированные из этих спек сервисы отправляли запросы в настоящие sandbox Stripe, Paystack и
+PayPal с неверным ключом — реальные 401 классифицированы как `provider.invalid_credentials`, сетевой сбой —
+как `provider.unavailable`, чужой тип реквизитов отсекается `check_conditions` до запроса (`docs/AUDIT.md` § 5a).
 
 ## Критерий → где смотреть
 

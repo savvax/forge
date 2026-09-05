@@ -33,7 +33,10 @@ module Forge
         %w[base64 json openssl].select { |r| r != 'base64' || base64 }
       end
 
+      # Пустая карта (статусы не найдены в спеке) → пустой Hash-литерал; сервис вернёт unknown_provider_status.
       def aligned(hash)
+        return [] if hash.empty?
+
         width = hash.keys.map { |k| k.to_s.size }.max + 2
         hash.map { |k, v| "#{"'#{k}'".ljust(width)} => '#{v}'" }
       end

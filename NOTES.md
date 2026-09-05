@@ -112,6 +112,12 @@ Plaid: `POST /transfer/get` → status 0.80.
 в ТЗ: пример 401 `error.code: unauthorized` не входит в enum `PayoutError.code`. Уровень INFO, чтобы канон
 «3 WARN + 3 INFO» остался; json_schemer не добавлен (новый гем — только с согласия).
 
+### D-21 · Живые провайдеры без ключей — проверка транспорта и классификации ошибок
+Сгенерированные из реальных спек сервисы вызывали настоящие sandbox Stripe/Paystack/PayPal с неверным ключом:
+401 → `provider.invalid_credentials`, таймаут → `provider.unavailable`. Найдены и закрыты два дефекта:
+`generate` падал на спеке без enum статусов (пустой `STATUS_MAP` → TODO), `create_request` падал KeyError при
+чужом типе реквизитов (теперь `requisite_missing`, как в `check_conditions`). Таблица — `docs/AUDIT.md` § 5a.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

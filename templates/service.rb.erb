@@ -14,9 +14,13 @@ module Provider
     PRODUCTION_URL = '<%= plan.base_url[:production] %>'
 <% end -%>
 
+<% if plan.status_map.empty? -%>
+    STATUS_MAP = {}.freeze # TODO(forge): no status enum in the spec; fill from the provider docs (statuses.<X>: … in overrides.yml)
+<% else -%>
     STATUS_MAP = {
 <%= view.aligned(plan.status_map).map { |l| "      #{l}" }.join(",\n") %>
     }.freeze
+<% end -%>
 <% if view.webhook && !plan.event_map.empty? -%>
 
     EVENT_MAP = {
@@ -70,6 +74,8 @@ module Provider
 
 <% if view.requisites? -%>
       requisite_type = requisite_type_for(operation, request_method)
+      return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type
+
       payload = build_payout_payload(operation, requisite_type)
 <% else -%>
       payload = build_payout_payload(operation)

@@ -104,6 +104,20 @@ RSpec.describe Forge::Renderers::Service do
     end
   end
 
+  it 'renders an empty STATUS_MAP with a TODO when the spec has no status enum' do
+    ok = response_json(200, { 'id' => { 'type' => 'string' }, 'note' => { 'type' => 'string' } })
+    body = body_json({ 'amount' => { 'type' => 'integer' } })
+    op = { 'operationId' => 'createPayout', 'responses' => ok, 'requestBody' => body }
+    schemes = { 'b' => { 'type' => 'http', 'scheme' => 'bearer' } }
+    spec = build_spec(security_schemes: schemes, security: [{ 'b' => [] }], paths: { '/payouts' => { 'post' => op } })
+    plan = plan_for_hash(spec)
+    expect(plan.status_map).to eq({})
+    dir = 'tmp/no_statuses'
+    files = Forge::Renderers::Runner.render(plan, out_dir: dir, force: true).map { |f| f[:path] }
+    expect(File.read("#{dir}/test_service.rb")).to include('STATUS_MAP = {}.freeze # TODO(forge)')
+    expect(Forge::Verifier.syntax!(files.grep(/\.rb\z/))).to be_truthy
+  end
+
   it 'raises VerificationError with compiler output for a broken template' do
     FileUtils.mkdir_p('tmp/templates')
     File.write('tmp/templates/service.rb.erb', "class Broken\n  def x(\nend\n")

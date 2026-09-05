@@ -43,6 +43,11 @@ RSpec.describe Provider::SwiftpayService do
       expect(service.create_request(operation, 'create').code).to eq('provider.validation_error')
     end
 
+    it 'refuses an operation without a known requisite type' do
+      operation.payout_requisite = { 'unknown_type' => {} }
+      expect(service.create_request(operation, 'create').code).to eq('requisite_missing')
+    end
+
     it 'maps 401 to invalid_credentials' do
       stub_request(:post, create_url).to_return(status: 401, body: '{}')
       expect(service.create_request(operation, 'create').code).to eq('provider.invalid_credentials')

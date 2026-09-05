@@ -157,6 +157,22 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 валидация фикстур по схемам спеки (INFO). NovaPay теперь даёт 3 WARN + 4 INFO: четвёртый INFO —
 `fixture_schema_mismatch` (пример 401 в ТЗ не входит в enum кодов ошибок).
 
+## 5a. Проверка против живых провайдеров (5.09, без учётных данных)
+
+Сгенерированные из реальных спек сервисы вызывали настоящие sandbox-API с заведомо неверным ключом.
+Проверяется формирование запроса, транспорт и классификация реального ответа.
+
+| Провайдер | Вызов | Реальный ответ | Результат сервиса |
+|---|---|---|---|
+| Stripe (`api.stripe.com`) | `create_request` (form-urlencoded), `fetch_status` | 401 `invalid_request_error` | `provider.invalid_credentials` ×2 |
+| Paystack (`api.paystack.co`) | `create_request` (`source` из credentials), `fetch_status` | 401 `invalid_Key` | `provider.invalid_credentials` ×2; один сетевой таймаут → `provider.unavailable` |
+| PayPal (`api-m.sandbox.paypal.com`) | `create_request`, `fetch_status` | 401 `invalid_token` | `provider.invalid_credentials` ×2 |
+| Adyen (`pal-test.adyen.com`) | `check_conditions` с чужим типом реквизитов | — | `requisite_missing` до запроса (REQUISITE_TYPES = card) |
+
+Найдено и исправлено по ходу: `generate` падал на спеке без enum статусов (Paystack) — теперь `STATUS_MAP = {}`
+с TODO; `create_request` при неизвестном типе реквизитов возвращает `requisite_missing`, а не KeyError.
+Позитивный сценарий (201 + webhook) без ключей провайдера недостижим — он покрыт e2e на моке той же спеки.
+
 ## 6. Что не входит в проверенное состояние
 
 - Push на GitHub и CI на `main` не выполнялись из этой сессии (remote `savvax/forge` есть, тег `v1.0.0` локальный).
