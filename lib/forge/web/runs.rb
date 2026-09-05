@@ -63,10 +63,10 @@ module Forge
       end
 
       # bin/forge generate тем же кодом, что и CLI; stdout → report, ошибки → meta.error.
+      # Один прогон: stdout в формате json → report.json; report.txt (текст того же прогона) пишет сам GenerateCommand.
       def generate
-        code, text = capture { GenerateCommand.new(generate_options).run }
-        File.write(File.join(@dir, 'generate.log'), text)
-        save_json if code.zero? || code == 4
+        code, json = capture { GenerateCommand.new(generate_options).run }
+        File.write(File.join(@dir, 'report.json'), json)
         write_meta(meta.merge('exit_code' => code, 'provider' => provider_from_files))
       rescue Forge::Error => e
         write_meta(meta.merge('exit_code' => e.class.exit_code, 'error' => e.message))
@@ -75,12 +75,7 @@ module Forge
       def generate_options
         { spec: spec_path, out: out_dir, overrides: meta['overrides'], provider: meta['provider_name'],
           include_paths: meta['include_paths'], strict: meta['strict'], verify: meta['verify'],
-          force: true, format: 'text', templates_dir: nil }
-      end
-
-      def save_json
-        _code, json = capture { GenerateCommand.new(generate_options.merge(format: 'json', verify: false)).run }
-        File.write(File.join(@dir, 'report.json'), json)
+          force: true, format: 'json', templates_dir: nil }
       end
 
       def exec_step(name)
