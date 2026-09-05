@@ -25,11 +25,14 @@ module Forge
       plan = Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
       files = Renderers::Runner.render(plan, out_dir: @opts[:out], templates_dir: @opts[:templates_dir],
                                              force: @opts[:force])
-      generation = { steps: files.map { |f| f[:label] }, verify: verify(files, plan), outputs: outputs(files),
-                     exit_code: exit_code(findings) }
+      verify, error = verify_or_error(files, plan)
+      generation = { steps: files.map { |f| f[:label] }, verify: verify, outputs: outputs(files),
+                     exit_code: error ? VerificationError.exit_code : exit_code(findings) }
       text = Report.text(spec, findings, generation: generation)
       Renderers::ReportFile.write(@opts[:out], text)
       print_report(spec, findings, generation, text)
+      raise error if error
+
       exit_code(findings)
     end
 
@@ -58,6 +61,13 @@ module Forge
 
     private
 
+    # Отчёт пишется и при упавшей верификации: его WARN/UNSUPPORTED объясняют, почему сгенерированный spec красный.
+    def verify_or_error(files, plan)
+      [verify(files, plan), nil]
+    rescue VerificationError => e
+      ['FAILED (see error below)', e]
+    end
+
     def verify(files, plan)
       ruby = files.map { |f| f[:path] }.grep(/\.rb\z/)
       Verifier.syntax!(ruby)
@@ -76,7 +86,7 @@ module Forge
     def print_report(spec, findings, generation, text)
       return puts(text) unless @opts[:format] == 'json'
 
-      puts Report.json(spec, findings, exit_code: exit_code(findings), generation: generation)
+      puts Report.json(spec, findings, exit_code: generation[:exit_code], generation: generation)
     end
 
     def exit_code(findings)

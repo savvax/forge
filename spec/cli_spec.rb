@@ -125,6 +125,16 @@ RSpec.describe 'CLI' do
       expect(File.read("#{out}/INTEGRATION.md")).to eq("# Custom novapay\n")
     end
 
+    it 'keeps report.txt and prints the report when verification fails (exit 3)' do
+      FileUtils.mkdir_p('tmp/cli_broken')
+      File.write('tmp/cli_broken/service.rb.erb', "class Broken\n  def x(\nend\n")
+      res = generate('--force', '--templates-dir', 'tmp/cli_broken', '--format', 'json')
+      expect(res.exit_code).to eq(3)
+      expect(res.stderr).to include('syntax error')
+      expect(JSON.parse(res.stdout)).to include('exit_code' => 3)
+      expect(File.read("#{out}/report.txt")).to include('Verifying generated code... FAILED', 'Exit 3.')
+    end
+
     it 'runs the generated spec unless --no-verify' do
       res = run_cli('generate', '--spec', 'examples/specs/novapay.yaml', '--out', out, '--force')
       expect(res.exit_code).to eq(0)
