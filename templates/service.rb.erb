@@ -100,7 +100,7 @@ module Provider
 <% end -%>
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == <%= view.op(:status).success_statuses.first %>
 
-      apply_status(operation, <%= view.paths.body(view.op(:status).response_status_path) %>)
+      apply_status(operation, <%= view.paths.body(view.op(:status).response_status_path) %>, strict: true)
 <%= partial('_rescues.erb') -%>
     end
 <% else -%>
@@ -162,11 +162,22 @@ module Provider
 <% end -%>
 
     def build_payout_payload(operation<%= ', requisite_type' if view.requisites? %>)
-      {
+      deep_compact(
+        {
 <% view.payload_lines.each do |line| -%>
-        <%= line %>
+          <%= line %>
 <% end -%>
-      }
+        }
+      )
+    end
+
+    # Убирает nil, пустые Hash/Array и объекты из одних nil (поля без источника — TODO выше).
+    def deep_compact(value)
+      case value
+      when Hash then value.transform_values { |v| deep_compact(v) }.reject { |_k, v| v.nil? || v == {} || v == [] }
+      when Array then value.map { |v| deep_compact(v) }.compact
+      else value
+      end
     end
 <% if view.container? -%>
 
@@ -196,9 +207,15 @@ module Provider
       apply_status(operation, <%= view.paths.body(view.op(:create).response_status_path) %>)
     end
 
-    def apply_status(operation, provider_status)
-      status = STATUS_MAP[provider_status]
-      return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) unless status
+    # Успешный ответ без распознаваемого статуса (нет поля или значение вне STATUS_MAP) → in_progress:
+    # операция создана, итог придёт через fetch_status / webhook. unknown_provider_status — только для fetch_status.
+    def apply_status(operation, provider_status, strict: false)
+      status = STATUS_MAP[provider_status.to_s]
+      if status.nil?
+        return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) if strict
+
+        status = 'in_progress'
+      end
 
       transition(operation, status, provider_status: provider_status)
     end

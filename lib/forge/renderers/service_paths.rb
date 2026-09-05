@@ -16,10 +16,11 @@ module Forge
 
       def url(role)
         path = op(role).path.gsub(/\{\w+\}/, ID_EXPR)
-        return "\"\#{BASE_URL}#{path}\"" if role == :status && op(role).status_request_field
-
-        "\"\#{BASE_URL}#{path}\""
+        literal = "\"\#{BASE_URL}#{path}\""
+        query_api_key? ? "with_auth(#{literal})" : literal
       end
+
+      def query_api_key? = @plan.auth[:type] == 'api_key' && @plan.auth[:location] == 'query'
 
       def dig(path)
         return "['#{path.first}']" if path.size == 1
@@ -53,6 +54,12 @@ module Forge
       end
 
       def cancel_client_call
+        field = op(:cancel).status_request_field
+        if field
+          return "client.post(#{url(:cancel)}, json: { '#{field}' => operation.provider_operation_id }, " \
+                 'headers: auth_headers)'
+        end
+
         verb = op(:cancel).method == 'delete' ? 'delete' : 'post'
         "client.#{verb}(#{url(:cancel)}, headers: auth_headers)"
       end

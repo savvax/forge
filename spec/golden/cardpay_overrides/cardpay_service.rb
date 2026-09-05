@@ -80,7 +80,7 @@ module Provider
       response = client.get("#{BASE_URL}/transfers/#{operation.provider_operation_id}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
-      apply_status(operation, response.body.dig('data', 'state'))
+      apply_status(operation, response.body.dig('data', 'state'), strict: true)
     rescue Provider::RateLimitError => e
       failure(:too_many_requests, 'provider.rate_limit', retry_after: e.retry_after)
     rescue Provider::UnauthorizedError
@@ -116,15 +116,26 @@ module Provider
     end
 
     def build_payout_payload(operation, requisite_type)
-      {
-        merchant_id: credentials.fetch('merchant_id'),
-        reference: operation.id.to_s,
-        amount: format('%.2f', operation.amount),
-        currency: operation.currency,
-        description: operation.description || "Payout #{operation.id}",
-        callback_url: callback_url,
-        destination: build_recipient(operation, requisite_type)
-      }
+      deep_compact(
+        {
+          merchant_id: credentials.fetch('merchant_id'),
+          reference: operation.id.to_s,
+          amount: format('%.2f', operation.amount),
+          currency: operation.currency,
+          description: operation.description || "Payout #{operation.id}",
+          callback_url: callback_url,
+          destination: build_recipient(operation, requisite_type)
+        }
+      )
+    end
+
+    # Убирает nil, пустые Hash/Array и объекты из одних nil (поля без источника — TODO выше).
+    def deep_compact(value)
+      case value
+      when Hash then value.transform_values { |v| deep_compact(v) }.reject { |_k, v| v.nil? || v == {} || v == [] }
+      when Array then value.map { |v| deep_compact(v) }.compact
+      else value
+      end
     end
 
     def build_recipient(operation, requisite_type)
@@ -148,9 +159,15 @@ module Provider
       apply_status(operation, response.body.dig('data', 'state'))
     end
 
-    def apply_status(operation, provider_status)
-      status = STATUS_MAP[provider_status]
-      return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) unless status
+    # Успешный ответ без распознаваемого статуса (нет поля или значение вне STATUS_MAP) → in_progress:
+    # операция создана, итог придёт через fetch_status / webhook. unknown_provider_status — только для fetch_status.
+    def apply_status(operation, provider_status, strict: false)
+      status = STATUS_MAP[provider_status.to_s]
+      if status.nil?
+        return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) if strict
+
+        status = 'in_progress'
+      end
 
       transition(operation, status, provider_status: provider_status)
     end

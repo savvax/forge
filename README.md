@@ -247,9 +247,10 @@ paths:
 
 Сводка: [SUMMARY.md](examples/real/reports/SUMMARY.md).
 
-Живые API: сгенерированные из этих спек сервисы отправляли запросы в настоящие sandbox Stripe, Paystack и
-PayPal с неверным ключом — реальные 401 классифицированы как `provider.invalid_credentials`, сетевой сбой —
-как `provider.unavailable`, чужой тип реквизитов отсекается `check_conditions` до запроса (`docs/AUDIT.md` § 5a).
+Живые API: сервисы, сгенерированные из этих спек, проходят собственные RSpec (6 из 7 спек с create; Square —
+честный exit 2) и отправляли запросы в настоящие sandbox Stripe, Paystack, PayPal и Adyen с неверным ключом:
+реальные 401 → `provider.invalid_credentials`, 400 с неизвестным кодом → `provider.unknown_error`, сетевой
+сбой → `provider.unavailable`. Этот прогон вскрыл и закрыл 10 дефектов генерации (`docs/AUDIT.md` § 5a).
 
 ## Критерий → где смотреть
 

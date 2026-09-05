@@ -80,7 +80,7 @@ module Provider
       response = client.get("#{BASE_URL}/payouts/#{operation.provider_operation_id}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
-      apply_status(operation, response.body['status'])
+      apply_status(operation, response.body['status'], strict: true)
     rescue Provider::RateLimitError => e
       failure(:too_many_requests, 'provider.rate_limit', retry_after: e.retry_after)
     rescue Provider::UnauthorizedError
@@ -123,12 +123,23 @@ module Provider
     end
 
     def build_payout_payload(operation, requisite_type)
-      {
-        amount: to_minor_units(operation.amount),
-        currency: operation.currency,
-        external_id: operation.id.to_s,
-        recipient: build_recipient(operation, requisite_type)
-      }
+      deep_compact(
+        {
+          amount: to_minor_units(operation.amount),
+          currency: operation.currency,
+          external_id: operation.id.to_s,
+          recipient: build_recipient(operation, requisite_type)
+        }
+      )
+    end
+
+    # Убирает nil, пустые Hash/Array и объекты из одних nil (поля без источника — TODO выше).
+    def deep_compact(value)
+      case value
+      when Hash then value.transform_values { |v| deep_compact(v) }.reject { |_k, v| v.nil? || v == {} || v == [] }
+      when Array then value.map { |v| deep_compact(v) }.compact
+      else value
+      end
     end
 
     def build_recipient(operation, requisite_type)
@@ -151,9 +162,15 @@ module Provider
       apply_status(operation, response.body['status'])
     end
 
-    def apply_status(operation, provider_status)
-      status = STATUS_MAP[provider_status]
-      return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) unless status
+    # Успешный ответ без распознаваемого статуса (нет поля или значение вне STATUS_MAP) → in_progress:
+    # операция создана, итог придёт через fetch_status / webhook. unknown_provider_status — только для fetch_status.
+    def apply_status(operation, provider_status, strict: false)
+      status = STATUS_MAP[provider_status.to_s]
+      if status.nil?
+        return failure(:unprocessable_entity, 'unknown_provider_status', provider_status: provider_status) if strict
+
+        status = 'in_progress'
+      end
 
       transition(operation, status, provider_status: provider_status)
     end

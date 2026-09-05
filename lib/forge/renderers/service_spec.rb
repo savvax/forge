@@ -31,7 +31,15 @@ module Forge
         end
       end
 
-      def url(role) = "\"\#{described_class::BASE_URL}#{op(role).path.gsub(/\{\w+\}/, ID_EXPR)}\""
+      def url(role) = "\"\#{described_class::BASE_URL}#{op(role).path.gsub(/\{\w+\}/, ID_EXPR)}#{query_suffix}\""
+
+      # apiKey в query: заглушки WebMock ждут URL с ключом.
+      def query_suffix
+        return '' unless plan.auth[:type] == 'api_key' && plan.auth[:location] == 'query'
+
+        "?#{plan.auth[:param_name]}=test_api_key"
+      end
+
       def create_response_status = op(:create).success_statuses.first
       def status_verb = op(:status).status_request_field ? 'post' : 'get'
       def create_response_key = "response_#{create_response_status}"
@@ -40,10 +48,17 @@ module Forge
       def error_code(status) = plan.error_map[status] && "provider.#{plan.error_map[status][:internal_code]}"
       def min? = plan.validations.any? { |v| v[:rule] == :min }
 
+      # Не сравниваются: поля с override source, поля из operation.idempotency_key (UUID) и «синтезированные»
+      # примеры (в спеке не было example — значение фикстуры выдумано, сервис подставит своё из operation).
       def overridden_paths
-        plan.warnings.filter_map { |w| w.code == :override_applied && w.message[/\Afields\.(\S+) → .*source/, 1] }
-            .map { |path| path.split('.') }
+        overridden = plan.warnings.filter_map do |w|
+          w.code == :override_applied && w.message[/\Afields\.(\S+) → .*source/, 1]
+        end
+        volatile = plan.fields[:request].select { |m| m.source_expr.to_s.include?('idempotency_key') }
+        (overridden + volatile.map { |m| m.path.join('.') }).map { |path| path.split('.') }
       end
+
+      def synthesized_request? = plan.fixtures.dig('create_request', 'synthesized') == true
 
       def callback_id_path = (plan.webhook[:id_field] || ['id']).inspect
       def event_of(key) = fx.dig(key, 'payload', plan.webhook[:event_field].to_s)

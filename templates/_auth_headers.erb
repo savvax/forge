@@ -6,11 +6,13 @@
     end
 <% else -%>
     def auth_headers
-      {} # api key is sent as a query parameter (see auth_params)
+      {} # api key is sent as a query parameter (see with_auth)
     end
 
-    def auth_params
-      { '<%= plan.auth[:param_name] %>' => credentials.fetch('api_key') }
+    # apiKey в query (<%= plan.auth[:param_name] %>): добавляется к каждому URL.
+    def with_auth(url)
+      separator = url.include?('?') ? '&' : '?'
+      "#{url}#{separator}<%= plan.auth[:param_name] %>=#{URI.encode_www_form_component(credentials.fetch('api_key'))}"
     end
 <% end -%>
 <% when 'basic' -%>

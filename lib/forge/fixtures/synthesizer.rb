@@ -31,8 +31,10 @@ module Forge
       def string(schema, name)
         return FORMATS[schema.format] if FORMATS.key?(schema.format)
         return from_pattern(schema.pattern) if schema.pattern
+        return '1.00' if schema.type == 'string' && name.to_s.match?(/amount|sum|total/) # decimal-string суммы
 
-        "#{name}_example"
+        value = "#{name}_example"
+        schema.max_length ? value[0, schema.max_length] : value
       end
 
       # Простой генератор по регулярке: `^7\d{10}$` → '79000000000', `[A-Z]{2}\d{2}` → 'AA00'.
@@ -44,7 +46,9 @@ module Forge
         end
         body = body.gsub(/\\d[+*]?/, '1').gsub(/\[([^\]]+)\][+*]?/) { first_char(::Regexp.last_match(1)) }
         body = body.gsub(/\((?:\?:)?([^)|]+)(?:\|[^)]*)?\)/, '\1').gsub(/[()?*+]/, '').gsub('\\.', '.')
-        phone?(pattern, body) ? "79#{'0' * 9}" : body
+        return "79#{'0' * 9}" if phone?(pattern, body)
+
+        body.match?(/\A0+\.0+\z/) ? body.sub(/\A0+/, '1') : body
       end
 
       def phone?(pattern, body) = body.start_with?('7') && pattern.include?('\d{10}')

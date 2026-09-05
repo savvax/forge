@@ -76,11 +76,19 @@ module Forge
 
       def amount_expr = findings[:amount]&.value&.[](:expr) || 'operation.amount'
 
+      # Канонические типы (CONTRACT § 3) из enum поля типа; enum вне словаря (auLocal, iban…) — не типы реквизитов.
       def requisite_types(request)
-        enum = request.find { |m| m.source_expr == 'requisite_type' }&.schema&.enum
-        return enum.map(&:to_s) if enum
+        enum = type_enum(request)
+        known = enum & dict['requisite_types']
+        return known unless known.empty?
 
-        request.filter_map(&:requisite_type).uniq
+        types = request.filter_map(&:requisite_type).uniq
+        types.empty? && !enum.empty? ? ['bank_account'] : types
+      end
+
+      def type_enum(request)
+        type_field = request.find { |m| m.source_expr == 'requisite_type' }
+        Array(type_field && type_field.schema&.enum).map(&:to_s)
       end
 
       def headers(endpoint)

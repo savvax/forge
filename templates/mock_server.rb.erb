@@ -143,7 +143,11 @@ class <%= class_name %> < Sinatra::Base
 <% if op(:cancel) -%>
 
   <%= op(:cancel).method %> '<%= sinatra_path(:cancel) %>' do
+<% if op(:cancel).status_request_field -%>
+    payout = find_payout(json_body['<%= op(:cancel).status_request_field %>'])
+<% else -%>
     payout = find_payout(params[:<%= op(:cancel).path_params.first %>])
+<% end -%>
     halt(*reply(404, error_body(404, 'not_found'))) unless payout
     halt(*reply(409, fixture('cancel', 'response_409') || error_body(409, 'invalid_status'))) unless STATUS_MAP[payout['status']] == 'in_progress'
     payout['status'] = CANCELLED_STATUS

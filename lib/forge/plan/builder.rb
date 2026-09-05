@@ -89,7 +89,7 @@ module Forge
 
       def provider_naming
         name = override('provider')[:name] || @provider_name
-        naming = name ? Naming.from_provider(name) : Naming.from_title(@spec.title)
+        naming = name ? Naming.from_provider(name) : Naming.from_title(@spec.title, host: @spec.servers.first&.url)
         naming.merge(override('provider').slice(:class_name))
       end
 
@@ -108,7 +108,7 @@ module Forge
 
       # status через POST без path-параметра: имя поля тела с id провайдера.
       def status_request_field(role, endpoint)
-        return nil unless role == :status && endpoint.method == 'post' && !endpoint.path.include?('{')
+        return nil unless %i[status cancel].include?(role) && endpoint.method == 'post' && !endpoint.path.include?('{')
 
         id_key(endpoint.request_body&.schema&.properties.to_h.keys)
       end

@@ -17,12 +17,17 @@ module Forge
       # Варианты по типам: есть поле типа или несколько типов реквизитов.
       def variants? = container? && (!type_field.nil? || @plan.requisite_types.size > 1)
 
-      def payload_lines
-        lines = tree(@plan.fields[:request].reject { |m| inside_container?(m) }, [])
-        return lines unless container?
+      RECIPIENT_CALL = 'build_recipient(operation, requisite_type)'
 
-        lines[-1] = "#{lines.last}," unless lines.empty? || lines.last.include?('# TODO')
-        lines << "#{@container.first}: build_recipient(operation, requisite_type)"
+      # Контейнер реквизитов (любой глубины) рендерится как один ключ `<name>: build_recipient(...)` на своём месте.
+      def payload_lines
+        outside = @plan.fields[:request].reject { |m| container_subtree?(m) }
+        return tree(outside, []) unless container?
+
+        marker = Forge::FieldMapping.new(provider_field: @container.last, path: @container, source_expr: RECIPIENT_CALL,
+                                         required: true, required_if: nil, transform: nil, schema: nil,
+                                         confidence: 1.0, requisite_type: nil)
+        tree(outside + [marker], [])
       end
 
       def recipient_lines
@@ -35,6 +40,7 @@ module Forge
 
       def type_field = @plan.fields[:request].find { |m| m.source_expr == 'requisite_type' }
       def inside_container?(mapping) = container? && mapping.path.first(@container.size) == @container
+      def container_subtree?(mapping) = container? && mapping.path.first(@container.size) == @container
       def requisite_expr(mapping) = mapping.source_expr.gsub(DIG, "requisite['\\1']")
 
       # Вложенные объекты → многострочный hash; листья → `key: expr,` (последний без запятой).
@@ -63,11 +69,22 @@ module Forge
       end
 
       def variant_lines
-        inner = @plan.fields[:request].select { |m| inside_container?(m) }
+        inner = direct_children
         base, typed = inner.partition { |m| m.requisite_type.nil? && m.required_if.nil? }
         lines = ['requisite = operation.payout_requisite.fetch(requisite_type)',
                  "base = { #{base.map { |m| base_entry(m) }.join(', ')} }"]
+        lines += todo_notes(inner.select { |m| m.source_expr.nil? })
         lines + (typed.empty? ? ['base'] : case_lines(typed.group_by(&:requisite_type)))
+      end
+
+      def direct_children
+        @plan.fields[:request].select { |m| inside_container?(m) && m.path.size == @container.size + 1 }
+      end
+
+      # Глубже одного уровня внутри контейнера и поля без источника — отдельными TODO-комментариями.
+      def todo_notes(unmapped)
+        deeper = @plan.fields[:request].select { |m| inside_container?(m) && m.path.size > @container.size + 1 }
+        (unmapped + deeper).map { |m| "# TODO(forge): map '#{m.path.join('.')}' (see overrides.yml)" }
       end
 
       def case_lines(typed)
@@ -77,11 +94,14 @@ module Forge
       def base_entry(mapping)
         return "#{mapping.provider_field}: requisite_type" if mapping.source_expr == 'requisite_type'
 
-        "#{mapping.provider_field}: #{requisite_expr(mapping)}"
+        "#{mapping.provider_field}: #{entry_expr(mapping)}"
       end
 
+      # Поле без источника внутри варианта → nil с TODO в комментарии не поместится в однострочный Hash: даём nil.
+      def entry_expr(mapping) = mapping.source_expr.nil? ? 'nil' : requisite_expr(mapping)
+
       def variant_line(type, mappings)
-        merged = mappings.map { |m| "#{m.provider_field}: #{requisite_expr(m)}" }.join(', ')
+        merged = mappings.map { |m| "#{m.provider_field}: #{entry_expr(m)}" }.join(', ')
         notes = mappings.select(&:required_if).map do |m|
           "#{m.provider_field} required for #{m.required_if[:field]}=#{m.required_if[:equals]} (from description)"
         end

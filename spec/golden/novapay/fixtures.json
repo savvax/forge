@@ -154,7 +154,8 @@
     "response_200": {
       "balance": 500000000,
       "currency": "RUB",
-      "hold": 15000000
+      "hold": 15000000,
+      "status": "pending"
     }
   }
 }

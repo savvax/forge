@@ -14,8 +14,8 @@ Errors: 401 (create) invalid_credentials → alert_block;
         500 (status) internal_error → retry
 Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
-Fields: 61 request fields, 48 unmapped (counterparty.bankAccount.accountIdentification: auLocal)
-Warnings (118):
+Fields: 61 request fields, 52 unmapped (counterparty.bankAccount.accountIdentification: bank_account, card)
+Warnings (122):
   WARN         role_conflict              POST /transfers/approve (post-transfers-approve) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)
         hint: endpoints.post-transfers-approve: create
   WARN         role_conflict              POST /transfers/cancel (post-transfers-cancel) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)
@@ -36,7 +36,7 @@ Warnings (118):
         hint: the generated client passes it as a query param
   WARN         unmapped_status            status 'approvalPending' (approval_pending) of status is unknown
         hint: statuses.approvalPending: in_progress|approved|rejected  (overrides.yml)
-  … and 108 more (see --format json)
+  … and 112 more (see --format json)
 Unsupported (2):
   UNSUPPORTED  http_alternative           alternative security scheme 'BasicAuth' (http) is ignored
         hint: the first supported scheme is used
@@ -54,4 +54,4 @@ Info (11):
   INFO         outside_contract           POST /transfers/{transferId}/returns (post-transfers-transferId-returns) — not used
   INFO         outside_contract           POST /cashouts (post-cashouts) — not used
   … and 1 more (see --format json)
-Done: 118 warnings, 2 unsupported. Exit 0.
+Done: 122 warnings, 2 unsupported. Exit 0.

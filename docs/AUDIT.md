@@ -159,19 +159,34 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 
 ## 5a. Проверка против живых провайдеров (5.09, без учётных данных)
 
-Сгенерированные из реальных спек сервисы вызывали настоящие sandbox-API с заведомо неверным ключом.
-Проверяется формирование запроса, транспорт и классификация реального ответа.
+Сгенерированные из реальных спек сервисы (`bin/forge generate` на `examples/real/*`) вызывали настоящие
+sandbox-API с заведомо неверным ключом. Проверяется формирование запроса, транспорт и классификация ответа.
 
-| Провайдер | Вызов | Реальный ответ | Результат сервиса |
+| Провайдер | `create_request` | `fetch_status` (несуществующий id) | Реальный ответ сервера |
 |---|---|---|---|
-| Stripe (`api.stripe.com`) | `create_request` (form-urlencoded), `fetch_status` | 401 `invalid_request_error` | `provider.invalid_credentials` ×2 |
-| Paystack (`api.paystack.co`) | `create_request` (`source` из credentials), `fetch_status` | 401 `invalid_Key` | `provider.invalid_credentials` ×2; один сетевой таймаут → `provider.unavailable` |
-| PayPal (`api-m.sandbox.paypal.com`) | `create_request`, `fetch_status` | 401 `invalid_token` | `provider.invalid_credentials` ×2 |
-| Adyen (`pal-test.adyen.com`) | `check_conditions` с чужим типом реквизитов | — | `requisite_missing` до запроса (REQUISITE_TYPES = card) |
+| Stripe `api.stripe.com` (form-urlencoded) | `provider.invalid_credentials` | `provider.invalid_credentials` | 401 `invalid_request_error` |
+| Paystack `api.paystack.co` | `provider.invalid_credentials` | `bad_request`/`provider.unknown_error` | 401 `invalid_Key`; GET → 400 `invalid_params` (код вне словаря) |
+| PayPal sandbox (oauth2 → bearer) | `provider.invalid_credentials` | `provider.invalid_credentials` | 401 `invalid_token` |
+| Adyen Transfers (apiKey в query `clientKey`) | `provider.invalid_credentials` | `provider.invalid_credentials` | 401 `00_401` |
+| Adyen Payout | `requisite_missing` до запроса (REQUISITE_TYPES = card) | — | — |
 
-Найдено и исправлено по ходу: `generate` падал на спеке без enum статусов (Paystack) — теперь `STATUS_MAP = {}`
-с TODO; `create_request` при неизвестном типе реквизитов возвращает `requisite_missing`, а не KeyError.
+Сгенерированные spec зелёные для всех 6 реальных спек с create (Square — exit 2 «no create endpoint»):
+Adyen Payout 9, Adyen Transfers 10, PayPal 8, Paystack 8, Stripe 9, Plaid 8 примеров.
+
+Дефекты, найденные этой проверкой и исправленные (все воспроизводимы на реальных спеках):
+1. `generate` падал без enum статусов (Paystack) → `STATUS_MAP = {}` с TODO.
+2. `create_request` при чужом типе реквизитов → `requisite_missing` вместо KeyError.
+3. apiKey в query объявлялся, но не отправлялся (Adyen Transfers) → `with_auth(url)` во всех вызовах.
+4. Cancel через POST без path-параметра рендерил `params[:]` (Plaid) → id в теле, как у status.
+5. Дублированный ключ контейнера реквизитов и пустые вложенные объекты в теле (Adyen) → `deep_compact`, контейнер на своей глубине.
+6. enum поля `type` без канонических значений (`auLocal`) считался типами реквизитов → только словарь CONTRACT § 3.
+7. Алиасы `external_id`/`idempotency`/`credential` матчились глубоко внутри объектов (`accountHolder.reference`) → только корень.
+8. Синтез фикстур: `"0.00"` суммы, `_example` вместо статуса, обрезка `maxLength`, `default`-реквизит без типа, потерянный Hash в `set_path`.
+9. Успешный create без распознанного статуса давал `unknown_provider_status` → `in_progress` (строгая проверка только в `fetch_status`).
+10. Тело в сгенерированном spec: сравнение по общим ключам (лишние поля из operation допустимы), пустая `with(headers: {})` ломала блок WebMock.
+
 Позитивный сценарий (201 + webhook) без ключей провайдера недостижим — он покрыт e2e на моке той же спеки.
+С тестовыми ключами: `<PROVIDER>_BASE_URL` + `credentials` → `bin/e2e` против sandbox.
 
 ## 6. Что не входит в проверенное состояние
 

@@ -118,6 +118,13 @@ Plaid: `POST /transfer/get` → status 0.80.
 `generate` падал на спеке без enum статусов (пустой `STATUS_MAP` → TODO), `create_request` падал KeyError при
 чужом типе реквизитов (теперь `requisite_missing`, как в `check_conditions`). Таблица — `docs/AUDIT.md` § 5a.
 
+### D-22 · Проверка на реальных спеках закрывает 10 дефектов генерации (5.09)
+Все шесть реальных спек с create теперь проходят `generate` с зелёным сгенерированным spec; список дефектов и
+исправлений — `docs/AUDIT.md` § 5a. Принципиальные решения: успешный create без распознанного статуса →
+`in_progress` (итог придёт через fetch_status/webhook), строгий `unknown_provider_status` — только в
+`fetch_status`; тело запроса в сгенерированном spec сверяется по общим с примером ключам; apiKey в query
+добавляется хелпером `with_auth(url)`.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

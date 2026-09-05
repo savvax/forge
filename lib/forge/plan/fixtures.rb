@@ -82,9 +82,12 @@ module Forge
 
       def create_request(endpoint)
         body = endpoint.request_body
-        request = body&.examples.to_h.values.first || Synth.example(body&.schema, 'request')
+        example = body&.examples.to_h.values.first
+        request = example || Synth.example(body&.schema, 'request')
         operation, extras = request && FixturesOperation.new(@f).from(request)
-        { 'endpoint' => label(endpoint), 'request' => request, 'operation' => operation }.merge(extras.to_h)
+        base = { 'endpoint' => label(endpoint), 'request' => request, 'operation' => operation }
+        base['synthesized'] = true if example.nil? && request
+        base.merge(extras.to_h)
       end
 
       def remember_create_success(endpoint, fixture)
@@ -114,6 +117,7 @@ module Forge
       def set_path(hash, path, value)
         *head, last = path
         head.reduce(hash) { |node, key| node[key] ||= {} }[last] = value
+        hash
       end
 
       # Успешный ответ без примера: та же схема, что у create → его пример; иначе синтез по схеме.
@@ -126,8 +130,22 @@ module Forge
 
       def success_example(schema, base)
         same = base && schema.ref_name && base[:ref] == schema.ref_name
-        same ? base[:example] : Synth.example(schema, 'response')
+        example = same ? base[:example] : Synth.example(schema, 'response')
+        with_known_status(example)
       end
+
+      # Синтез даёт 'status_example'; подставляем первый статус провайдера из карты, чтобы сервис его распознал.
+      def with_known_status(example)
+        path = @f[:statuses].value[:response_status_path]
+        raw = @p[:status_map].keys.first
+        return example unless raw && path && !path.empty? && example.is_a?(Hash)
+
+        return example unless placeholder?(dig(example, path))
+
+        set_path(Marshal.load(Marshal.dump(example)), path, raw)
+      end
+
+      def placeholder?(value) = value.nil? || (value.is_a?(String) && value.end_with?('_example'))
 
       def responses(endpoint)
         endpoint.responses.each_with_object({}) do |res, acc|

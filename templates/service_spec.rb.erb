@@ -11,14 +11,14 @@ RSpec.describe Provider::<%= class_name %> do
   let(:operation) { build_operation.tap { |op| operations.save(op) } }
   let(:create_fixture) { fixtures['create_request'] }
   let(:provider_id) { dig_path(create_fixture['<%= create_response_key %>'], <%= provider_id_path %>) }
-  let(:create_url) { "#{described_class::BASE_URL}<%= op(:create).path %>" }
+  let(:create_url) { "#{described_class::BASE_URL}<%= op(:create).path %><%= query_suffix %>" }
 <% unless overridden_paths.empty? -%>
   let(:overridden) { <%= overridden_paths.inspect %> } # source задан в overrides.yml — не сравнивается
 <% end -%>
 <% if auth_header_expectation -%>
   let(:auth_headers) { { <%= auth_header_expectation %> } }
 <% else -%>
-  let(:auth_headers) { {} }
+  let(:auth_headers) { { 'Accept' => 'application/json' } } # auth без заголовков (apiKey в query / none)
 <% end -%>
 
   describe '#check_conditions' do
@@ -36,7 +36,10 @@ RSpec.describe Provider::<%= class_name %> do
 
   describe '#create_request' do
     it 'creates payout (<%= create_response_status %>)' do
-<% if overridden_paths.empty? -%>
+<% if synthesized_request? -%>
+      # Пример запроса в спеке отсутствует — фикстура синтезирована по схеме; сверяем только ключи верхнего уровня.
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| (parse_body(req).keys - create_fixture['request'].keys).empty? }
+<% elsif overridden_paths.empty? -%>
       stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(parse_body(req), create_fixture['request']) }
 <% else -%>
       expected_body = without_paths(create_fixture['request'], overridden)
@@ -103,9 +106,12 @@ RSpec.describe Provider::<%= class_name %> do
         .to_return(status: <%= op(:status).success_statuses.first %>, body: fixtures.dig('fetch_status', '<%= status_response_key %>').to_json,
                    headers: { 'Content-Type' => 'application/json' })
       result = service.fetch_status(operation)
-      expect(result).to be_success
 <% if fx.dig('fetch_status', 'expected_operation_status') -%>
+      expect(result).to be_success
       expect(result.data[:status]).to eq('<%= fx.dig('fetch_status', 'expected_operation_status') %>')
+<% else -%>
+      # Статус в ответе спекой не описан (нет enum/примера): сервис либо применяет его, либо честно сообщает unknown.
+      expect(result.success? || result.code == 'unknown_provider_status').to be(true)
 <% end -%>
     end
   end

@@ -20,10 +20,19 @@ module Forge
           value = dig(request, m.path)
           assign(op, m, value, type) unless value.nil?
         end
-        fill_requisite_defaults(op['payout_requisite'])
-        op['payout_requisite'] = { 'default' => {} } if op['payout_requisite'].empty? # BaseService требует реквизиты
-        [op.compact, @extras]
+        [with_defaults(op).compact, @extras]
       end
+
+      # Чего нет в примере: реквизиты типа по умолчанию, минимальная сумма, первая валюта (BaseService требует их).
+      def with_defaults(operation)
+        operation['payout_requisite'] = { default_type => {} } if operation['payout_requisite'].empty?
+        fill_requisite_defaults(operation['payout_requisite'])
+        operation['amount'] ||= format('%.2f', @f[:amount].value[:minimum_major] || 1)
+        operation['currency'] ||= @f[:amount].value[:currencies].first || 'USD'
+        operation
+      end
+
+      def default_type = @f[:fields].value[:requisite_types].first || 'default'
 
       # Канонические поля типа (CONTRACT § 3), которых нет в примере: чтобы override-выражения имели данные.
       def fill_requisite_defaults(requisites)
@@ -63,6 +72,7 @@ module Forge
       def major_amount(value)
         amount = @f[:amount].value
         number = amount[:unit] == :minor ? value.to_r / amount[:multiplier] : value.to_r
+        number = amount[:minimum_major] || 1 unless number.positive? # синтез без примера → минимально валидная сумма
         format('%.2f', number)
       end
 

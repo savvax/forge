@@ -4,6 +4,8 @@ module Forge
   module Analyzers
     # Обход схемы запроса create: свойство → FieldMapping. Реквизиты — внутри контейнеров (recipient, destination…).
     class FieldWalker
+      ROOT_ONLY = %w[external_id idempotency credential].freeze # id/ключи мерчанта осмысленны только на корне
+
       attr_reader :container
 
       def self.match?(names, path)
@@ -112,7 +114,7 @@ module Forge
       def leaf(path, prop, req, requisite)
         return requisite_leaf(path, prop, req, requisite) if requisite
 
-        _name, rule = @dict['aliases'].find { |_n, r| self.class.match?(r['names'], path) }
+        rule = alias_rule(path)
         return unmapped(path, prop, req) unless rule
 
         @analyzer.info_credential(path) if rule['info']
@@ -121,7 +123,7 @@ module Forge
       end
 
       def requisite_leaf(path, prop, req, requisite)
-        return mapping(path, 'requisite_type', req, prop, 0.95) if type_field?(path)
+        return mapping(path, 'requisite_type', req, prop, 0.95) if canonical_type_field?(path, prop)
 
         rule = requisite_rule(path)
         return unmapped(path, prop, req) unless rule
@@ -141,7 +143,19 @@ module Forge
         exact || fields.find { |_n, r| self.class.match?(r['names'], path) }&.last
       end
 
+      def alias_rule(path)
+        name, rule = @dict['aliases'].find { |_n, r| self.class.match?(r['names'], path) }
+        return nil if rule.nil? || (path.size > 1 && ROOT_ONLY.include?(name))
+
+        rule
+      end
+
       def type_field?(path) = self.class.match?(@dict.dig('requisite_type', 'names'), path)
+
+      # enum поля `type` без канонических значений (auLocal, iban…) — это не выбор типа реквизитов.
+      def canonical_type_field?(path, prop)
+        type_field?(path) && (prop.enum.nil? || prop.enum.map(&:to_s).intersect?(@dict['requisite_types']))
+      end
 
       # :any → тип известен, только если поле встречается ровно в одном типе реквизитов (CONTRACT § 3).
       def resolve_type(requisite, rule)

@@ -542,14 +542,14 @@
           "accountHolder",
           "reference"
         ],
-        "source_expr": "operation.id.to_s",
+        "source_expr": null,
         "required": false,
         "required_if": null,
-        "transform": "to_s",
+        "transform": null,
         "schema": {
           "type": "string"
         },
-        "confidence": 0.95,
+        "confidence": 0.0,
         "requisite_type": null
       },
       {
@@ -637,7 +637,7 @@
           "accountIdentification",
           "type"
         ],
-        "source_expr": "requisite_type",
+        "source_expr": null,
         "required": true,
         "required_if": null,
         "transform": null,
@@ -647,7 +647,7 @@
             "auLocal"
           ]
         },
-        "confidence": 0.95,
+        "confidence": 0.0,
         "requisite_type": null
       },
       {
@@ -1215,14 +1215,14 @@
           "fundingInstrument",
           "reference"
         ],
-        "source_expr": "operation.id.to_s",
+        "source_expr": null,
         "required": false,
         "required_if": null,
-        "transform": "to_s",
+        "transform": null,
         "schema": {
           "type": "string"
         },
-        "confidence": 0.95,
+        "confidence": 0.0,
         "requisite_type": null
       },
       {
@@ -1268,14 +1268,14 @@
           "ultimateParty",
           "reference"
         ],
-        "source_expr": "operation.id.to_s",
+        "source_expr": null,
         "required": false,
         "required_if": null,
-        "transform": "to_s",
+        "transform": null,
         "schema": {
           "type": "string"
         },
-        "confidence": 0.95,
+        "confidence": 0.0,
         "requisite_type": null
       },
       {
@@ -1317,7 +1317,8 @@
       }
     ],
     "requisite_types": [
-      "auLocal"
+      "bank_account",
+      "card"
     ],
     "requisite_container": "counterparty.bankAccount.accountIdentification",
     "headers": [
@@ -2000,6 +2001,13 @@
     {
       "level": "warn",
       "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountHolder.reference (string, A unique reference to identify the party or counterparty involved in the transfer. For example, your client's unique wallet or payee ID.\n\nRequired when you include `cardIdentification.storedPaymentMethodId`.) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountHolder.reference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
       "message": "counterparty.bankAccount.accountHolder.type (string, The type of entity that owns the bank account or card.\n\nPossible values: **individual**, **organization**, or **unknown**.\n\nRequired when `category` is **card**. In this case, the value must be **individual**.) has no source",
       "pointer": null,
       "hint": "fields.counterparty.bankAccount.accountHolder.type.source: \"…\"  (overrides.yml)"
@@ -2024,6 +2032,13 @@
       "message": "counterparty.bankAccount.accountIdentification.bsbCode (string, The 6-digit [Bank State Branch (BSB) code](https://en.wikipedia.org/wiki/Bank_state_branch), without separators or whitespace.) has no source",
       "pointer": null,
       "hint": "fields.counterparty.bankAccount.accountIdentification.bsbCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "counterparty.bankAccount.accountIdentification.type (string, **auLocal**) has no source",
+      "pointer": null,
+      "hint": "fields.counterparty.bankAccount.accountIdentification.type.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
@@ -2231,6 +2246,13 @@
     {
       "level": "warn",
       "code": "unmapped_field",
+      "message": "ultimateParty.fundingInstrument.reference (string, Your internal reference that identifies this funding instrument. Required if `sourceOfFunds` is **DEPOSIT_ACCOUNT**.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.fundingInstrument.reference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
       "message": "ultimateParty.fundingInstrument.sourceOfFunds (string, Indicates where the funds used for the transfer originated. Possible values are:\n- **DEBIT** for card-to-card transfers.\n- **DEPOSIT_ACCOUNT** for wallet-to-card transfers.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.sourceOfFunds.source: \"…\"  (overrides.yml)"
@@ -2241,6 +2263,13 @@
       "message": "ultimateParty.lastName (string, The last name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.lastName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "ultimateParty.reference (string, A unique reference to identify the party or counterparty involved in the transfer. For example, your client's unique wallet or payee ID.\n\nRequired when you include `cardIdentification.storedPaymentMethodId`.) has no source",
+      "pointer": null,
+      "hint": "fields.ultimateParty.reference.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",

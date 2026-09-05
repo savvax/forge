@@ -39,10 +39,21 @@ module Forge
 
       def find_property(schema, names, require:)
         candidates(schema).each do |path, prop|
-          next unless names.include?(path.last)
-          return [path, prop, 0.95] if require == :enum && prop.enum
-          return [path, prop, 0.6] if require == :description && prop.description.to_s.match?(QUOTED)
+          next unless names.include?(path.last) && string_like?(prop)
+
+          confidence = property_confidence(prop, require)
+          return [path, prop, confidence] if confidence
         end
+        nil
+      end
+
+      # Корневой `status: true` (обёртка status: true в ответе) — не статус выплаты.
+      def string_like?(prop) = !%w[boolean integer number object array].include?(prop.type)
+
+      def property_confidence(prop, require)
+        return 0.95 if require == :enum && prop.enum
+        return 0.6 if require == :description && prop.description.to_s.match?(QUOTED)
+
         nil
       end
 

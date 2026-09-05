@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'uri'
+
 module Forge
   module Plan
     # Имя провайдера → name / class_name / env_prefix / file_name.
@@ -15,9 +17,17 @@ module Forge
           title: provider }
       end
 
-      def from_title(title)
+      # Title из одних стоп-слов («Transfers API») → имя из домена сервера (pal-test.example.com → example).
+      def from_title(title, host: nil)
         words = title.to_s.split(/[\s\-_]+/).reject { |w| STOP_WORDS.any? { |s| w.downcase.match?(/\A#{s}\z/) } }
-        from_provider(words.empty? ? 'provider' : words.join(' '))
+        from_provider(words.empty? ? from_host(host) || 'provider' : words.join(' '))
+      end
+
+      def from_host(url)
+        labels = URI(url.to_s).host.to_s.split('.')
+        labels.size >= 2 ? labels[-2] : nil
+      rescue URI::InvalidURIError
+        nil
       end
 
       def camelize(name) = name.split('_').map(&:capitalize).join

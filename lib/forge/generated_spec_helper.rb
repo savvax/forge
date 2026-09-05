@@ -33,8 +33,8 @@ module GeneratedSpecHelper
                             customer: fixture['customer'])
   end
 
-  # Тело запроса ⊆ пример из спеки: каждое отправленное значение совпадает с примером; поля, которые forge
-  # не смог отобразить (nil/TODO), и необязательные пропуски допускаются.
+  # Отправленное тело согласуется с примером из спеки: каждый ключ, который есть и там и там, совпадает по значению.
+  # Отправленные поля без примера (из других алиасов operation) и пустые (nil/TODO) — допускаются.
   def subset_of?(actual, expected)
     case actual
     when Hash then hash_subset?(actual, expected)
@@ -43,10 +43,20 @@ module GeneratedSpecHelper
     end
   end
 
+  # nil, пустые Hash/Array и объекты из одних nil — поля без источника (TODO), они не сравниваются.
   def hash_subset?(actual, expected)
     return false unless expected.is_a?(Hash)
 
-    actual.all? { |k, v| v.nil? || (expected.key?(k) && subset_of?(v, expected[k])) }
+    actual.all? { |k, v| blank?(v) || !expected.key?(k) || subset_of?(v, expected[k]) }
+  end
+
+  def blank?(value)
+    case value
+    when nil then true
+    when Hash then value.values.all? { |v| blank?(v) }
+    when Array then value.empty?
+    else false
+    end
   end
 
   # Поля с пользовательским source из overrides.yml сравнивать нельзя (их значения не выводятся из примера).

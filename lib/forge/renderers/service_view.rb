@@ -29,8 +29,9 @@ module Forge
       def body_kw = op(:create).body_encoding == 'form' ? 'form' : 'json'
 
       def requires
-        base64 = plan.auth[:type] == 'basic' || signature&.dig(:encoding) == 'base64'
-        %w[base64 json openssl].select { |r| r != 'base64' || base64 }
+        optional = { 'base64' => plan.auth[:type] == 'basic' || signature&.dig(:encoding) == 'base64',
+                     'uri' => plan.auth[:type] == 'api_key' && plan.auth[:location] == 'query' }
+        %w[base64 json openssl uri].select { |r| optional.fetch(r, true) }
       end
 
       # Пустая карта (статусы не найдены в спеке) → пустой Hash-литерал; сервис вернёт unknown_provider_status.
