@@ -94,6 +94,19 @@ RSpec.describe Forge::Analyzers::Fields do
     expect { fields_for(spec) }.to raise_error(Forge::UnsupportedError, /external \$ref/)
   end
 
+  it 'does not map a root type field to requisite_type when the spec has no requisite types' do
+    spec = ir_for(build_spec(paths: { '/payments' => { 'post' => {
+                               'operationId' => 'createPayment',
+                               'requestBody' => body_json({ 'amount' => { 'type' => 'integer' },
+                                                            'type' => { 'type' => 'string' } }),
+                               'responses' => { '201' => { 'description' => 'ok' } }
+                             } } }))
+    finding = fields_for(spec)
+    expect(finding.value[:requisite_types]).to eq([])
+    expect(mapping(finding, 'type').source_expr).to be_nil
+    expect(finding).to have_warning(:unmapped_field, message: /^type /)
+  end
+
   it 'arrays → WARN array_field_unsupported' do
     spec = ir_for(build_spec(paths: { '/payouts' => { 'post' => {
                                'operationId' => 'createPayout',

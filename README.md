@@ -298,6 +298,9 @@ paths:
 - Статус через `POST` с id в теле (Plaid `/transfer/get`) поддержан; статус через query-параметр — только
   если параметр назван id/code/reference.
 - Массивы полей (PayPal `items[]`) не мапятся автоматически (WARN + `[]`).
+- Идентификаторы подключения в пути (`/client/{clientHashId}/wallet/{walletHashId}/…`, Nium-стиль): в URL
+  подставляется только id выплаты, остальные `{param}` → `UNSUPPORTED path_params_unresolved`; такой URL
+  нужно поправить руками (или взять их из `credentials` — «что дальше»).
 - Примеры из спеки сверяются с её схемами (`INFO fixture_schema_mismatch`), но берутся как есть.
 - Секреты (API-ключ, HMAC secret) в документации нет — генерируются как `credentials.*` с пометкой
   для ручного заполнения.

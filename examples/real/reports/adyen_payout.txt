@@ -8,8 +8,8 @@ Errors: 400 validation_error → reject; 401 invalid_credentials → alert_block
         403 forbidden → alert_block; 422 validation_error → reject; 500 internal_error → retry
 Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
-Fields: 49 request fields, 38 unmapped (card: card)
-Warnings (46):
+Fields: 49 request fields, 37 unmapped (card: card)
+Warnings (45):
   WARN         role_conflict              POST /confirmThirdParty (post-confirmThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
         hint: endpoints.post-confirmThirdParty: create
   WARN         role_conflict              POST /declineThirdParty (post-declineThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
@@ -31,15 +31,17 @@ Warnings (46):
   WARN         unmapped_field             billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.
 > If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source
         hint: fields.billingAddress.country.source: "…"  (overrides.yml)
-  … and 36 more (see --format json)
+  … and 35 more (see --format json)
 Unsupported (1):
   UNSUPPORTED  apiKey_alternative         alternative security scheme 'ApiKeyAuth' (apiKey) is ignored
         hint: the first supported scheme is used
-Info (6):
+Info (7):
   INFO         outside_contract           POST /confirmThirdParty (post-confirmThirdParty) — not used
   INFO         outside_contract           POST /declineThirdParty (post-declineThirdParty) — not used
   INFO         outside_contract           POST /storeDetail (post-storeDetail) — not used
   INFO         outside_contract           POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) — not used
   INFO         outside_contract           POST /submitThirdParty (post-submitThirdParty) — not used
   INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
-Done: 46 warnings, 1 unsupported. Exit 0.
+  INFO         credential_field           merchantAccount → credentials.merchantAccount
+        hint: fill it in credentials
+Done: 45 warnings, 1 unsupported. Exit 0.

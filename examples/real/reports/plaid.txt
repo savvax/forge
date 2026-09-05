@@ -195,7 +195,7 @@ Errors: none described
 Webhook signature: no webhook found
 Amount: string, major units (×100) — source: amount (string) → major units: 'The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). When calling `/transfer/authorization/create`, specify the maximum amount to authorize. When calling `/transfer/create`, specify the exact amount of the transfer, up to a maximum of the amount authorized. If this field is left blank when calling `/transfer/create`, the maximum amount authorized in the `authorization_id` will be sent.'
 Fields: 23 request fields, 18 unmapped
-Warnings (60):
+Warnings (59):
   WARN         role_conflict              POST /transfer/recurring/get (transferRecurringGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
         hint: endpoints.transferRecurringGet: status
   WARN         role_conflict              POST /transfer/balance/get (transferBalanceGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
@@ -216,7 +216,7 @@ Warnings (60):
         hint: endpoints.transferOriginatorGet: status
   WARN         role_conflict              POST /transfer/originator/list (transferOriginatorList) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
         hint: endpoints.transferOriginatorList: status
-  … and 50 more (see --format json)
+  … and 49 more (see --format json)
 Info (42):
   INFO         outside_contract           POST /transfer/cancel (transferCancel) — generated as `cancel_request` helper
   INFO         outside_contract           POST /transfer/recurring/get (transferRecurringGet) — not used
@@ -229,4 +229,4 @@ Info (42):
   INFO         outside_contract           POST /transfer/ledger/distribute (transferLedgerDistribute) — not used
   INFO         outside_contract           POST /transfer/ledger/deposit (transferLedgerDeposit) — not used
   … and 32 more (see --format json)
-Done: 60 warnings, 0 unsupported. Exit 0.
+Done: 59 warnings, 0 unsupported. Exit 0.

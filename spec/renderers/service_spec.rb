@@ -56,6 +56,19 @@ RSpec.describe Forge::Renderers::Service do
     end
   end
 
+  it 'reads nil instead of a status when the status endpoint returns a list' do
+    hash = minimal_spec
+    list = { 'type' => 'array', 'items' => { 'type' => 'object' } }
+    hash['paths']['/payouts/{id}/status'] = { 'get' => {
+      'operationId' => 'getPayoutStatus',
+      'parameters' => [{ 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'string' } }],
+      'responses' => { '200' => { 'description' => 'ok', 'content' => { 'application/json' => { 'schema' => list } } } }
+    } }
+    code = render(plan_for_hash(hash))
+    expect(code).to include('apply_status(operation, nil, strict: true)')
+    expect(code).not_to include("response.body['status'], strict: true")
+  end
+
   it 'renders basic auth with Base64' do
     code = render(plan_for_hash(minimal_spec(auth: 'basic')))
     expect(code).to include("require 'base64'", 'Base64.strict_encode64("#{credentials.fetch(\'login\')}:' \

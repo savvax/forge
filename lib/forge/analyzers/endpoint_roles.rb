@@ -13,6 +13,7 @@ module Forge
         check_include_paths(candidates)
         assigned = assign(candidates)
         assigned[:webhook] ||= explicit_webhook
+        check_path_params(assigned.compact)
         value = build_value(candidates, assigned.compact)
         check_create(value)
         finding(:endpoint_roles, value, confidence: value[:confidences].fetch(:create, 0.0), source: source_text(value))
@@ -79,6 +80,22 @@ module Forge
         warn(:low_confidence, message, pointer: endpoint.pointer, hint: "endpoints.#{name(endpoint)}: #{role}")
       end
 
+      # В URL подставляется только id выплаты (для status/cancel — последний {param}); остальные — ids подключения.
+      def check_path_params(assigned)
+        assigned.slice(:create, :status, :cancel).each do |role, (endpoint, _score)|
+          params = endpoint.path.scan(/\{(\w+)\}/).flatten
+          unresolved = role == :create ? params : params[0..-2]
+          next if unresolved.empty?
+
+          unsupported(:path_params_unresolved,
+                      "#{label(endpoint)}: path params #{unresolved.join(', ')} cannot be filled from the operation " \
+                      '(only the payout id is known); provider_operation_id is substituted',
+                      pointer: endpoint.pointer,
+                      hint: 'connection-level ids in the path are not supported yet: edit the URL in the generated ' \
+                            "service or choose another endpoint via endpoints.<operationId>: #{role}")
+        end
+      end
+
       def check_create(value)
         return if value[:create]
 
@@ -107,6 +124,8 @@ module Forge
           'has_request_body' => ->(f) { !f.endpoint.request_body.nil? },
           'has_path_param' => lambda(&:path_param?),
           'no_path_param' => ->(f) { !f.path_param? },
+          'multi_path_param' => ->(f) { f.endpoint.path.count('{') > 1 },
+          'array_response' => ->(f) { f.success_schema&.type == 'array' },
           'security_explicitly_empty' => ->(f) { f.endpoint.security == [] },
           'id_query_param' => ->(f) { f.param_word?('query', 'id') },
           'id_body_field' => ->(f) { !f.id_body_field.nil? },
@@ -135,6 +154,7 @@ module Forge
 
         def method = endpoint.method
         def path_param? = endpoint.path.include?('{')
+        def success_schema = endpoint.responses.find { |r| r.status.start_with?('2') }&.schema
 
         # Поле тела с id-словом в имени и без других обязательных полей кроме credentials-подобных.
         def id_body_field

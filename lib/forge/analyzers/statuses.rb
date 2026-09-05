@@ -28,12 +28,22 @@ module Forge
 
       # → [path, schema, confidence]; без поля — ['status'], nil, 0.0 + WARN.
       def locate(schema)
+        return array_response if schema&.type == 'array'
+
         found = find_property(schema, dict['status_fields'], require: :enum) ||
                 find_property(schema, dict['status_fields'], require: :description)
         return found if found
 
         warn(:status_field_not_found, 'no status field (enum or described) found in the response schema',
              hint: 'statuses.field: <path>  (overrides.yml)')
+        [['status'], nil, 0.0]
+      end
+
+      # Список вместо одной выплаты: статус прочитать нечем, сервис честно вернёт unknown_provider_status.
+      def array_response
+        warn(:status_response_is_array, 'status endpoint returns an array (a list), not one payout; ' \
+                                        'fetch_status cannot read a status from it',
+             hint: 'endpoints.<operationId>: status  (overrides.yml) — pick the endpoint that returns a single payout')
         [['status'], nil, 0.0]
       end
 

@@ -27,7 +27,7 @@ module Forge
 
       def servers
         Array(@hash['servers']).map do |s|
-          Server.new(url: s['url'], description: s['description'],
+          Server.new(url: s['url'].to_s.chomp('/'), description: s['description'],
                      alternatives: s.fetch('x-forge-url-alternatives', []))
         end
       end

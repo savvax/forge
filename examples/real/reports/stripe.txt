@@ -391,11 +391,11 @@ Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount (integer) → minor units: 'A positive integer in cents representing how much to payout.'
 Fields: 9 request fields, 4 unmapped
 Warnings (11):
-  WARN         role_conflict              POST /v1/payouts/{payout} (PostPayoutsPayout) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)
+  WARN         role_conflict              POST /v1/payouts/{payout} (PostPayoutsPayout) also looks like create (0.6); POST /v1/payouts (PostPayouts) wins (0.95)
         hint: endpoints.PostPayoutsPayout: create
-  WARN         role_conflict              POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) also looks like create (0.85); POST /v1/payouts (PostPayouts) wins (0.95)
+  WARN         role_conflict              POST /v1/payouts/{payout}/reverse (PostPayoutsPayoutReverse) also looks like create (0.6); POST /v1/payouts (PostPayouts) wins (0.95)
         hint: endpoints.PostPayoutsPayoutReverse: create
-  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.stripe.com/)
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.stripe.com)
         hint: base_url.default: <sandbox url>  (overrides.yml)
   WARN         status_from_description    statuses of status taken from description: paid, pending, in_transit, canceled, failed
         hint: verify the list; statuses.<VALUE>: in_progress|approved|rejected (overrides.yml)
@@ -409,8 +409,8 @@ Warnings (11):
         hint: fields.expand.source: "…"
   WARN         unmapped_field             method (string, The method used to send this payout, which is `standard` or `instant`. We support `instant` for payouts to debit cards and bank accounts in certain countries. Learn more about [bank support for Instant Payouts](https://stripe.com/docs/payouts/instant-payouts-banks).) has no source
         hint: fields.method.source: "…"  (overrides.yml)
-  WARN         unmapped_field             payout_method (string, The ID of a v2 FinancialAccount to send funds to.) has no source
-        hint: fields.payout_method.source: "…"  (overrides.yml)
+  WARN         unmapped_field             source_type (string, The balance type of your Stripe balance to draw this payout from. Balances for different payment sources are kept separately. You can find the amounts with the Balances API. One of `bank_account`, `card`, or `fpx`.) has no source
+        hint: fields.source_type.source: "…"  (overrides.yml)
   … and 1 more (see --format json)
 Unsupported (1):
   UNSUPPORTED  http_alternative           alternative security scheme 'bearerAuth' (http) is ignored

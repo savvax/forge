@@ -21,7 +21,9 @@ module Forge
         check_media_type(endpoint)
         walker = FieldWalker.new(self, dict, amount_expr, variants: variant_overrides)
         request = schema ? walker.walk(schema, [], schema.required.to_a, nil) : []
-        value = { request: request, requisite_types: requisite_types(request), requisite_container: walker.container,
+        types = requisite_types(request, walker.container)
+        request = orphan_type(request) if types.empty?
+        value = { request: request, requisite_types: types, requisite_container: walker.container,
                   requisite_type_values: requisite_type_values(request), headers: headers(endpoint) }
         finding(:fields, value, confidence: request.empty? ? 0.0 : mean(request),
                                 source: "#{request.size} request fields mapped")
@@ -76,14 +78,27 @@ module Forge
 
       def amount_expr = findings[:amount]&.value&.[](:expr) || 'operation.amount'
 
+      # Поле `type` без типов реквизитов (нет контейнера, enum вне словаря) — обычное поле без источника.
+      def orphan_type(request)
+        request.map do |m|
+          next m unless m.source_expr == 'requisite_type'
+
+          warn_unmapped(m.path, m.schema)
+          m.with(source_expr: nil, confidence: 0.0)
+        end
+      end
+
       # Канонические типы (CONTRACT § 3) из enum поля типа; enum вне словаря (auLocal, iban…) — не типы реквизитов.
-      def requisite_types(request)
+      def requisite_types(request, container)
         enum = type_enum(request)
         known = enum.filter_map { |v| canonical_type(v) }.uniq
         return known unless known.empty?
 
         types = request.filter_map(&:requisite_type).uniq
-        types.empty? && !enum.empty? ? ['bank_account'] : types
+        return types unless types.empty?
+
+        # Контейнер реквизитов есть, а тип не выведен (enum вне словаря или его нет) — банковский счёт по умолчанию.
+        !enum.empty? || container ? ['bank_account'] : []
       end
 
       # Провайдерское значение типа (SBP) для каждого канонического (sbp) — сервис шлёт его в поле типа.

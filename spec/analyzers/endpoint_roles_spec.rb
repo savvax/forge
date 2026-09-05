@@ -7,6 +7,8 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
 
   def ids(value) = value.slice(:create, :status, :cancel, :balance, :webhook).transform_values { |e| e&.operation_id }
 
+  def path_param(name) = { 'name' => name, 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'string' } }
+
   def post_op(path, id, body: true, params: [])
     op = { 'operationId' => id, 'responses' => { '201' => { 'description' => 'ok' } }, 'parameters' => params }
     op['requestBody'] = body_json({ 'amount' => { 'type' => 'integer' } }, required: ['amount']) if body
@@ -102,6 +104,44 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       finding = described_class.new(ir_for(spec), rules).call
       expect(finding.value[:create]).to be_nil
       expect(finding).to have_warning(:no_create_endpoint, hint: /endpoints\.<operationId>: create/)
+    end
+
+    it 'rejects a status candidate whose 2xx body is an array (list, not a status)' do
+      list = { 'type' => 'array', 'items' => { 'type' => 'object' } }
+      ok = { 'description' => 'ok', 'content' => { 'application/json' => { 'schema' => list } } }
+      paths = { '/wallet/{walletId}/paymentIds' => { 'get' => {
+        'operationId' => 'paymentIds', 'parameters' => [path_param('walletId')], 'responses' => { '200' => ok }
+      } } }
+      value = described_class.new(ir_for(build_spec(paths: paths)), rules).call.value
+      expect(value[:status]).to be_nil
+    end
+
+    it 'penalises a status endpoint with several path params (only one id comes from the operation)' do
+      paths = { '/client/{clientId}/payment/{paymentId}' => { 'get' => {
+        'operationId' => 'getPayment', 'parameters' => [path_param('clientId'), path_param('paymentId')],
+        'responses' => { '200' => { 'description' => 'ok' } }
+      } } }
+      finding = described_class.new(ir_for(build_spec(paths: paths)), rules).call
+      expect(finding.value[:confidences][:status]).to be < 0.8
+      expect(finding).to have_warning(:low_confidence, hint: /endpoints\.getPayment: status/)
+    end
+
+    it 'treats sandbox simulation and inward payment endpoints as negative' do
+      finding = described_class.new(ir_for(build_spec(paths: post_op('/inward/payment/manual', 'simulatePayment'))),
+                                    rules).call
+      expect(finding.value[:create]).to be_nil
+    end
+
+    it 'reports UNSUPPORTED path params that cannot be filled from the operation' do
+      create = post_op('/client/{clientId}/payouts', 'createPayout', params: [path_param('clientId')])
+      status = { '/client/{clientId}/payouts/{payoutId}' => { 'get' => {
+        'operationId' => 'getPayout', 'parameters' => [path_param('clientId'), path_param('payoutId')],
+        'responses' => { '200' => { 'description' => 'ok' } }
+      } } }
+      finding = described_class.new(ir_for(build_spec(paths: create.merge(status))), rules).call
+      expect(finding).to have_warning(:path_params_unresolved, level: :unsupported, message: /createPayout.*clientId/)
+      expect(finding).to have_warning(:path_params_unresolved, level: :unsupported, message: /getPayout.*clientId/)
+      expect(finding.warnings.count { |w| w.code == :path_params_unresolved }).to eq(2)
     end
 
     it 'accepts a status endpoint identified by an id query param' do

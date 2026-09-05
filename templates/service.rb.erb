@@ -103,7 +103,7 @@ module Provider
 <% end -%>
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == <%= view.op(:status).success_statuses.first %>
 
-      apply_status(operation, <%= view.paths.body(view.op(:status).response_status_path) %>, strict: true)
+      apply_status(operation, <%= view.paths.status_body %>, strict: true)
 <%= partial('_rescues.erb') -%>
     end
 <% else -%>

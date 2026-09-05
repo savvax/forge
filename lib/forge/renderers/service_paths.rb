@@ -29,6 +29,8 @@ module Forge
       end
 
       def body(path) = "response.body#{dig(path)}"
+      # Ответ статуса — массив: ['status'] на Array бросил бы TypeError; nil → unknown_provider_status.
+      def status_body = success_schema(:status)&.type == 'array' ? 'nil' : body(op(:status).response_status_path)
       def payload(path) = "payload#{dig(path)}"
       def create_error_code = body(error_code_path)
       def create_error_message = body(error_code_path[0..-2] + ['message'])

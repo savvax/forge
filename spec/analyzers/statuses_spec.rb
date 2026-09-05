@@ -57,6 +57,20 @@ RSpec.describe Forge::Analyzers::Statuses do
     expect(finding).to have_warning(:response_id_not_found)
   end
 
+  it 'warns status_response_is_array when the status endpoint returns a list' do
+    list = { 'type' => 'array', 'items' => { 'type' => 'object' } }
+    ok = { 'description' => 'ok', 'content' => { 'application/json' => { 'schema' => list } } }
+    id_param = { 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'string' } }
+    create = { 'operationId' => 'createPayout', 'requestBody' => body_json({ 'a' => { 'type' => 'integer' } }),
+               'responses' => response_json(201, { 'id' => { 'type' => 'string' } }) }
+    status = { 'operationId' => 'getPayoutStatus', 'parameters' => [id_param], 'responses' => { '200' => ok } }
+    finding = statuses_for(ir_for(build_spec(paths: { '/payouts' => { 'post' => create },
+                                                      '/payouts/{id}/status' => { 'get' => status } })))
+    expect(finding).to have_warning(:status_response_is_array, hint: /endpoints\.<operationId>: status/)
+    expect(finding).not_to have_warning(:status_field_not_found)
+    expect(finding.value[:response_status_path]).to eq(['status'])
+  end
+
   it 'warns when no status field is found' do
     finding = statuses_for(spec_with_response('id' => { 'type' => 'string' }))
     expect(finding.value[:field_path]).to eq(['status'])

@@ -15,6 +15,11 @@ RSpec.describe Forge::IR::Builder do
       expect(spec.endpoints.map(&:source).uniq).to eq([:paths])
     end
 
+    it 'strips the trailing slash from server urls' do
+      spec = described_class.build(build_spec(servers: [{ 'url' => 'https://gateway.example.com/' }]))
+      expect(spec.servers.first.url).to eq('https://gateway.example.com')
+    end
+
     it 'keeps title, servers and security schemes' do
       expect(spec.title).to eq('NovaPay Payout API')
       expect(spec.servers.map(&:url)).to eq(%w[https://api.sandbox.novapay.example/v1 https://api.novapay.example/v1])

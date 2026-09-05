@@ -35,7 +35,8 @@ payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, tra
                disbursement, disbursements, payment, payments, send, remittance, outbound]
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
-                 recipients, otp, export, bulk, search, resend, finalize]   # каждое совпадение: −0.4
+                 recipients, otp, export, bulk, search, resend, finalize,
+                 simulate, simulation, inward, incoming, payin, deposit, deposits]   # каждое совпадение: −0.4
 
 roles:
   create:
@@ -53,6 +54,8 @@ roles:
       payout_word_in_path: 0.25
       has_path_param: 0.20
       status_word: 0.15              # status, get, retrieve, fetch, info, details, show, verify, check
+      array_response: -0.40          # 2xx-схема — массив: это список, а не статус одной выплаты
+      multi_path_param: -0.30        # больше одного {param} в пути: из operation берётся только один id
   cancel:
     requires: { any: [has_path_param, has_request_body] }
     signals:
@@ -61,6 +64,7 @@ roles:
       cancel_word_in_path: 0.30      # cancel, void, revoke, abort, stop
       cancel_word_in_operation: 0.10
       has_path_param: 0.10
+      multi_path_param: -0.30
   webhook:
     signals:
       webhook_word_in_path: 0.40     # webhook, webhooks, callback, callbacks, notify, notification, notifications, ipn, events
