@@ -84,6 +84,7 @@ CLI: `lib/forge/cli.rb` (Thor) → `lib/forge/generate_command.rb` (конвей
 | `bin/integrate --spec F --provider N [--lang ruby]` | обёртка ТЗ → `generate --out ./output/<provider> --force`; `--lang` ≠ ruby → exit 1 |
 | `bin/e2e SPEC [--overrides F]` | мок + сервис + приёмник webhook → `operation approved ✓`, exit 0 |
 | `bin/demo [SPEC] [--fast]` | сценарий демо |
+| `bin/forge-web` / `docker compose up` | веб-интерфейс (демо): загрузка спеки, отчёт, файлы, rspec/e2e кнопкой (D-23) |
 | `rake check` / `rake ci` / `rake real` / `rake determinism` / `rake licenses` / `rake guard:vendor` / `rake golden:update` | проверки |
 
 ### 2.3 Словари (`rules/`)

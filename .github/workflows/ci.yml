@@ -75,8 +75,14 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t forge .
+      - run: docker build --target cli -t forge .
       - run: docker run --rm forge help
+      - run: docker build --target web -t forge-web .
+      - run: |
+          docker run -d --rm -p 8080:8080 --name forge-web forge-web
+          for i in $(seq 1 20); do curl -fs http://127.0.0.1:8080/ >/dev/null && break; sleep 1; done
+          curl -fs http://127.0.0.1:8080/ | grep -q 'Analyze + Generate'
+          docker stop forge-web
       - run: |
           docker run --rm -v "$PWD/examples:/app/examples" -v "$PWD/tmp:/app/tmp" forge \
             generate --spec examples/specs/novapay.yaml --out tmp/docker-out --force

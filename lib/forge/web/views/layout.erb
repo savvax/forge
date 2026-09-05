@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>forge — генератор интеграций из OpenAPI</title>
+  <link rel="stylesheet" href="/forge.css">
+</head>
+<body>
+  <header>
+    <a class="brand" href="/">forge</a>
+    <span class="sub">OpenAPI → Ruby-сервис провайдера выплат · без нейросетей · v<%= Forge::VERSION %></span>
+    <nav><a href="https://github.com/savvax/forge" target="_blank" rel="noopener">репозиторий</a></nav>
+  </header>
+  <main>
+    <%= yield %>
+  </main>
+  <footer>Space Payments hackathon · задача 1 · все решения объяснимы: <code>report.txt</code> и раздел «Допущения» в <code>INTEGRATION.md</code></footer>
+</body>
+</html>

@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Веб-интерфейс forge (Sinatra + Puma). PORT (default 8080), FORGE_WORKDIR (default tmp/web).
+require_relative '../lib/forge/web/app'
+
+Forge::Web::App.run!

@@ -151,6 +151,22 @@ Done: 3 warnings, 0 unsupported. Exit 0.
 
 Формат — `docs/OUTPUT_FORMAT.md` § 6.
 
+## Веб-интерфейс (демо)
+
+CLI — основной интерфейс (по условиям задачи). Веб-слой — тонкая обёртка над теми же классами для демо
+жюри: загрузить спеку и overrides, увидеть отчёт, открыть/скачать 7 файлов, запустить сгенерированный
+RSpec и e2e (мок + webhook) кнопкой. Без базы и без новых гемов (Sinatra + Puma уже в Gemfile).
+
+```bash
+bin/forge-web                                  # http://localhost:8080 (PORT, FORGE_WORKDIR)
+docker compose up --build                      # то же в контейнере, данные прогонов — в volume forge-data
+docker build --target web -t forge-web . && docker run --rm -p 8080:8080 forge-web
+```
+
+Деплой на сервер: любой хост с Docker — `docker compose up -d`; за reverse-proxy (nginx/Caddy) на 8080.
+Прогоны хранятся на диске (`FORGE_WORKDIR`), секретов в них нет: `credentials` в сгенерированном коде —
+плейсхолдеры. Ограничение размера спеки — 20 МБ. Обработчик `Forge::Error` показывает ошибку с pointer и hint.
+
 ## Как это работает
 
 ```

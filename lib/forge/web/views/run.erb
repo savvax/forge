@@ -1,0 +1,44 @@
+<section class="card">
+  <h1><%= h run.provider %> <small>· <%= h run.id %> · exit <span class="exit-<%= run.exit_code %>"><%= run.exit_code %></span></small></h1>
+  <p class="actions">
+    <a class="btn" href="/">← новый прогон</a>
+    <% unless run.files.empty? %><a class="btn" href="/runs/<%= h run.id %>/download.tar">скачать всё (.tar)</a><% end %>
+    <a class="btn" href="/runs/<%= h run.id %>/report.json">report.json</a>
+    <% unless run.files.empty? %>
+    <form method="post" action="/runs/<%= h run.id %>/spec" class="inline"><button>▶ rspec сгенерированного</button></form>
+    <form method="post" action="/runs/<%= h run.id %>/e2e" class="inline"><button>▶ e2e (мок + webhook)</button></form>
+    <% end %>
+  </p>
+</section>
+
+<section class="card">
+  <h2>Отчёт</h2>
+  <pre class="report"><%= h run.report %></pre>
+</section>
+
+<% unless run.files.empty? %>
+<section class="card">
+  <h2>Файлы</h2>
+  <div class="tabs">
+    <% run.files.each_with_index do |name, i| %>
+      <input type="radio" name="tab" id="tab<%= i %>" <%= 'checked' if i.zero? %>>
+      <label for="tab<%= i %>"><%= h name %></label>
+    <% end %>
+    <% run.files.each_with_index do |name, i| %>
+      <div class="pane" data-for="tab<%= i %>">
+        <p class="file-actions"><a href="/runs/<%= h run.id %>/files/<%= h name %>" target="_blank">открыть</a> · <a href="/runs/<%= h run.id %>/files/<%= h name %>?download=1">скачать</a></p>
+        <pre><%= h File.read(run.file(name)) %></pre>
+      </div>
+    <% end %>
+  </div>
+</section>
+<% end %>
+
+<% %w[spec e2e].each do |step| %>
+<% if (out = run.step_output(step)) %>
+<section class="card" id="<%= step %>">
+  <h2><%= step == 'spec' ? 'Сгенерированный RSpec' : 'e2e: мок провайдера → сервис → webhook' %></h2>
+  <pre class="report"><%= h out %></pre>
+</section>
+<% end %>
+<% end %>

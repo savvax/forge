@@ -1,0 +1,53 @@
+<% if @error %><div class="alert"><pre><%= h @error %></pre></div><% end %>
+<section class="card">
+  <h1>Новая интеграция</h1>
+  <form method="post" action="/runs" enctype="multipart/form-data" class="grid">
+    <fieldset>
+      <legend>Спецификация OpenAPI 3.x</legend>
+      <label>Файл (YAML/JSON)<input type="file" name="spec" accept=".yaml,.yml,.json"></label>
+      <label>или пример
+        <select name="example">
+          <option value="">—</option>
+          <% examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
+        </select>
+      </label>
+      <label>или текст<textarea name="spec_text" rows="6" placeholder="openapi: 3.0.3&#10;info: …"></textarea></label>
+    </fieldset>
+    <fieldset>
+      <legend>overrides.yml (необязательно)</legend>
+      <label>Файл<input type="file" name="overrides" accept=".yaml,.yml"></label>
+      <label>или пример
+        <select name="overrides_example">
+          <option value="">—</option>
+          <% overrides_examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
+        </select>
+      </label>
+      <label>или текст<textarea name="overrides_text" rows="6" placeholder="statuses:&#10;  ON_HOLD: in_progress"></textarea></label>
+    </fieldset>
+    <fieldset>
+      <legend>Параметры</legend>
+      <label>--provider (имя; иначе из info.title)<input type="text" name="provider" placeholder="novapay"></label>
+      <label>--include-paths (glob, через пробел)<input type="text" name="include_paths" placeholder="/v1/payouts* /balance"></label>
+      <label class="check"><input type="checkbox" name="strict" value="1"> --strict (exit 4 при WARN/UNSUPPORTED, файлы всё равно создаются)</label>
+      <label class="check"><input type="checkbox" name="verify" value="0"> --no-verify (не запускать сгенерированный spec)</label>
+      <button type="submit">Analyze + Generate</button>
+    </fieldset>
+  </form>
+</section>
+<% unless @runs.empty? %>
+<section class="card">
+  <h2>Последние прогоны</h2>
+  <table>
+    <tr><th>ID</th><th>Провайдер</th><th>Спека</th><th>Exit</th><th></th></tr>
+    <% @runs.each do |r| %>
+    <tr>
+      <td><a href="/runs/<%= h r.id %>"><%= h r.id %></a></td>
+      <td><%= h r.provider %></td>
+      <td><%= h File.basename(r.spec_path.to_s) %></td>
+      <td class="exit-<%= r.exit_code %>"><%= r.exit_code %></td>
+      <td><form method="post" action="/runs/<%= h r.id %>/delete"><button class="link">удалить</button></form></td>
+    </tr>
+    <% end %>
+  </table>
+</section>
+<% end %>
