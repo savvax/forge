@@ -1,50 +1,81 @@
 <% if @error %><div class="alert"><pre><%= h @error %></pre></div><% end %>
-<section class="card">
-  <h1>Новая интеграция</h1>
-  <form method="post" action="/runs" enctype="multipart/form-data" class="grid">
-    <fieldset>
-      <legend>Спецификация OpenAPI 3.x</legend>
-      <label>Файл (YAML/JSON)<input type="file" name="spec" accept=".yaml,.yml,.json"></label>
-      <label>или пример
-        <select name="example">
-          <option value="">—</option>
-          <% examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
-        </select>
-      </label>
-      <label>или текст<textarea name="spec_text" rows="6" placeholder="openapi: 3.0.3&#10;info: …"></textarea></label>
-    </fieldset>
-    <fieldset>
-      <legend>overrides.yml (необязательно)</legend>
-      <label>Файл<input type="file" name="overrides" accept=".yaml,.yml"></label>
-      <label>или пример
-        <select name="overrides_example">
-          <option value="">—</option>
-          <% overrides_examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
-        </select>
-      </label>
-      <label>или текст<textarea name="overrides_text" rows="6" placeholder="statuses:&#10;  ON_HOLD: in_progress"></textarea></label>
-    </fieldset>
-    <fieldset>
-      <legend>Параметры</legend>
-      <label>--provider (имя; иначе из info.title)<input type="text" name="provider" placeholder="novapay"></label>
-      <label>--include-paths (glob, через пробел)<input type="text" name="include_paths" placeholder="/v1/payouts* /balance"></label>
-      <label class="check"><input type="checkbox" name="strict" value="1"> --strict (exit 4 при WARN/UNSUPPORTED, файлы всё равно создаются)</label>
-      <label class="check"><input type="checkbox" name="verify" value="0"> --no-verify (не запускать сгенерированный spec)</label>
-      <button type="submit">Analyze + Generate</button>
-    </fieldset>
-  </form>
-</section>
+<form method="post" action="/runs" enctype="multipart/form-data" class="new-run">
+  <section class="card source">
+    <h1>Новая интеграция</h1>
+    <p class="muted">Загрузите OpenAPI 3.0/3.1 спецификацию провайдера выплат — forge разберёт её и сгенерирует сервис,
+      тесты, гайд, фикстуры и мок. Без нейросетей: правила, словари, детерминизм.</p>
+
+    <div class="src-tabs">
+      <input type="radio" name="src" id="src-file" checked><label for="src-file">Файл</label>
+      <input type="radio" name="src" id="src-example"><label for="src-example">Пример</label>
+      <input type="radio" name="src" id="src-text"><label for="src-text">Текст</label>
+
+      <div class="src-pane" data-for="src-file">
+        <label class="drop">
+          <input type="file" name="spec" accept=".yaml,.yml,.json">
+          <span class="drop-title">Выберите файл спецификации</span>
+          <span class="drop-hint">YAML или JSON, до 20 МБ · например <code>provider_api.yaml</code></span>
+        </label>
+      </div>
+      <div class="src-pane" data-for="src-example">
+        <label>Спецификация из комплекта
+          <select name="example">
+            <option value="">— не выбрано —</option>
+            <% examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
+          </select>
+        </label>
+      </div>
+      <div class="src-pane" data-for="src-text">
+        <label>Вставьте текст спецификации
+          <textarea name="spec_text" rows="12" placeholder="openapi: 3.0.3&#10;info:&#10;  title: …&#10;paths:&#10;  /payouts: …"></textarea>
+        </label>
+      </div>
+    </div>
+
+    <details class="overrides">
+      <summary>overrides.yml — переопределить решения анализа (необязательно)</summary>
+      <div class="grid3">
+        <label class="drop small">
+          <input type="file" name="overrides" accept=".yaml,.yml">
+          <span class="drop-title">Файл overrides.yml</span>
+        </label>
+        <label>или пример
+          <select name="overrides_example">
+            <option value="">— не выбрано —</option>
+            <% overrides_examples.each do |f| %><option value="<%= h f.sub(%r{.*/examples/}, 'examples/') %>"><%= h File.basename(f) %></option><% end %>
+          </select>
+        </label>
+        <label>или текст
+          <textarea name="overrides_text" rows="4" placeholder="statuses:&#10;  ON_HOLD: in_progress"></textarea>
+        </label>
+      </div>
+    </details>
+  </section>
+
+  <aside class="card side">
+    <h2>Параметры</h2>
+    <label>Имя провайдера <span class="muted">(--provider; иначе из info.title)</span>
+      <input type="text" name="provider" placeholder="novapay"></label>
+    <label>Ограничить пути <span class="muted">(--include-paths, glob через пробел)</span>
+      <input type="text" name="include_paths" placeholder="/v1/payouts* /balance"></label>
+    <label class="check"><input type="checkbox" name="strict" value="1"><span>--strict — exit 4 при WARN/UNSUPPORTED (файлы всё равно создаются)</span></label>
+    <label class="check"><input type="checkbox" name="verify" value="0"><span>--no-verify — не запускать сгенерированный RSpec</span></label>
+    <button type="submit" class="primary">Analyze + Generate</button>
+    <p class="muted tiny">Результат: сервис по контракту <code>Provider::BaseService</code>, RSpec, INTEGRATION.md, fixtures.json, мок-сервер, отчёт.</p>
+  </aside>
+</form>
+
 <% unless @runs.empty? %>
 <section class="card">
   <h2>Последние прогоны</h2>
-  <table>
-    <tr><th>ID</th><th>Провайдер</th><th>Спека</th><th>Exit</th><th></th></tr>
+  <table class="md">
+    <tr><th>Провайдер</th><th>Спека</th><th>Когда</th><th>Exit</th><th></th></tr>
     <% @runs.each do |r| %>
     <tr>
-      <td><a href="/runs/<%= h r.id %>"><%= h r.id %></a></td>
-      <td><%= h r.provider %></td>
-      <td><%= h File.basename(r.spec_path.to_s) %></td>
-      <td class="exit-<%= r.exit_code %>"><%= r.exit_code %></td>
+      <td><a href="/runs/<%= h r.id %>"><b><%= h r.provider %></b></a></td>
+      <td><code><%= h r.spec_name %></code></td>
+      <td class="muted"><%= h r.id.sub(/-\h+\z/, '').sub('-', ' ').sub(/(\d{4})(\d{2})(\d{2}) (\d{2})(\d{2})(\d{2})/, '\1-\2-\3 \4:\5:\6') %></td>
+      <td><span class="pill exit-<%= r.exit_code %>">exit <%= r.exit_code %></span></td>
       <td><form method="post" action="/runs/<%= h r.id %>/delete"><button class="link">удалить</button></form></td>
     </tr>
     <% end %>

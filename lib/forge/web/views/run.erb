@@ -1,7 +1,7 @@
 <% ov = overview %>
 <section class="card head">
   <div>
-    <h1><%= h run.provider %> <small>· <%= h ov&.spec&.dig('title') || File.basename(run.spec_path.to_s) %> <%= h ov&.spec&.dig('version') %> · <%= h run.id %></small></h1>
+    <h1><%= h run.provider %> <small>· <%= h ov&.spec&.dig('title') || run.spec_name %> <%= h ov&.spec&.dig('version') %> · <%= h run.id %></small></h1>
     <p class="muted">exit <span class="pill exit-<%= run.exit_code %>"><%= run.exit_code %></span>
       <% if ov %>· WARN <b><%= ov.warnings.fetch('warn', []).size %></b> · UNSUPPORTED <b><%= ov.warnings.fetch('unsupported', []).size %></b> · INFO <b><%= ov.warnings.fetch('info', []).size %></b><% end %></p>
   </div>
@@ -88,11 +88,18 @@
       <section class="card wide">
         <h2>Допущения и предупреждения</h2>
         <% if ov.warnings.empty? %><p class="muted">Все решения приняты с confidence ≥ 0.8; предупреждений нет.</p><% end %>
-        <% { 'warn' => 'WARN', 'unsupported' => 'UNSUPPORTED', 'info' => 'INFO' }.each do |level, label| %>
-          <% ov.warnings.fetch(level, []).each do |w| %>
-          <div class="warn-row lvl-<%= level %>"><span class="lvl"><%= label %></span> <code><%= h w['code'] %></code> <%= h w['message'] %>
-            <% if w['hint'] %><div class="hint">→ <%= h w['hint'] %></div><% end %></div>
-          <% end %>
+        <% { 'warn' => ['WARN', 'требуют решения человека — закрываются строкой в overrides.yml', true],
+             'unsupported' => ['UNSUPPORTED', 'не генерируется автоматически — в коде TODO', true],
+             'info' => ['INFO', 'для сведения', false] }.each do |level, (label, note, open)| %>
+          <% items = ov.warnings.fetch(level, []) %>
+          <% next if items.empty? %>
+          <details class="wgroup lvl-<%= level %>" <%= 'open' if open %>>
+            <summary><span class="lvl"><%= label %></span> <b><%= items.size %></b> <span class="muted">· <%= note %></span></summary>
+            <% items.each do |w| %>
+            <div class="warn-row lvl-<%= level %>"><code><%= h w['code'] %></code> <%= h w['message'] %>
+              <% if w['hint'] %><div class="hint">→ <%= h w['hint'] %></div><% end %></div>
+            <% end %>
+          </details>
         <% end %>
       </section>
     </div>

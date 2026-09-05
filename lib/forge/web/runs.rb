@@ -44,6 +44,7 @@ module Forge
       def provider = meta['provider'] || 'provider'
       def out_dir = File.join(@dir, 'out')
       def spec_path = meta['spec']
+      def spec_name = meta['spec_name'] || File.basename(spec_path.to_s)
       def files = Dir[File.join(out_dir, '*')].map { |f| File.basename(f) }
       def file(name) = (path = File.join(out_dir, File.basename(name))) && File.file?(path) ? path : nil
 
@@ -62,7 +63,8 @@ module Forge
         FileUtils.mkdir_p(File.join(@dir, 'input'))
         spec = save_upload(params[:spec], params[:spec_text], params[:example], 'spec')
         overrides = save_upload(params[:overrides], params[:overrides_text], params[:overrides_example], 'overrides')
-        write_meta('spec' => spec, 'overrides' => overrides, 'provider_name' => blank_to_nil(params[:provider]),
+        write_meta('spec' => spec, 'spec_name' => @spec_name, 'overrides' => overrides,
+                   'provider_name' => blank_to_nil(params[:provider]),
                    'include_paths' => params[:include_paths].to_s.split(/[\s,]+/).reject(&:empty?),
                    'strict' => params[:strict] == '1', 'verify' => params[:verify] != '0',
                    'created_at' => Time.now.utc.iso8601)
@@ -117,6 +119,8 @@ module Forge
       def save_upload(upload, text, example, kind)
         data, name = upload_source(upload, text, example, kind)
         return nil unless data
+
+        @spec_name = name if kind == 'spec'
 
         if data.bytesize > MAX_SPEC_BYTES
           raise ArgumentError,
