@@ -30,7 +30,11 @@
         "sbp": {
           "phone": "79001234567",
           "bank_code": "044525225",
-          "bank_name": "Сбербанк"
+          "bank_name": "Сбербанк",
+          "first_name": "Ivan",
+          "last_name": "Ivanov",
+          "middle_name": "Ivanovich",
+          "tax_id": "123456789012"
         }
       }
     },

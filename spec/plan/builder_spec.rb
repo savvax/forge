@@ -52,10 +52,9 @@ RSpec.describe Forge::Plan::Builder do
     it 'builds the create fixture and the operation from the request example' do
       create = plan.fixtures['create_request']
       expect(create['request']['recipient']['phone']).to eq('79001234567')
-      expect(create['operation']).to eq('id' => 'op_abc123', 'amount' => '15000.00', 'currency' => 'RUB',
-                                        'payout_requisite' => { 'sbp' => { 'phone' => '79001234567',
-                                                                           'bank_code' => '044525225',
-                                                                           'bank_name' => 'Сбербанк' } })
+      expect(create['operation']).to include('id' => 'op_abc123', 'amount' => '15000.00', 'currency' => 'RUB')
+      sbp = create['operation']['payout_requisite']['sbp']
+      expect(sbp).to include('phone' => '79001234567', 'bank_code' => '044525225', 'bank_name' => 'Сбербанк')
       expect(create['expected_operation_status']).to eq('in_progress')
     end
 

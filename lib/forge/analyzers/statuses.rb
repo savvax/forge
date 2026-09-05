@@ -39,12 +39,17 @@ module Forge
 
       def find_property(schema, names, require:)
         candidates(schema).each do |path, prop|
-          next unless names.include?(path.last) && string_like?(prop)
+          next unless status_path?(path, names) && string_like?(prop)
 
           confidence = property_confidence(prop, require)
           return [path, prop, confidence] if confidence
         end
         nil
+      end
+
+      # `status` / `data.state` / `status.value` (объект статуса с полем value).
+      def status_path?(path, names)
+        names.include?(path.last) || (path.last == 'value' && path.size > 1 && names.include?(path[-2]))
       end
 
       # Корневой `status: true` (обёртка status: true в ответе) — не статус выплаты.
@@ -58,13 +63,18 @@ module Forge
       end
 
       # Свойства корня и внутри wrappers (глубина ≤ 2): [[path, schema], ...]
+      # Обходим wrappers (data, result…) и объект статуса вида `status: {value: enum}` (объект статуса с полем value).
       def candidates(schema, prefix = [], depth = 0)
         return [] unless schema&.properties
 
         schema.properties.flat_map do |name, prop|
-          nested = depth < 2 && dict['wrappers'].include?(name) ? candidates(prop, prefix + [name], depth + 1) : []
+          nested = depth < 2 && descend?(name, prop) ? candidates(prop, prefix + [name], depth + 1) : []
           [[prefix + [name], prop]] + nested
         end
+      end
+
+      def descend?(name, prop)
+        dict['wrappers'].include?(name) || (dict['status_fields'].include?(name) && prop.properties&.key?('value'))
       end
 
       def enum_or_description(field, path)

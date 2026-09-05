@@ -25,6 +25,8 @@ module Forge
       def minor? = plan.amount[:unit] == :minor
       def currency = plan.amount[:currencies].first
       def requisites? = !plan.requisite_types.empty?
+      def type_values = plan.fields[:requisite_type_values].to_h.reject { |k, v| k == v }
+      def type_values? = !type_values.empty?
       def idempotency? = !op(:create).headers.empty?
       def body_kw = op(:create).body_encoding == 'form' ? 'form' : 'json'
 
@@ -78,7 +80,7 @@ module Forge
       def pattern_checks = plan.validations.select { |v| v[:rule] == :pattern }.map { |v| pattern_check(v) }
 
       def length_expr(validation)
-        expr = validation[:expr]
+        expr = validation[:expr].sub('requisite_type', 'requisite_type_for(operation, request_method)')
         return "#{expr}.length" if expr.end_with?('.to_s')
 
         expr.match?(/\A[\w.]+\z/) ? "#{expr}.to_s.length" : "(#{expr}).to_s.length"

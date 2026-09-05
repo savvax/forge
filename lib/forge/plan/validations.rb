@@ -7,7 +7,8 @@ module Forge
       module_function
 
       def build(fields, amount)
-        mappings = fields[:request].reject { |m| m.source_expr.nil? }
+        skip = /\Acredentials\.|\Acallback_url\z/
+        mappings = fields[:request].reject { |m| m.source_expr.nil? || m.source_expr.match?(skip) }
         amount_rules(mappings, amount) + mappings.reject { |m| m.transform == 'amount' }.flat_map { |m| field_rules(m) }
       end
 

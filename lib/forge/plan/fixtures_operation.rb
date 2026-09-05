@@ -15,7 +15,7 @@ module Forge
       def from(request)
         @extras = {}
         op = { 'id' => nil, 'amount' => nil, 'currency' => nil, 'payout_requisite' => {} }
-        type = dig(request, @f[:fields].value[:request].find { |m| m.source_expr == 'requisite_type' }&.path)
+        type = canonical_type_of(request)
         @f[:fields].value[:request].each do |m|
           value = dig(request, m.path)
           assign(op, m, value, type) unless value.nil?
@@ -30,6 +30,11 @@ module Forge
         operation['amount'] ||= format('%.2f', @f[:amount].value[:minimum_major] || 1)
         operation['currency'] ||= @f[:amount].value[:currencies].first || 'USD'
         operation
+      end
+
+      def canonical_type_of(request)
+        raw = dig(request, @f[:fields].value[:request].find { |m| m.source_expr == 'requisite_type' }&.path)
+        raw && (@f[:fields].value[:requisite_type_values].to_h.key(raw.to_s) || raw)
       end
 
       def default_type = @f[:fields].value[:requisite_types].first || 'default'

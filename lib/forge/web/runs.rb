@@ -46,7 +46,13 @@ module Forge
       def spec_path = meta['spec']
       def files = Dir[File.join(out_dir, '*')].map { |f| File.basename(f) }
       def file(name) = (path = File.join(out_dir, File.basename(name))) && File.file?(path) ? path : nil
-      def report = read('out/report.txt') || meta['error'].to_s
+
+      def report
+        text = read('out/report.txt')
+        error = meta['error'].to_s
+        [text, (error.empty? ? nil : "error: #{error}")].compact.join("\n\n")
+      end
+
       def report_json = read('report.json') || '{}'
       def step_output(name) = read("#{name}.log")
       def exit_code = meta['exit_code']
@@ -69,7 +75,8 @@ module Forge
         File.write(File.join(@dir, 'report.json'), json)
         write_meta(meta.merge('exit_code' => code, 'provider' => provider_from_files))
       rescue Forge::Error => e
-        write_meta(meta.merge('exit_code' => e.class.exit_code, 'error' => e.message))
+        write_meta(meta.merge('exit_code' => e.class.exit_code, 'error' => e.message,
+                              'provider' => provider_from_files))
       end
 
       def generate_options

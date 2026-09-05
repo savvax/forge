@@ -1,0 +1,52 @@
+Parsing spec... ok (openapi 3.0.0, API интеграции выплат 1.0)
+Found 6 endpoints: GET /payout/v1/sbp/banks, POST /payout/v1/payouts, POST /payout/v1/payouts/draft,
+                   GET /payout/v1/payouts/{id}, PUT /payout/v1/payouts/{id},
+                   POST /settings/v1/callback
+  create   POST /payout/v1/payouts                    post-payout-v1-payouts   confidence 0.95
+  status   GET /payout/v1/payouts/{id}                get-payout-v1-payouts-id confidence 0.90
+  webhook  POST newPay                                сallbackTransaction      confidence 0.95
+Auth: not found (credentials required; see warnings)
+Statuses (status.value): IN_PROGRESS, PENDING → in_progress; COMPLETED → approved; DECLINED → rejected; unmapped: WAITING_CONFIRMATION
+Errors: none described
+Webhook signature: not found (callbacks are not verified)
+Webhook events: event → status from payout.status
+Amount: number, major units (×100) — source: amount (number) → major units: 'Сумма в рублях.
+Действует несколько лимитов от НСПК:
+1. Ограничение до 600000 на одну операцию
+2. Ограничение в 1000000 в сутки в пользу одного получателя.
+Можно сделать 3 платежа на одинаковую сумму, например по 400000, главное что бы первые 2 платежа в общей сумме не превысили лимит в 1000000'
+Fields: 13 request fields, 1 unmapped (payoutParams: sbp)
+Generating service...
+Generating integration guide...
+Generating test fixtures...
+Generating service spec...
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
+Output:
+  ./raiffeisen_service.rb
+  ./INTEGRATION.md
+  ./fixtures.json
+  ./raiffeisen_service_spec.rb
+  ./mock_server.rb
+  ./report.txt
+Warnings (5):
+  WARN         role_conflict              POST /payout/v1/payouts/draft (post-payout-v1-payouts-draft) also looks like create (0.55); POST /payout/v1/payouts (post-payout-v1-payouts) wins (0.95)
+        hint: endpoints.post-payout-v1-payouts-draft: create
+  WARN         auth_not_found             no security requirement on the create endpoint or at the root
+        hint: auth.type: api_key|bearer|basic (overrides.yml)
+  WARN         unmapped_status            status 'WAITING_CONFIRMATION' (waiting_confirmation) of status.value is unknown
+        hint: statuses.WAITING_CONFIRMATION: in_progress|approved|rejected  (overrides.yml)
+  WARN         signature_not_found        webhook has no signature header parameter; callbacks will not be verified
+        hint: webhook.signature_header: <Header-Name>  (overrides.yml)
+  WARN         unmapped_field             incomeTypeCode (string, Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/cons_doc_LAW_353568/527cf8edd2262cb7068cafd44ed596d9a05dd237/)) has no source
+        hint: fields.incomeTypeCode.source: "…"  (overrides.yml)
+Info (7):
+  INFO         webhook_source_webhooks    webhook taken from webhooks: POST newPay (сallbackTransaction)
+  INFO         outside_contract           GET /payout/v1/sbp/banks (get-payout-v1-sbp-banks) — not used
+  INFO         outside_contract           POST /payout/v1/payouts/draft (post-payout-v1-payouts-draft) — not used
+  INFO         outside_contract           PUT /payout/v1/payouts/{id} (put-payout-v1-payouts-id) — not used
+  INFO         outside_contract           POST /settings/v1/callback (post-settings-v1-callback) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+  INFO         credential_field           account → credentials.account
+        hint: fill it in credentials
+Done: 6 files, 5 warnings, 0 unsupported. Exit 0.

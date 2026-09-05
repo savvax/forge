@@ -20,7 +20,8 @@ module Forge
       # Title из одних стоп-слов («Transfers API») → имя из домена сервера (pal-test.example.com → example).
       def from_title(title, host: nil)
         words = title.to_s.split(/[\s\-_]+/).reject { |w| STOP_WORDS.any? { |s| w.downcase.match?(/\A#{s}\z/) } }
-        from_provider(words.empty? ? from_host(host) || 'provider' : words.join(' '))
+        latin = words.join(' ').gsub(/[^A-Za-z0-9\s]/, '').strip
+        from_provider(latin.empty? ? from_host(host) || 'provider' : latin)
       end
 
       def from_host(url)

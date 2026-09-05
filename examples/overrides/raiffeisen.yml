@@ -1,0 +1,23 @@
+# examples/overrides/raiffeisen.yml — Райффайзенбанк, выплаты по СБП (examples/specs/raiffeisen.yaml).
+# Спека описывает подпись webhook текстом в описании тега, а не параметром: подсказываем вручную.
+# Контрольная строка amount|id|statusValue|statusDate (HMAC-SHA256) — поле за полем, не raw body.
+webhook:
+  signature_header: X-Api-Signature-SHA256
+  signature_algorithm: sha256
+  signature_encoding: hex
+  signature_payload: fields
+
+statuses:
+  WAITING_CONFIRMATION: in_progress          # двухстадийная выплата ждёт подтверждения (PUT /payouts/{id})
+
+fields:
+  incomeTypeCode:
+    source: "'1'"                            # код вида дохода по 115-ФЗ: 1 — обычный доход
+
+auth:
+  type: bearer                             # «Authorization: Bearer secretKey» описан текстом, не в securitySchemes
+  header: Authorization
+  credential_key: token
+
+endpoints:
+  post-payout-v1-payouts-draft: other      # двухстадийная заявка (draft + PUT-подтверждение) — вне контракта

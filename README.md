@@ -237,6 +237,7 @@ paths:
 | `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 4 INFO (один — расхождение примера 401 с enum в самом ТЗ), exit 0 | не нужны |
 | `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
 | `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 0 WARN (3 UNSUPPORTED) |
+| `examples/specs/raiffeisen.yaml` (реальная спека Райффайзенбанка, СБП) | OpenAPI 3.0 на русском, bearer в тексте, контейнер `payoutParams`, тип `payoutMethod: SBP`, статус в объекте `status.value`, `x-webhooks` + `x-examples`, подпись описана текстом | 5 WARN, exit 0; e2e → approved | 1 WARN |
 
 Все три покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без).
 

@@ -132,6 +132,16 @@ Plaid: `POST /transfer/get` → status 0.80.
 id прогона — `[\w-]+`, размер спеки ≤ 20 МБ, секретов в артефактах нет. Логика анализа в веб-слой не попадает
 (правило «шаблоны и парсер не знают друг о друге» сохраняется: UI знает только команду).
 
+### D-24 · Спеки экспертов (5.09): Райффайзен СБП, Adyen Payout/Transfers/Webhooks, PayPal, Kaspi
+Прогон шести файлов через UI вскрыл и закрыл: контейнер и поле типа матчатся по нормализованному имени
+(`payoutParams`, `payoutMethod: SBP` → `sbp` через `requisite_type_values`), статус в объекте `status.value`,
+`x-webhooks`/`x-examples` (Redoc-стиль), имя провайдера из домена при кириллическом title, maxLength-проверки
+реквизитов в `check_conditions` (был NameError), credential-поля не валидируются, create с path-параметром
+штрафуется (Kaspi `POST /connections/{id}/auth/send-phone` больше не create), мок называет недостающие
+required-поля, e2e останавливается с объяснением, если webhook в спеке нет, веб не теряет отчёт при exit 3.
+Райффайзен добавлен четвёртой спекой в `examples/` с golden и overrides (подпись по полям из описания тега).
+Adyen Webhooks — только webhooks без paths → понятная ошибка; Kaspi — pay-in, честный 0.70 с WARN.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

@@ -29,7 +29,9 @@ RSpec.describe 'golden output' do
     'cardpay' => ['examples/specs/cardpay.yaml', nil],
     'cardpay_overrides' => ['examples/specs/cardpay.yaml', 'examples/overrides/cardpay.yml'],
     'swiftpay' => ['examples/specs/swiftpay.json', nil],
-    'swiftpay_overrides' => ['examples/specs/swiftpay.json', 'examples/overrides/swiftpay.yml']
+    'swiftpay_overrides' => ['examples/specs/swiftpay.json', 'examples/overrides/swiftpay.yml'],
+    'raiffeisen' => ['examples/specs/raiffeisen.yaml', nil],
+    'raiffeisen_overrides' => ['examples/specs/raiffeisen.yaml', 'examples/overrides/raiffeisen.yml']
   }.each do |name, (spec_file, overrides)|
     it "produces exactly the golden files for #{name}" do
       out = generate_golden(name, spec_file, overrides: overrides)

@@ -22,7 +22,7 @@ module Forge
         walker = FieldWalker.new(self, dict, amount_expr, variants: variant_overrides)
         request = schema ? walker.walk(schema, [], schema.required.to_a, nil) : []
         value = { request: request, requisite_types: requisite_types(request), requisite_container: walker.container,
-                  headers: headers(endpoint) }
+                  requisite_type_values: requisite_type_values(request), headers: headers(endpoint) }
         finding(:fields, value, confidence: request.empty? ? 0.0 : mean(request),
                                 source: "#{request.size} request fields mapped")
       end
@@ -79,11 +79,23 @@ module Forge
       # Канонические типы (CONTRACT § 3) из enum поля типа; enum вне словаря (auLocal, iban…) — не типы реквизитов.
       def requisite_types(request)
         enum = type_enum(request)
-        known = enum & dict['requisite_types']
+        known = enum.filter_map { |v| canonical_type(v) }.uniq
         return known unless known.empty?
 
         types = request.filter_map(&:requisite_type).uniq
         types.empty? && !enum.empty? ? ['bank_account'] : types
+      end
+
+      # Провайдерское значение типа (SBP) для каждого канонического (sbp) — сервис шлёт его в поле типа.
+      def requisite_type_values(request)
+        type_enum(request).filter_map { |v| (c = canonical_type(v)) && [c, v] }.to_h
+      end
+
+      def canonical_type(value)
+        key = Rules.normalize(value)
+        return key if dict['requisite_types'].include?(key)
+
+        dict.fetch('requisite_type_values', {}).find { |_t, aliases| aliases.include?(key) }&.first
       end
 
       def type_enum(request)

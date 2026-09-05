@@ -17,7 +17,8 @@ RSpec.describe 'CLI' do
 
   describe 'bin/forge analyze' do
     { 'novapay' => 'examples/specs/novapay.yaml', 'cardpay' => 'examples/specs/cardpay.yaml',
-      'swiftpay' => 'examples/specs/swiftpay.json' }.each do |name, file|
+      'swiftpay' => 'examples/specs/swiftpay.json',
+      'raiffeisen' => 'examples/specs/raiffeisen.yaml' }.each do |name, file|
       it "matches the snapshot for #{name}" do
         res = run_cli('analyze', '--spec', file)
         snapshot = "spec/snapshots/#{name}_analyze.txt"

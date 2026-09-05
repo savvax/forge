@@ -103,7 +103,10 @@ class SwiftpayMock < Sinatra::Base
   post '/v1/payments/outbound' do
     body = json_body
     missing = REQUIRED.reject { |f| body.key?(f) }
-    halt(*reply(400, error_body(400, 'validation_error'))) unless missing.empty?
+    unless missing.empty?
+      halt(*reply(400, { 'error' => { 'code' => 'validation_error', 'message' => "missing required fields: #{missing.join(', ')}",
+                                     'missing' => missing } }))
+    end
     amount = dig_path(body, AMOUNT_PATH)
     halt(*reply(422, error_body(422, 'validation_error'))) if MIN_AMOUNT && amount && amount.to_f < MIN_AMOUNT
     key = IDEMPOTENCY_HEADER && request.env["HTTP_#{IDEMPOTENCY_HEADER.upcase.tr('-', '_')}"]

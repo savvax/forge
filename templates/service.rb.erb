@@ -35,6 +35,9 @@ module Provider
     SUCCESS_STATUSES = <%= plan.success_statuses.inspect %>.freeze<%= view.success_comment %>
 <% if view.requisites? -%>
     REQUISITE_TYPES = %w[<%= plan.requisite_types.join(' ') %>].freeze
+<% if view.type_values? -%>
+    REQUISITE_TYPE_VALUES = <%= view.type_values.inspect %>.freeze # canonical type → value the provider expects
+<% end -%>
 <% end -%>
     STATUS_METHODS = %w[status check].freeze
 <% unless plan.amount[:currencies].empty? -%>

@@ -4,7 +4,9 @@ payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, tra
                disbursement, disbursements, payment, payments, send, remittance, outbound]
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
-                 recipients, otp, export, bulk, search, resend, finalize, authorization, authorize]
+                 recipients, otp, export, bulk, search, resend, finalize, authorization, authorize,
+                 auth, login, logout, token, tokens, connection, connections, session, sessions, phone_code,
+                 send_phone, verify_phone, settings, callback_settings, draft, banks, dictionary]
 negative_penalty: 0.4
 
 words:
@@ -25,6 +27,7 @@ roles:
       create_word: 0.20
       no_path_param: 0.10
       has_request_body: 0.10
+      has_path_param: -0.25        # POST /x/{id}/… — действие над существующим объектом, не создание выплаты
   status:
     requires: { any: [has_path_param, id_query_param, id_body_field] }
     signals:

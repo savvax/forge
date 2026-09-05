@@ -1,0 +1,184 @@
+{
+  "meta": {
+    "provider": "raiffeisen",
+    "spec": "API интеграции выплат 1.0",
+    "forge": "1.0.0"
+  },
+  "auth": {
+    "headers": {}
+  },
+  "create_request": {
+    "endpoint": "POST /payout/v1/payouts",
+    "request": {
+      "id": "1404fhr7i272a2",
+      "account": "40700000000000000000",
+      "amount": 1110.01,
+      "currency": "RUB",
+      "paymentDetails": "Выплата от страховой компании",
+      "payoutMethod": "SBP",
+      "payoutParams": {
+        "phone": "79191234567",
+        "bankAlias": "RAIFFEISEN",
+        "firstName": "Петр",
+        "middleName": "Петрович",
+        "lastName": "Петров",
+        "inn": 123456789101
+      },
+      "incomeTypeCode": "1",
+      "extra": {
+        "contract": "1234567/89012"
+      }
+    },
+    "operation": {
+      "id": "1404fhr7i272a2",
+      "amount": "1110.01",
+      "currency": "RUB",
+      "payout_requisite": {
+        "sbp": {
+          "phone": "79191234567",
+          "bank_code": "RAIFFEISEN",
+          "first_name": "Петр",
+          "middle_name": "Петрович",
+          "last_name": "Петров",
+          "tax_id": 123456789101,
+          "bank_name": "Bank"
+        }
+      },
+      "description": "Выплата от страховой компании"
+    },
+    "credentials": {
+      "account": "40700000000000000000"
+    },
+    "response_200": {
+      "id": "1404fhr7i272a2",
+      "account": "40700000000000000000",
+      "amount": 1110.01,
+      "currency": "RUB",
+      "payoutMethod": "SBP",
+      "payoutParams": {
+        "phone": "79191234567",
+        "bankAlias": "RAIFFEISEN",
+        "firstName": "Петр",
+        "middleName": "Петрович",
+        "lastName": "Петров",
+        "inn": 123456789101
+      },
+      "incomeTypeCode": "1",
+      "extra": {
+        "contract": "1234567/89012"
+      },
+      "status": {
+        "value": "IN_PROGRESS",
+        "date": "2019-07-11T17:45:13+03:00"
+      },
+      "createDate": "2019-07-11T17:45:13+03:00"
+    },
+    "expected_operation_status": "in_progress"
+  },
+  "fetch_status": {
+    "endpoint": "GET /payout/v1/payouts/{id}",
+    "response_200": {
+      "id": "1404fhr7i272a2",
+      "account": "40700000000000000000",
+      "amount": 1110.01,
+      "currency": "RUB",
+      "payoutMethod": "SBP",
+      "payoutParams": {
+        "phone": "79191234567",
+        "bankAlias": "RAIFFEISEN",
+        "firstName": "Петр",
+        "middleName": "Петрович",
+        "lastName": "Петров",
+        "inn": 123456789101
+      },
+      "incomeTypeCode": "1",
+      "extra": {
+        "contract": "1234567/89012"
+      },
+      "status": {
+        "value": "COMPLETED",
+        "date": "2019-07-11T17:45:13+03:00"
+      },
+      "createDate": "2019-07-11T17:45:13+03:00"
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback": {
+    "payload": {
+      "event": "payout",
+      "payout": {
+        "id": "p210730t2jboNkN0ft1",
+        "amount": 0.01,
+        "currency": "RUB",
+        "payoutMethod": "SBP",
+        "payoutParams": {
+          "phone": "79191234567",
+          "bankAlias": "RAIFFEISEN",
+          "firstName": "Петр",
+          "middleName": "Петрович",
+          "lastName": "Петров",
+          "inn": "123456789101"
+        },
+        "extra": {
+          "contract": "1234567/89012"
+        },
+        "status": "COMPLETED",
+        "creationDate": "2021-07-30T14:16:31+03:00",
+        "incomeTypeCode": "1"
+      }
+    },
+    "expected_operation_status": "approved"
+  },
+  "callback_failed": {
+    "payload": {
+      "event": "payout",
+      "payout": {
+        "id": "p210730t2jboNkN0ft1",
+        "amount": 0.01,
+        "currency": "RUB",
+        "payoutMethod": "SBP",
+        "payoutParams": {
+          "phone": "79191234567",
+          "bankAlias": "RAIFFEISEN",
+          "firstName": "Петр",
+          "middleName": "Петрович",
+          "lastName": "Петров",
+          "inn": "123456789101"
+        },
+        "extra": {
+          "contract": "1234567/89012"
+        },
+        "status": "DECLINED",
+        "creationDate": "2021-07-30T14:16:31+03:00",
+        "incomeTypeCode": "1"
+      }
+    },
+    "expected_operation_status": "rejected"
+  },
+  "callback_processing": {
+    "payload": {
+      "event": "payout",
+      "payout": {
+        "id": "p210730t2jboNkN0ft1",
+        "amount": 0.01,
+        "currency": "RUB",
+        "payoutMethod": "SBP",
+        "payoutParams": {
+          "phone": "79191234567",
+          "bankAlias": "RAIFFEISEN",
+          "firstName": "Петр",
+          "middleName": "Петрович",
+          "lastName": "Петров",
+          "inn": "123456789101"
+        },
+        "extra": {
+          "contract": "1234567/89012"
+        },
+        "status": "IN_PROGRESS",
+        "creationDate": "2021-07-30T14:16:31+03:00",
+        "incomeTypeCode": "1"
+      }
+    },
+    "expected_operation_status": "in_progress"
+  }
+}

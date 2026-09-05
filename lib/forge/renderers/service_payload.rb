@@ -57,7 +57,13 @@ module Forge
       def leaf_entry(key, mapping, requisite)
         return ["#{key}: nil, #{format(TODO, mapping.path.join('.'))}", :todo] if mapping.source_expr.nil?
 
-        [["#{key}: #{requisite ? requisite_expr(mapping) : mapping.source_expr}"]]
+        [["#{key}: #{leaf_expr(mapping, requisite)}"]]
+      end
+
+      def leaf_expr(mapping, requisite)
+        return type_value_expr if mapping.source_expr == 'requisite_type'
+
+        requisite ? requisite_expr(mapping) : mapping.source_expr
       end
 
       def with_commas(entries)
@@ -92,13 +98,18 @@ module Forge
       end
 
       def base_entry(mapping)
-        return "#{mapping.provider_field}: requisite_type" if mapping.source_expr == 'requisite_type'
+        return "#{mapping.provider_field}: #{type_value_expr}" if mapping.source_expr == 'requisite_type'
 
         "#{mapping.provider_field}: #{entry_expr(mapping)}"
       end
 
       # Поле без источника внутри варианта → nil с TODO в комментарии не поместится в однострочный Hash: даём nil.
       def entry_expr(mapping) = mapping.source_expr.nil? ? 'nil' : requisite_expr(mapping)
+
+      def type_value_expr
+        values = @plan.fields[:requisite_type_values].to_h.reject { |k, v| k == v }
+        values.empty? ? 'requisite_type' : 'REQUISITE_TYPE_VALUES.fetch(requisite_type, requisite_type)'
+      end
 
       def variant_line(type, mappings)
         merged = mappings.map { |m| "#{m.provider_field}: #{entry_expr(m)}" }.join(', ')

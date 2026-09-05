@@ -3,26 +3,34 @@ aliases:
   amount:        { names: [amount, sum, total, value, money.amount, amount.value, money.value],
                    expr: "%{amount_expr}", transform: amount }
   currency:      { names: [currency, currency_code, ccy, amount.currency, money.currency], expr: "operation.currency" }
-  external_id:   { names: [external_id, merchant_order_id, order_id, reference, client_reference, request_id,
-                           tx_id, transaction_id, merchant_reference, merchant_tx_id, external_reference, client_id],
+  external_id:   { names: [external_id, merchant_order_id, order_id, reference, client_reference, request_id, id,
+                           tx_id, transaction_id, merchant_reference, merchant_tx_id, external_reference, client_id, sender_item_id],
                    expr: "operation.id.to_s", transform: to_s }
-  description:   { names: [description, purpose, comment, narrative, note, memo, statement_descriptor, reason],
+  description:   { names: [description, purpose, comment, narrative, note, memo, statement_descriptor, reason, payment_details,
+                           payment_purpose, details_text],
                    expr: "operation.description || \"Payout #{operation.id}\"" }
   idempotency:   { names: [idempotency_key, idempotence_key, nonce], expr: "operation.idempotency_key" }
   callback_url:  { names: [callback_url, webhook_url, notify_url, notification_url, ipn_url], expr: "callback_url" }
-  credential:    { names: [merchant_id, shop_id, account_id, terminal_id, partner_id, seller_id, source],
+  credential:    { names: [merchant_id, merchant_account, shop_id, account_id, terminal_id, partner_id, seller_id, source, account,
+                           source_account, debit_account, balance_account_id, instructing_balance_account_id],
                    expr: "credentials.fetch('%{name}')", info: credential_field }
   email:         { names: [email, customer_email, payer_email], expr: "operation.customer&.dig('email')" }
   ip:            { names: [ip, ip_address, customer_ip], expr: "operation.customer&.dig('ip')" }
-requisite_container: [recipient, receiver, beneficiary, destination, payee, account, target, details, card, bank, bank_account]
+requisite_container: [recipient, receiver, beneficiary, destination, payee, account, target, details, card, bank, bank_account,
+                      payout_params, payment_params, params, payee_details, recipient_details, counterparty]
 requisite_types: [sbp, card, bank_account, wallet]
-requisite_type:  { names: [type, method, payout_method, payment_method, channel, kind, destination_type] }
+requisite_type:  { names: [type, method, payout_method, payment_method, channel, kind, destination_type, transfer_type] }
+requisite_type_values: { sbp: [sbp, fps, phone], card: [card, cards], bank_account: [bank, bank_account, account, iban, sepa], wallet: [wallet, ewallet] }
 requisite_fields:    # хвост пути → поле реквизита; types — типы реквизитов из docs/CONTRACT.md § 3, где поле встречается
   phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone, types: [sbp, card, wallet] }
-  bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code], field: bank_code, types: [sbp, bank_account] }
+  bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code, bank_alias, bank_member_id], field: bank_code, types: [sbp, bank_account] }
   bank_name:      { names: [bank_name, bank], field: bank_name, types: [sbp, bank_account] }
   number:         { names: [card_number, pan, number, card, card_pan], field: number, types: [card] }
-  holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name], field: holder, types: [card, bank_account] }
+  holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name, owner_name, recipient_name], field: holder, types: [card, bank_account] }
+  first_name:     { names: [first_name, firstname, given_name], field: first_name, types: [sbp, card, bank_account] }
+  last_name:      { names: [last_name, lastname, surname, family_name], field: last_name, types: [sbp, card, bank_account] }
+  middle_name:    { names: [middle_name, middlename, patronymic], field: middle_name, types: [sbp, card, bank_account] }
+  tax_id:         { names: [inn, tax_id, tin, taxpayer_id], field: tax_id, types: [sbp, card, bank_account] }
   expiry_month:   { names: [expiry_month, exp_month, month], field: expiry_month, types: [card] }
   expiry_year:    { names: [expiry_year, exp_year, year], field: expiry_year, types: [card] }
   account_number: { names: [account_number, account, account_no, acct], field: account_number, types: [bank_account] }
@@ -34,7 +42,7 @@ conditional_required_patterns:   # regex по description → required_if
   - "(?:for|when|if|при|для)\\s+(?<field>\\w+)\\s*=\\s*(?<value>\\w+)"
   - "required\\s+(?:only\\s+)?(?:for|when)\\s+(?<field>\\w+)\\s+(?:is|=)\\s*(?<value>\\w+)"
 requisite_defaults:  # канонические реквизиты docs/CONTRACT.md § 3 — значения для fixtures, когда пример спеки их не содержит
-  sbp:          { phone: "79000000000", bank_code: "044525225", bank_name: "Bank" }
+  sbp:          { phone: "79000000000", bank_code: "044525225", bank_name: "Bank", first_name: "Ivan", last_name: "Ivanov", middle_name: "Ivanovich", tax_id: "123456789012" }
   card:         { number: "4111111111111111", holder: "CARD HOLDER", expiry_month: 12, expiry_year: 2030, phone: "79000000000" }
   bank_account: { account_number: "40817810000000000001", bank_code: "044525225", bank_name: "Bank", iban: "DE89370400440532013000",
                   bic: "COBADEFFXXX", holder: "ACCOUNT HOLDER", country: "DE" }

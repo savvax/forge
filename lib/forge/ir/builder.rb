@@ -53,9 +53,12 @@ module Forge
         end
       end
 
+      # OpenAPI 3.1 `webhooks` и распространённое расширение 3.0 `x-webhooks` (Redoc-стиль).
       def webhooks
-        @hash['webhooks'].to_h.flat_map do |name, item|
-          operations(item, "#/webhooks/#{escape(name)}", name, :webhooks)
+        %w[webhooks x-webhooks].flat_map do |key|
+          @hash[key].to_h.flat_map do |name, item|
+            operations(item, "#/#{escape(key)}/#{escape(name)}", name, :webhooks)
+          end
         end
       end
 
@@ -108,10 +111,12 @@ module Forge
       end
 
       # `examples: {name: {value: ...}}` + `example: ...` → {name => value}.
+      # `examples` + `example` + расширение `x-examples` ({name: {...}} или {name: {value: ...}}).
       def examples(media)
         return {} unless media.is_a?(Hash)
 
-        named = media['examples'].to_h.transform_values { |e| e.is_a?(Hash) && e.key?('value') ? e['value'] : e }
+        raw = media['examples'].to_h.merge(media['x-examples'].to_h)
+        named = raw.transform_values { |e| e.is_a?(Hash) && e.key?('value') ? e['value'] : e }
         media.key?('example') ? named.merge('example' => media['example']) : named
       end
 

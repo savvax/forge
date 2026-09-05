@@ -39,7 +39,7 @@ jobs:
     needs: test
     strategy:
       matrix:
-        provider: [novapay, cardpay, swiftpay]
+        provider: [novapay, cardpay, swiftpay, raiffeisen]
     steps:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1

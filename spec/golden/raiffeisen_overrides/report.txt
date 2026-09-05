@@ -1,0 +1,44 @@
+Parsing spec... ok (openapi 3.0.0, API интеграции выплат 1.0)
+Found 6 endpoints: GET /payout/v1/sbp/banks, POST /payout/v1/payouts, POST /payout/v1/payouts/draft,
+                   GET /payout/v1/payouts/{id}, PUT /payout/v1/payouts/{id},
+                   POST /settings/v1/callback
+  create   POST /payout/v1/payouts                    post-payout-v1-payouts   confidence 0.95
+  status   GET /payout/v1/payouts/{id}                get-payout-v1-payouts-id confidence 0.90
+  webhook  POST newPay                                сallbackTransaction      confidence 0.95
+Auth:  (bearer, header: Authorization) → credentials.token
+Statuses (status.value): IN_PROGRESS, PENDING, WAITING_CONFIRMATION → in_progress; COMPLETED → approved; DECLINED → rejected
+Errors: none described
+Webhook signature: X-Api-Signature-SHA256 (HMAC-SHA256, fields, hex) → credentials.callback_secret
+Webhook events: event → status from payout.status
+Amount: number, major units (×100) — source: amount (number) → major units: 'Сумма в рублях.
+Действует несколько лимитов от НСПК:
+1. Ограничение до 600000 на одну операцию
+2. Ограничение в 1000000 в сутки в пользу одного получателя.
+Можно сделать 3 платежа на одинаковую сумму, например по 400000, главное что бы первые 2 платежа в общей сумме не превысили лимит в 1000000'
+Fields: 13 request fields, 0 unmapped (payoutParams: sbp)
+Generating service...
+Generating integration guide...
+Generating test fixtures...
+Generating service spec...
+Generating mock server...
+Verifying generated code... ok (ruby -c ×3, rspec skipped: --no-verify)
+Output:
+  ./raiffeisen_service.rb
+  ./INTEGRATION.md
+  ./fixtures.json
+  ./raiffeisen_service_spec.rb
+  ./mock_server.rb
+  ./report.txt
+Info (12):
+  INFO         webhook_source_webhooks    webhook taken from webhooks: POST newPay (сallbackTransaction)
+  INFO         override_applied           endpoints.post-payout-v1-payouts-draft → other
+  INFO         outside_contract           GET /payout/v1/sbp/banks (get-payout-v1-sbp-banks) — not used
+  INFO         outside_contract           POST /payout/v1/payouts/draft (post-payout-v1-payouts-draft) — not used
+  INFO         outside_contract           PUT /payout/v1/payouts/{id} (put-payout-v1-payouts-id) — not used
+  INFO         outside_contract           POST /settings/v1/callback (post-settings-v1-callback) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+  INFO         override_applied           statuses.WAITING_CONFIRMATION → in_progress
+  INFO         override_applied           webhook → signature_header, signature_algorithm, signature_encoding, signature_payload
+  INFO         override_applied           fields.incomeTypeCode → source
+  … and 2 more (see --format json)
+Done: 6 files, 0 warnings, 0 unsupported. Exit 0.

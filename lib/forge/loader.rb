@@ -60,7 +60,13 @@ module Forge
       paths = spec['paths']
       return if paths.is_a?(Hash) && !paths.empty?
 
-      raise error('no paths', 'the document must declare at least one path', '#/paths')
+      raise error('no paths', no_paths_hint(spec), '#/paths')
+    end
+
+    def no_paths_hint(spec)
+      return 'the document must declare at least one path' unless spec.key?('webhooks') || spec.key?('x-webhooks')
+
+      'this document describes only webhooks; payout endpoints (paths) are needed'
     end
 
     def validate_version(version)

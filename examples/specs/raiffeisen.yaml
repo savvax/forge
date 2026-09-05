@@ -1,0 +1,944 @@
+openapi: 3.0.0
+info:
+  version: '1.0'
+  title: API интеграции выплат
+  contact:
+    email: ecom@raiffeisen.ru
+    name: Support e-mail
+  x-logo:
+    url: images/raifflogo.png
+    backgroundColor: '#FFFFFF'
+    altText: Raiff logo
+  description: |-
+    Свои предложения и идеи о документации можно оставить в репозитории по адресу: https://github.com/Raiffeisen-DGTL/ecom-API/blob/master/payout.yml
+
+    # Описание API
+    Bзаимодействие осуществляется по протоколу HTTP с использованием методов GET/POST (в описании каждого запроса явно указан требуемый метод и адрес).
+
+    POST-запросы используют JSON-аргументы, GET-запросы работают со строками запросов.
+
+    API всегда возвращает ответ в формате JSON, независимо от типа запроса.
+
+    Ответ любого метода содержит код сообщения (code). Если в процессе обработки любого запроса произойдет логическая ошибка, API вернет дополнительно описание ошибки (message).
+
+    # Общие схемы работы
+
+    ## Одностадийная обработка
+    При получении запроса на выплату, банк сразу проводит все проверки и в случае возможности проведения операции, выполняет выплату.
+
+    <a href='images/subscriptions.png' target='_blank'><img src='images/Payout_scheme.png'></a>
+
+    ## Двухстадийная обработка
+
+    При двухстадийной обработке создается заявка на выплату, банк делает проверку возможности проведения такой операции и возвращает результат. Далее ожидается подтверждение выплаты со стороны партнера.
+
+    <a href='images/subscriptions.png' target='_blank'><img src='images/Payout_2_scheme.png'></a>
+
+    # Авторизация
+    Авторизация производится посредством секретного ключа API (secretKey). Параметр авторизации указывается в заголовке Authorization, значение которого формируется как "Bearer secretKey".
+
+    Так же настраивается список IP с которых система будет пропускать запросы.
+servers:
+  - url: 'https://test.ecom.raiffeisen.ru/api'
+    description: Sandbox
+  - url: 'https://e-commerce.raiffeisen.ru/api'
+    description: Production
+tags:
+  - name: api-controller
+    x-displayName: Работа с выплатами
+    description: |
+      Для реализации взаимодействия с партнёром Райффайзенбанк предоставляет API из следующих запросов:
+        * получение списка банков, принимающих выплаты по СБП,
+        * запрос на проведение выплаты,
+        * получение статуса выплаты
+
+      Банки, подключенные к приему выплат по СБП вы сможете посмотреть на сайте https://sbp.nspk.ru/participants/ в разделе "Оплата по QR".
+
+      Мы автоматически поддерживаем актуальный список и возвращаем его для вас в запросе на получение банков частников.
+  - name: Callback
+    x-displayName: Уведомления
+    description: |
+      Для информирования ТСП о проведенных операциях могут использоваться HTTP-уведомления на адрес, указанный в его настройках.
+
+      Для партнёра уведомление представляет собой входящий POST-запрос, который использует JSON-структуру.
+
+      Уведомление считается принятым, если получатель ответил на запрос кодом HTTP 200.
+
+      Ответы с любыми другими HTTP-кодами будут считаться невалидными.
+
+      Повторные попытки отправки будут проводиться в течение суток с нарастающим интервалом.
+
+      Для проверки подлинности уведомления к данным добавляется подпись в заголовке  X-Api-Signature-SHA256, полученная на основе общего секретного ключа и контрольной строки (amount|id|statusValue|statusDate) с помощью HMAC-SHA-256.
+
+      Уведомления отправляются с IP 193.28.44.23
+  - name: Registry
+    x-displayName: Реестр
+    description: |
+      Для подключения отправки реестров необходимо написать на ecom@raiffeisen.ru
+
+      Реестры по операциям отправляются на ежедневной основе.
+
+      В случае отсуствия операций за день, реестр на следующий день не отправляется.
+
+      Формат реестра:
+
+      Наименование колонки | Значение
+      --------|------------------
+      Мерчант | Идентификатор в системе СБП
+      Дата операции МСК | Дата и время проведения операции
+      Тип | Тип операции
+      id заказа | Id операции в системе партнера (id)
+      id возврата |  Не используется
+      Комментарий | Комментарий к заказу
+      Способ оплаты | Instant Payment QR
+      Данные оплаты | PAYOUT
+      id клиента | Маскированный код получателя
+      Сумма | Сумма транзакции
+      Комиссия | Комиссия по транзакции
+      Дополнительные поля | Дополнительная информация (Пока не используется)
+
+      <a download='' target='_blank' href='images/SBPPayoutReport.csv'>Пример реестра</a>
+  - name: Statement
+    x-displayName: Выписка
+    description: |
+      Выписку может выгрузить в банк-клиенте в разных форматах.
+
+      <a download='' target='_blank' href='images/test_statement_payout.pdf'>Пример выписки</a>
+
+      В назначение платежа есть системиный префикс: номер проводки , тип операции , идентификатор мерчанта НСПК.
+
+      В примерах выписки указаны стандартные назначение платежа, вы можете его изменить, для этого необходимо при выплате передавать параметр paymentDetails с вашими данными, при этом  ваше значение будет идти после системного префикса.
+  - name: 09.09.2021
+    x-displayName: 09.09.2021
+    description: |
+      * Исправлена длина параметра paymentDetails
+x-tagGroups:
+  - name: API
+    tags:
+      - api-controller
+      - Callback
+  - name: Сверка
+    tags:
+      - Registry
+      - Statement
+  - name: История изменений
+    tags:
+      - 09.09.2021
+paths:
+  /payout/v1/sbp/banks:
+    get:
+      summary: Получение списка банков
+      tags:
+        - api-controller
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/banksList'
+              examples:
+                Payload:
+                  value:
+                    - alias: RAIFFEISEN
+                      name: Райффайзенбанк
+                    - alias: TINKOFF
+                      name: Тинькофф
+                    - alias: VTB
+                      name: ВТБ
+      operationId: get-payout-v1-sbp-banks
+      description: 'Получение списка банков, принимающих выплаты по СБП'
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+    parameters: []
+  /payout/v1/payouts:
+    post:
+      tags:
+        - api-controller
+      operationId: post-payout-v1-payouts
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payoutResponse'
+              examples:
+                '200':
+                  value:
+                    id: 1404fhr7i272a2
+                    account: '40700000000000000000'
+                    amount: 1110.01
+                    currency: RUB
+                    payoutMethod: SBP
+                    payoutParams:
+                      phone: '79191234567'
+                      bankAlias: RAIFFEISEN
+                      firstName: Петр
+                      middleName: Петрович
+                      lastName: Петров
+                      inn: 123456789101
+                    incomeTypeCode: '1'
+                    extra:
+                      contract: 1234567/89012
+                    status:
+                      value: IN_PROGRESS
+                      date: '2019-07-11T17:45:13+03:00'
+                    createDate: '2019-07-11T17:45:13+03:00'
+      description: Проведение выплаты
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/payoutRequest'
+            examples:
+              Payload:
+                value:
+                  id: 1404fhr7i272a2
+                  account: '40700000000000000000'
+                  amount: 1110.01
+                  currency: RUB
+                  paymentDetails: Выплата от страховой компании
+                  payoutMethod: SBP
+                  payoutParams:
+                    phone: '79191234567'
+                    bankAlias: RAIFFEISEN
+                    firstName: Петр
+                    middleName: Петрович
+                    lastName: Петров
+                    inn: 123456789101
+                  incomeTypeCode: '1'
+                  extra:
+                    contract: 1234567/89012
+        description: ''
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Content-type: '
+          description: application/json
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+      summary: Проведение выплаты
+  /payout/v1/payouts/draft:
+    post:
+      summary: Создание заявки на выплату
+      tags:
+        - api-controller
+      operationId: post-payout-v1-payouts-draft
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payoutResponse'
+              examples:
+                '200':
+                  value:
+                    id: 1404fhr7i272a2
+                    account: '40700000000000000000'
+                    amount: 1110.01
+                    currency: RUB
+                    payoutMethod: SBP
+                    payoutParams:
+                      phone: '79191234567'
+                      bankAlias: RAIFFEISEN
+                      firstName: Петр
+                      middleName: Петрович
+                      lastName: Петров
+                      inn: 123456789101
+                    incomeTypeCode: '1'
+                    extra:
+                      contract: 1234567/89012
+                    status:
+                      value: PENDING
+                      date: '2019-07-11T17:45:13+03:00'
+                    createDate: '2019-07-11T17:45:13+03:00'
+      x-internal: false
+      description: Метод позволяет создавать заявку на выплату для двухстадийного взаимодействия
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Content-type:'
+          description: application/json
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/payoutRequest'
+            examples:
+              Payload:
+                value:
+                  id: 1404fhr7i272a2
+                  account: '40700000000000000000'
+                  amount: 1110.01
+                  currency: RUB
+                  paymentDetails: Выплата от страховой компании
+                  payoutMethod: SBP
+                  payoutParams:
+                    phone: '79191234567'
+                    bankAlias: RAIFFEISEN
+                    firstName: Петр
+                    middleName: Петрович
+                    lastName: Петров
+                    inn: 123456789101
+                  incomeTypeCode: '1'
+                  extra:
+                    contract: 1234567/89012
+        description: ''
+  '/payout/v1/payouts/{id}':
+    parameters:
+      - schema:
+          type: string
+          maxLength: 20
+          format: '^[Aa-Zz0-9_-]'
+        name: id
+        in: path
+        required: true
+        description: id выплаты
+    get:
+      summary: Получение информации по платежу
+      tags:
+        - api-controller
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/payoutResponse'
+              examples:
+                COMPLETED:
+                  value:
+                    id: 1404fhr7i272a2
+                    account: '40700000000000000000'
+                    amount: 1110.01
+                    currency: RUB
+                    payoutMethod: SBP
+                    payoutParams:
+                      phone: '79191234567'
+                      bankAlias: RAIFFEISEN
+                      firstName: Петр
+                      middleName: Петрович
+                      lastName: Петров
+                      inn: 123456789101
+                    incomeTypeCode: '1'
+                    extra:
+                      contract: 1234567/89012
+                    status:
+                      value: COMPLETED
+                      date: '2019-07-11T17:45:13+03:00'
+                    createDate: '2019-07-11T17:45:13+03:00'
+                DECLINED:
+                  value:
+                    id: 1404fhr7i272a2
+                    account: '40700000000000000000'
+                    amount: 1110.01
+                    currency: RUB
+                    payoutMethod: SBP
+                    payoutParams:
+                      phone: '79191234567'
+                      bankAlias: RAIFFEISEN
+                      firstName: Петр
+                      middleName: Петрович
+                      lastName: Петров
+                      inn: 123456789101
+                    incomeTypeCode: '1'
+                    extra:
+                      contract: 1234567/89012
+                    status:
+                      value: DECLINED
+                      declineReason: RECEIVER_ACCOUNT_ERROR
+                      date: '2019-07-11T17:45:13+03:00'
+                    createDate: '2019-07-11T17:45:13+03:00'
+      operationId: get-payout-v1-payouts-id
+      description: Получение информации по платежу
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+    put:
+      summary: Подтверждение выплаты
+      tags:
+        - api-controller
+      operationId: put-payout-v1-payouts-id
+      responses:
+        '200':
+          description: OK
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Content-type:'
+          description: application/json
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+      description: 'Подтверждение платежа , при двухстадийной выплате.'
+  /settings/v1/callback:
+    post:
+      summary: Настройка url для callback
+      operationId: post-settings-v1-callback
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/callbackSettings'
+              examples:
+                '200':
+                  value:
+                    callbackUrl: 'https://yoururl.ru'
+      description: Метод позволяет настроить url для получения уведомлений.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/callbackSettings'
+            examples:
+              Payload:
+                value:
+                  callbackUrl: 'https://yoururl.ru'
+        description: ''
+      tags:
+        - Callback
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: 'Content-type:'
+          description: application/json
+          required: true
+        - schema:
+            type: string
+          in: header
+          name: 'Authorization:'
+          required: true
+          description: '[secretKey](#section/Avtorizaciya)'
+x-webhooks:
+  newPay:
+    post:
+      summary: Уведомление о платеже
+      operationId: сallbackTransaction
+      tags:
+        - Callback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/paymentsNotification'
+      x-examples:
+        event:
+          event: payout
+          payout:
+            id: p210730t2WjboNkN0ft1
+            amount: 0.01
+            currency: RUB
+            payoutMethod: SBP
+            payoutParams:
+              phone: '79267016490'
+              bankAlias: RAIFFEISEN
+              firstName: Сергей
+              middleName: Сергеевич
+              lastName: Брюзгин
+            extra:
+              contract: 1234567/89012
+            status:
+              value: COMPLETED
+              date: '2021-07-30T14:16:32+03:00'
+            creationDate: '2021-07-30T14:16:31+03:00'
+components:
+  schemas:
+    paymentsNotification:
+      description: Уведомление о выплате
+      type: object
+      x-examples:
+        event:
+          event: payout
+          payout:
+            id: p210730t2WjboNkN0ft1
+            amount: 0.01
+            currency: RUB
+            payoutMethod: SBP
+            payoutParams:
+              phone: '79267016490'
+              bankAlias: RAIFFEISEN
+              firstName: Сергей
+              middleName: Сергеевич
+              lastName: Брюзгин
+            extra:
+              contract: 1234567/89012
+            status:
+              value: COMPLETED
+              date: '2021-07-30T14:16:32+03:00'
+            creationDate: '2021-07-30T14:16:31+03:00'
+          value:
+            event: payout
+            payout:
+              id: p210730t2jboNkN0ft1
+              amount: 0.01
+              currency: RUB
+              payoutMethod: SBP
+              payoutParams:
+                phone: '79191234567'
+                bankAlias: RAIFFEISEN
+                firstName: Петр
+                middleName: Петрович
+                lastName: Петров
+                inn: 123456789101
+              extra:
+                contract: 1234567/89012
+              status:
+                value: COMPLETED
+                date: '2021-07-30T14:16:32+03:00'
+              creationDate: '2021-07-30T14:16:31+03:00'
+              incomeTypeCode: '1'
+      title: paymentNotification
+      properties:
+        event:
+          type: string
+          description: Тип уведомления
+          example: payout
+        payout:
+          type: object
+          required:
+            - id
+            - amount
+            - currency
+            - payoutMethod
+            - payoutParams
+            - status
+            - creationDate
+          properties:
+            id:
+              type: string
+              description: Уникальныйидентификатор операции
+              format: Aa-Zz0-9_-
+              example: p210730t2jboNkN0ft1
+            amount:
+              type: number
+              description: Сумма в рублях
+              example: 0.01
+            currency:
+              type: string
+              description: Валюта платежа
+              enum:
+                - RUB
+              example: RUB
+            payoutMethod:
+              type: string
+              description: Тип выплаты
+              enum:
+                - SBP
+              example: SBP
+            payoutParams:
+              type: object
+              required:
+                - phone
+                - bankAlias
+              properties:
+                phone:
+                  type: string
+                  description: Номер телефона получателя
+                  maxLength: 15
+                  example: '79191234567'
+                bankAlias:
+                  type: string
+                  description: Код банка получателя из запроса списка банков
+                  maxLength: 255
+                  example: RAIFFEISEN
+                firstName:
+                  type: string
+                  description: Имя получателя
+                  example: Петр
+                middleName:
+                  type: string
+                  description: Отчество получателя
+                  example: Петрович
+                lastName:
+                  type: string
+                  description: Фамилия получателя
+                  example: Петров
+                inn:
+                  type: string
+                  description: ИНН получателя
+                  example: '123456789101'
+            extra:
+              type: object
+              description: Дополнительные данные
+              example: {"contract":"1234567/89012"}
+            status:
+              type: object
+              required:
+                - value
+                - date
+              properties:
+                value:
+                  type: string
+                  description: Статус
+                  enum:
+                    - COMPLETED
+                  example: COMPLETED
+                date:
+                  type: string
+                  description: Дата проведения операции
+                  example: '2021-07-30T14:16:32+03:00'
+            creationDate:
+              type: string
+              description: Дата создания заявки
+              example: '2021-07-30T14:16:31+03:00'
+            incomeTypeCode:
+              type: string
+              description: 'Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/cons_doc_LAW_353568/527cf8edd2262cb7068cafd44ed596d9a05dd237/)'
+              example: '1'
+      required:
+        - event
+        - payout
+    payoutRequest:
+      description: ''
+      type: object
+      x-examples:
+        Payload:
+          id: 1404fhr7i272a2
+          account: '40700000000000000000'
+          amount: 1110.01
+          currency: RUB
+          paymentDetails: Выплата от страховой компании
+          payoutMethod: SBP
+          payoutParams:
+            phone: '79191234567'
+            bankAlias: RAIFFEISEN
+            firstName: Петр
+            middleName: Петрович
+            lastName: Петров
+            inn: '12345678910'
+          incomeTypeCode: '1'
+          extra:
+            contract: 1234567/89012
+          value:
+            id: 1404fhr7i272a2
+            account: '40700000000000000000'
+            amount: 1110.01
+            currency: RUB
+            paymentDetails: Выплата от страховой компании
+            payoutMethod: SBP
+            payoutParams:
+              phone: '79191234567'
+              bankAlias: RAIFFEISEN
+              firstName: Петр
+              middleName: Петрович
+              lastName: Петров
+              inn: 123456789101
+            incomeTypeCode: '1'
+            extra:
+              contract: 1234567/89012
+      title: payoutRequest
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: 'Уникальный идентификатор выплаты в вашей системе, используется как номер документа в выписке'
+          format: '^[Aa-Zz0-9_-]+'
+        account:
+          type: string
+          description: Счет с которого будет происходить списание
+          maxLength: 20
+        amount:
+          type: number
+          description: |-
+            Сумма в рублях.
+            Действует несколько лимитов от НСПК:
+            1. Ограничение до 600000 на одну операцию
+            2. Ограничение в 1000000 в сутки в пользу одного получателя.
+            Можно сделать 3 платежа на одинаковую сумму, например по 400000, главное что бы первые 2 платежа в общей сумме не превысили лимит в 1000000
+        currency:
+          type: string
+          description: Валюта платежа
+          maxLength: 3
+          minLength: 3
+          enum:
+            - RUB
+        paymentDetails:
+          type: string
+          minLength: 1
+          description: Назначение платежа
+          maxLength: 140
+        payoutMethod:
+          type: string
+          minLength: 1
+          description: Тип выплаты
+          enum:
+            - SBP
+        payoutParams:
+          type: object
+          required:
+            - phone
+            - bankAlias
+          properties:
+            phone:
+              type: string
+              minLength: 1
+              description: Номер телефона получателя
+              maxLength: 15
+            bankAlias:
+              type: string
+              minLength: 1
+              description: Код банка получателя из запроса списка банков
+              maxLength: 255
+            firstName:
+              type: string
+              minLength: 1
+              description: Имя получателя
+              maxLength: 140
+            middleName:
+              type: string
+              minLength: 1
+              description: Фамилия получателя
+              maxLength: 140
+            lastName:
+              type: string
+              minLength: 1
+              description: Отчество получателя
+              maxLength: 140
+            inn:
+              description: ИНН получателя
+              type: number
+        incomeTypeCode:
+          type: string
+          minLength: 1
+          description: 'Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/cons_doc_LAW_353568/527cf8edd2262cb7068cafd44ed596d9a05dd237/)'
+          enum:
+            - '1'
+            - '2'
+            - '3'
+        extra:
+          type: object
+          description: Дополнительные данные
+      required:
+        - account
+        - amount
+        - currency
+        - payoutMethod
+        - payoutParams
+    payoutResponse:
+      description: ''
+      type: object
+      x-examples:
+        '200':
+          id: 1404fhr7i272a2
+          account: '40700000000000000000'
+          amount: 1110.01
+          currency: RUB
+          payoutMethod: SBP
+          payoutParams:
+            phone: '79191234567'
+            bankAlias: RAIFFEISEN
+            firstName: Петр
+            middleName: Петрович
+            lastName: Петров
+          incomeTypeCode: '1'
+          extra:
+            contract: 1234567/89012
+          status:
+            value: IN_PROGRESS
+            date: '2019-07-11T17:45:13+03:00'
+          createDate: '2019-07-11T17:45:13+03:00'
+          value:
+            id: 1404fhr7i272a2
+            account: '40700000000000000000'
+            amount: 1110.01
+            currency: RUB
+            payoutMethod: SBP
+            payoutParams:
+              phone: '79191234567'
+              bankAlias: RAIFFEISEN
+              firstName: Петр
+              middleName: Петрович
+              lastName: Петров
+              inn: 123456789101
+            incomeTypeCode: '1'
+            extra:
+              contract: 1234567/89012
+            status:
+              value: PENDING
+              date: '2019-07-11T17:45:13+03:00'
+            createDate: '2019-07-11T17:45:13+03:00'
+      title: payoutResponse
+      properties:
+        id:
+          type: string
+          minLength: 1
+          description: 'Уникальный идентификатор выплаты в вашей системе, используется как номер документа в выписке'
+        account:
+          type: string
+          minLength: 1
+          description: Счет с которого будет происходить списание
+        amount:
+          type: number
+          description: Сумма в рублях
+        currency:
+          type: string
+          minLength: 3
+          description: Валюта платежа
+          maxLength: 3
+          enum:
+            - RUB
+        payoutMethod:
+          type: string
+          minLength: 1
+          description: Тип выплаты
+          enum:
+            - SBP
+        payoutParams:
+          type: object
+          required:
+            - phone
+            - bankAlias
+          properties:
+            phone:
+              type: string
+              minLength: 1
+              description: Номер телефона получателя
+            bankAlias:
+              type: string
+              minLength: 1
+              description: Код банка получателя из запроса списка банков
+            firstName:
+              type: string
+              minLength: 1
+              description: Имя получателя
+            middleName:
+              type: string
+              minLength: 1
+              description: Фамилия получателя
+            lastName:
+              type: string
+              minLength: 1
+              description: Отчество получателя
+            inn:
+              type: number
+              description: ИНН получателя
+        incomeTypeCode:
+          type: string
+          minLength: 1
+          description: 'Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/cons_doc_LAW_353568/527cf8edd2262cb7068cafd44ed596d9a05dd237/)'
+          enum:
+            - '1'
+            - '2'
+            - '3'
+        extra:
+          type: object
+          description: Дополнительные данные
+        status:
+          type: object
+          required:
+            - value
+            - date
+          properties:
+            value:
+              type: string
+              minLength: 1
+              description: Статус
+              enum:
+                - COMPLETED
+                - DECLINED
+                - IN_PROGRESS
+                - PENDING
+                - WAITING_CONFIRMATION
+            date:
+              type: string
+              minLength: 1
+              description: Дата
+            declineReason:
+              type: string
+              description: Причина отклонения операции
+              enum:
+                - SYSTEM_ERROR
+                - TIMEOUT
+                - BANK_NOT_SUPPORTED
+                - RECEIVER_ACCOUNT_ERROR
+                - WRONG_RECIPIENT
+        createDate:
+          type: string
+          minLength: 1
+          description: Дата создания
+      required:
+        - id
+        - account
+        - amount
+        - currency
+        - payoutMethod
+        - payoutParams
+        - status
+        - createDate
+    callbackSettings:
+      description: ''
+      type: object
+      properties:
+        callbackUrl:
+          type: string
+          minLength: 1
+      required:
+        - callbackUrl
+      x-examples:
+        Payload:
+          callbackUrl: 'https://yoururl.ru'
+          value:
+            callbackUrl: 'https://yoururl.ru'
+      title: callBackSettings
+    banksList:
+      type: array
+      description: ''
+      minItems: 1
+      uniqueItems: true
+      x-examples:
+        '200':
+          - alias: RAIFFEISEN
+            name: Райффайзенбанк
+          - alias: TINKOFF
+            name: Тинькофф
+          - alias: VTB
+            name: ВТБ
+      items:
+        type: object
+        properties:
+          alias:
+            type: string
+            minLength: 1
+            description: Алиас банка
+            maxLength: 255
+          name:
+            type: string
+            minLength: 1
+            description: Наименование банка
+            maxLength: 255
+        required:
+          - alias
+          - name

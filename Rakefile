@@ -16,12 +16,14 @@ require 'uri'
 SPECS = {
   'novapay' => 'examples/specs/novapay.yaml',
   'cardpay' => 'examples/specs/cardpay.yaml',
-  'swiftpay' => 'examples/specs/swiftpay.json'
+  'swiftpay' => 'examples/specs/swiftpay.json',
+  'raiffeisen' => 'examples/specs/raiffeisen.yaml'
 }.freeze
 
 OVERRIDES = {
   'cardpay' => 'examples/overrides/cardpay.yml',
-  'swiftpay' => 'examples/overrides/swiftpay.yml'
+  'swiftpay' => 'examples/overrides/swiftpay.yml',
+  'raiffeisen' => 'examples/overrides/raiffeisen.yml'
 }.freeze
 
 # Реальные спеки провайдеров (docs/REAL_SPECS.md). Скачиваются в examples/real/, в git не попадают.

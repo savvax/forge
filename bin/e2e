@@ -128,11 +128,18 @@ class E2E
   end
 
   def check(name, result)
-    fail!("#{name}: #{result.code} #{result.data}") if result.failed?
+    if result.failed?
+      detail = result.data[:message] || result.data
+      hint = 'fields marked TODO in build_payout_payload need a source (overrides.yml)'
+      fail!("#{name}: #{result.code} — #{detail}\n  hint: #{hint}")
+    end
     step "#{name} ok" if name == 'check_conditions'
   end
 
   def simulate_and_callback
+    unless @plan.webhook
+      fail!('no webhook in the spec: process_callback is a stub; status must be polled via fetch_status')
+    end
     simulate(@plan.event_map.key('approved') || @plan.status_map.key('approved') || fail!('no approved event'))
     hook = wait_hook
     step "webhook received: #{hook[:line].strip}"

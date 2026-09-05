@@ -96,7 +96,7 @@ CLI: `lib/forge/cli.rb` (Thor) → `lib/forge/generate_command.rb` (конвей
 
 ### 2.4 Сгенерированный вывод (`spec/golden/<provider>/`)
 
-Для `novapay`, `cardpay`, `cardpay_overrides`, `swiftpay`, `swiftpay_overrides`: `<p>_service.rb`,
+Для `novapay`, `cardpay`, `cardpay_overrides`, `swiftpay`, `swiftpay_overrides`, `raiffeisen`, `raiffeisen_overrides`: `<p>_service.rb`,
 `<p>_extras.rb` (если есть cancel/balance), `<p>_service_spec.rb`, `generated_spec_helper.rb`, `INTEGRATION.md`,
 `fixtures.json`, `mock_server.rb`, `report.txt`. Golden для NovaPay-сервиса совпадает с целевым текстом `docs/OUTPUT_FORMAT.md` § 1.
 

@@ -43,12 +43,21 @@ module Forge
       def container?(name, prop, requisite)
         return false unless prop.type == 'object'
 
-        @dict['requisite_container'].include?(name) || (requisite && @dict['requisite_types'].include?(name))
+        key = Rules.normalize(name)
+        @dict['requisite_container'].include?(key) || (requisite && @dict['requisite_types'].include?(key))
+      end
+
+      # Значение enum поля типа → канонический тип (SBP → sbp, iban → bank_account); nil, если не из словаря.
+      def canonical_type(value)
+        key = Rules.normalize(value)
+        return key if @dict['requisite_types'].include?(key)
+
+        @dict.fetch('requisite_type_values', {}).find { |_type, aliases| aliases.include?(key) }&.first
       end
 
       def walk_container(path, prop, requisite)
         @container ||= path.join('.')
-        type = @dict['requisite_types'].include?(path.last) ? path.last : requisite
+        type = @dict['requisite_types'].include?(Rules.normalize(path.last)) ? Rules.normalize(path.last) : requisite
         narrow(backfill(walk(prop, path, prop.required.to_a, type || :any)))
       end
 
@@ -113,6 +122,7 @@ module Forge
 
       def leaf(path, prop, req, requisite)
         return requisite_leaf(path, prop, req, requisite) if requisite
+        return mapping(path, 'requisite_type', req, prop, 0.95) if path.size == 1 && canonical_type_field?(path, prop)
 
         rule = alias_rule(path)
         return unmapped(path, prop, req) unless rule
@@ -154,7 +164,7 @@ module Forge
 
       # enum поля `type` без канонических значений (auLocal, iban…) — это не выбор типа реквизитов.
       def canonical_type_field?(path, prop)
-        type_field?(path) && (prop.enum.nil? || prop.enum.map(&:to_s).intersect?(@dict['requisite_types']))
+        type_field?(path) && (prop.enum.nil? || prop.enum.any? { |v| canonical_type(v) })
       end
 
       # :any → тип известен, только если поле встречается ровно в одном типе реквизитов (CONTRACT § 3).
