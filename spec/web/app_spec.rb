@@ -48,6 +48,13 @@ RSpec.describe Forge::Web::App do
     expect(page).not_to include('.rb:')
   end
 
+  it 'rejects a form without any spec source with a readable message' do
+    res = client.post('/runs', params: { 'example' => '', 'spec_text' => '' })
+    expect(res.status).to eq(200)
+    expect(res.body).to include('spec is required')
+    expect(res.body).not_to include('.rb:')
+  end
+
   it 'runs the generated spec and e2e on demand' do
     id = create_run
     client.post("/runs/#{id}/spec")

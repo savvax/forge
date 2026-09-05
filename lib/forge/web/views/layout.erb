@@ -18,10 +18,17 @@
   </main>
   <script>
     // Показать имя выбранного файла в drop-зоне (без библиотек).
-    document.querySelectorAll('.drop input[type=file]').forEach(function (input) {
+    document.querySelectorAll('.drop').forEach(function (label) {
+      var input = label.querySelector('input[type=file]'), title = label.querySelector('.drop-title');
       input.addEventListener('change', function () {
-        var label = input.closest('.drop'), title = label.querySelector('.drop-title');
         if (input.files.length) { title.textContent = input.files[0].name; label.classList.add('has-file'); }
+      });
+      // Drag&drop: положить файл в input, иначе форма уйдёт без спеки.
+      label.addEventListener('dragover', function (e) { e.preventDefault(); label.classList.add('over'); });
+      label.addEventListener('dragleave', function () { label.classList.remove('over'); });
+      label.addEventListener('drop', function (e) {
+        e.preventDefault(); label.classList.remove('over');
+        if (e.dataTransfer.files.length) { input.files = e.dataTransfer.files; input.dispatchEvent(new Event('change')); }
       });
     });
   </script>

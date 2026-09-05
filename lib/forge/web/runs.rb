@@ -62,6 +62,8 @@ module Forge
       def prepare(params)
         FileUtils.mkdir_p(File.join(@dir, 'input'))
         spec = save_upload(params[:spec], params[:spec_text], params[:example], 'spec')
+        raise ArgumentError, 'spec is required: upload a file, pick an example or paste the text' unless spec
+
         overrides = save_upload(params[:overrides], params[:overrides_text], params[:overrides_example], 'overrides')
         write_meta('spec' => spec, 'spec_name' => @spec_name, 'overrides' => overrides,
                    'provider_name' => blank_to_nil(params[:provider]),
