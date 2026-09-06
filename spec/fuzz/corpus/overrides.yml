@@ -1,0 +1,70 @@
+# Враждебные overrides.yml для rake fuzz:web (имя → текст файла).
+---
+ov_empty: ''
+ov_string: hello
+ov_array: |
+  - a
+  - b
+ov_ruby: "!ruby/object:Object {}\n"
+ov_bad_yaml: 'a: [
+
+  '
+ov_unknown: 'statuz: {}
+
+  '
+ov_types: |
+  statuses: nope
+  amount: nope
+  fields: nope
+  endpoints: nope
+  auth: nope
+  webhook: nope
+  errors: nope
+  provider: nope
+  base_url: nope
+  paths: nope
+  events: nope
+ov_types2: |
+  statuses: [1,2]
+  amount: {unit: 5, multiplier: nope, minimum_major: [1]}
+  fields: {amount: nope, 'a.b': {required: nope, required_if: 5, source: [1], variant: {}}, 5: {required: true}}
+  endpoints: {create: 5, status: nope, cancel: [1], webhook: {}, foo: bar}
+  auth: {type: 5, header: [1], prefix: {}, credential_key: null}
+  webhook: {signature_header: 5, signature_algorithm: nope, signature_encoding: 5, signature_payload: [1], event_field: {}, id_field: null, status_field: 5}
+  errors: [1]
+  provider: {name: 5, class_name: []}
+  base_url: {default: 5, production: [], env_var: {}}
+  paths: {include: nope}
+  events: [1]
+ov_types3: |
+  statuses: {pending: 5, completed: nope, failed: [1], '': in_progress, 5: approved}
+  endpoints: {create: 'POST /nope', status: 'GET', cancel: 'nope', webhook: 'POST /w', balance: '/b'}
+  auth: {type: api_key, header: '', prefix: '', credential_key: ''}
+  webhook: {signature_algorithm: 'sha999', signature_encoding: 'base99', signature_payload: 'nope'}
+  provider: {name: '../../etc', class_name: '123'}
+  amount: {unit: minor, multiplier: 0}
+  fields: {'amount': {source: 'nope', required_if: 'x'}, 'type': {variant: 'nope'}}
+  events: {'payout.done': nope, 5: approved}
+  errors: {'400': nope, 'INSUFFICIENT': 5}
+  paths: {include: ['[', '**/**']}
+  base_url: {default: 'ht tp://', env_var: '../x'}
+ov_amount_neg: 'amount: {unit: minor, multiplier: -100, minimum_major: -5}
+
+  '
+ov_amount_str: 'amount: {unit: minor, multiplier: ''100''}
+
+  '
+ov_provider_empty: 'provider: {name: '''', class_name: ''''}
+
+  '
+ov_provider_kw: 'provider: {name: ''class'', class_name: ''end''}
+
+  '
+ov_provider_unicode: 'provider: {name: ''платёж'', class_name: ''Платёж''}
+
+  '
+ov_fields_nested: 'fields: {''a.b.c.d'': {required: true}, '''': {required: true},
+  ''.'': {required: false}, ''amount'': {required_if: ''type=sbp and''}, ''x'': {required_if:
+  nope}}
+
+  '

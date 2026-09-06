@@ -1,0 +1,751 @@
+# Враждебные спеки для rake fuzz:web (имя → текст файла; имена json_* сохраняются как .json).
+---
+ruby_object: |
+  openapi: 3.0.3
+  info: !ruby/object:Object {}
+  paths: {/p: {}}
+bad_alias: |
+  openapi: 3.0.3
+  info: *nope
+  paths: {/p: {}}
+paths_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths: hello
+paths_array: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths: [1,2]
+path_item_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p: hello
+path_item_null: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+op_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post: hi
+op_null: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+responses_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: nope
+responses_array: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: [1]
+response_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': ok}
+params_hash: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        parameters: {a: 1}
+        responses: {'200': {description: ok}}
+params_strings: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      parameters: [x, 3, null]
+      post:
+        parameters: [y]
+        responses: {'200': {description: ok}}
+param_no_name: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        parameters: [{in: query}, {name: 5, in: 7}, {name: q, in: query, schema: 5}]
+        responses: {'200': {description: ok}}
+body_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: nope
+        responses: {'200': {description: ok}}
+content_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: nope}
+        responses: {'200': {description: ok}}
+media_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: nope}}
+        responses: {'200': {description: ok}}
+schema_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: {schema: nope}}}
+        responses: {'200': {description: ok, content: {application/json: {schema: [1]}}}}
+props_array: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: [a, b], required: id}}}}
+        responses: {'200': {description: ok}}
+props_values_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {amount: 5, status: nope, id: null, x: [1]}, required: [1, null, {}]}}}}
+        responses: {'200': {description: ok}}
+type_array: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: {schema: {type: [object, 'null'], properties: {amount: {type: [number, 'null'], enum: 5}, status: {type: string, enum: {a: 1}}, items: {type: array, items: [1]}}}}}}
+        responses: {'200': {description: ok}}
+enum_mixed: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {amount: {type: number}, status: {type: string, enum: [1, null, {a: 1}, [x], pending, 2.5, true]}}}}}}
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object, properties: {status: {type: string, enum: [1, null, pending]}}}}}}}
+ref_int: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: 5}
+        responses: {'200': {description: ok}}
+ref_null: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: null}
+        responses: {'200': {description: ok}}
+ref_root: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: '#/'}
+        responses: {'200': {description: ok}}
+ref_self: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: '#/paths/~1p/post/requestBody'}
+        responses: {'200': {description: ok}}
+ref_to_scalar: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: '#/info/title'}
+        responses: {'200': {description: ok}}
+ref_arr_idx: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: '#/servers/abc'}
+        responses: {'200': {description: ok}}
+  servers: [{url: http://x}]
+ref_pct: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {$ref: '#/components/schemas/%ZZ%'}
+        responses: {'200': {description: ok}}
+  components: {schemas: {A: {type: object}}}
+ref_ops_whole: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      $ref: '#/components/x'
+  components: {x: {post: {responses: {'200': {description: ok}}}}}
+ref_in_paths_root: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths: {$ref: '#/components/schemas/A'}
+  components: {schemas: {A: {type: object}}}
+info_null: |
+  openapi: 3.0.3
+  info:
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+info_string: |
+  openapi: 3.0.3
+  info: hello
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_int: |
+  openapi: 3.0.3
+  info: {title: 123, version: 1.0}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_empty: |
+  openapi: 3.0.3
+  info: {title: '', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_symbols: |
+  openapi: 3.0.3
+  info: {title: '!!! *** ???', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_cyrillic: |
+  openapi: 3.0.3
+  info: {title: 'Платёжка №1', version: '1'}
+  paths:
+    /выплаты:
+      post:
+        responses: {'200': {description: ok}}
+title_unicode: |
+  openapi: 3.0.3
+  info: {title: '日本語 API', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_ruby_kw: |
+  openapi: 3.0.3
+  info: {title: 'class', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_digits_first: |
+  openapi: 3.0.3
+  info: {title: '1st pay', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_long: |
+  openapi: 3.0.3
+  info: {title: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+title_slash: |
+  openapi: 3.0.3
+  info: {title: '../../etc/passwd', version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+openapi_int: |
+  openapi: 3
+  info: {title: X, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+openapi_float: |
+  openapi: 3.1
+  info: {title: X, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+openapi_hash: |
+  openapi: {a: 1}
+  info: {title: X, version: '1'}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+servers_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  servers: hello
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+servers_hash: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  servers: {url: x}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+servers_nulls: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  servers: [null, 5, {url: null}, {url: 5}, {url: 'http://x', variables: nope}, {url: 'http://{a}', variables: {a: nope}}, {url: 'http://{a}', variables: {a: {default: 5, enum: nope}}}, {url: 'http://{a}', variables: {a: {enum: [1,2]}}}]
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+server_bad_url: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  servers: [{url: 'ht tp://bad url:x/{'}]
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+server_no_host: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  servers: [{url: '/relative'}, {url: ''}]
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+server_op_level: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      servers: nope
+      post:
+        servers: [5]
+        responses: {'200': {description: ok}}
+security_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  security: nope
+  components: {securitySchemes: nope}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+security_weird2: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  security: [nope, 5, {a: nope}, {b: [1]}]
+  components: {securitySchemes: {a: nope, b: {type: nope}, c: {type: http, scheme: 5}, d: {type: apiKey, in: 7, name: 8}, e: {type: oauth2, flows: nope}, f: {type: openIdConnect}, g: {type: http, scheme: bearer, bearerFormat: 5}, h: {}}}
+  paths:
+    /p:
+      post:
+        security: nope
+        responses: {'200': {description: ok}}
+security_op_level: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  components: {securitySchemes: {a: {type: apiKey, in: header, name: X}}}
+  paths:
+    /p:
+      post:
+        security: [{a: nope}, 5]
+        responses: {'200': {description: ok}}
+components_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  components: nope
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+schemas_string: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  components: {schemas: nope, responses: nope, parameters: nope, requestBodies: nope, headers: nope, callbacks: nope}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+webhooks_weird: |
+  openapi: 3.1.0
+  info: {title: X, version: '1'}
+  webhooks: nope
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+webhooks_weird2: |
+  openapi: 3.1.0
+  info: {title: X, version: '1'}
+  webhooks: {a: nope, b: {post: nope}, c: {post: {requestBody: nope}}, d: {post: {requestBody: {content: {application/json: {schema: {type: object, properties: nope}}}}}}}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+callbacks_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        callbacks: nope
+        responses: {'200': {description: ok}}
+    /q:
+      post:
+        callbacks: {a: nope, b: {'{$request.body#/url}': nope}, c: {'x': {post: nope}}, d: {x: {post: {requestBody: {content: {application/json: {schema: nope}}}}}}}
+        responses: {'200': {description: ok}}
+weird_paths: "openapi: 3.0.3\ninfo: {title: Fz, version: '1'}\npaths:\n  '': \n    post:\n
+  \     responses: {'200': {description: ok}}\n  '{}':\n    post:\n      responses:
+  {'200': {description: ok}}\n  '/{}':\n    post:\n      responses: {'200': {description:
+  ok}}\n  '//':\n    post:\n      responses: {'200': {description: ok}}\n  '/a/{b':\n
+  \   post:\n      responses: {'200': {description: ok}}\n  '/a/{{b}}':\n    post:\n
+  \     responses: {'200': {description: ok}}\n  '/a/{b}/{b}':\n    post:\n      responses:
+  {'200': {description: ok}}\n  '/../x':\n    post:\n      responses: {'200': {description:
+  ok}}\n  '/x?y=1':\n    post:\n      responses: {'200': {description: ok}}\n  'no-leading-slash':\n
+  \   post:\n      responses: {'200': {description: ok}}\n  '/x/{id}':\n    post:\n
+  \     responses: {'200': {description: ok}}\n  '/y/{id}':\n    get:\n      parameters:
+  [{name: id, in: path}]\n      responses: {'200': {description: ok}}\n"
+weird_methods: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      POST:
+        responses: {'200': {description: ok}}
+      foo: {responses: {'200': {description: ok}}}
+      5: {responses: {'200': {description: ok}}}
+      trace: {responses: {'200': {description: ok}}}
+      x-custom: 5
+      summary: 5
+      description: [1]
+weird_status_codes: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        responses: {200: {description: ok}, abc: {description: ok}, '2XX': {description: ok}, default: nope, 5xx: {description: ok, content: nope}, '999': {description: 5, content: {application/json: {schema: {type: object, properties: {code: {type: integer, enum: [1,2]}, message: {type: string, enum: [a]}}}}}}, '-1': {description: ok}, 4.5: {description: ok}}
+errors_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        responses:
+          '200': {description: ok}
+          '400': {description: bad, content: {application/json: {schema: {type: object, properties: {error: {type: object, properties: {code: {type: string, enum: [null, 5, {}, [], INSUFFICIENT_FUNDS]}, message: 5}}}}}}}
+          '422': {description: bad, content: {application/json: {schema: {oneOf: nope}}}}
+          '500': {description: bad, content: {application/json: {schema: {allOf: [nope, 5, null, {anyOf: [{type: object, properties: {code: {enum: [X]}}}]}]}}}}
+amount_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {amount: {type: string, description: 'in cents', minimum: nope, maximum: [1], multipleOf: 0, format: 5, pattern: '(', example: {}}, currency: {type: string, enum: [1, null], minLength: nope, maxLength: -1}, sum: {type: number, minimum: 1e999, maximum: -1e999}, total: {type: integer, minimum: 0.001}}}}}}
+        responses: {'200': {description: ok}}
+amount_regex_pattern: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {amount: {type: string, pattern: '^\d+(\.\d{1,2})?$'}, currency: {type: string, pattern: '[A-Z]{3', enum: []}, bank_code: {type: string, pattern: '*bad('}}}}}}
+        responses: {'200': {description: ok}}
+desc_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        description: 5
+        summary: [a]
+        operationId: 5
+        tags: nope
+        deprecated: nope
+        requestBody: {description: 5, required: nope, content: {application/json: {schema: {type: object, description: [1], properties: {amount: {type: number, description: {a: 1}}, status: {type: string, description: null, enum: ['pending']}, type: {type: string, enum: [sbp, card], description: 5}, bank_code: {type: string, description: "required when type=sbp"}}}}}}
+        responses: {'200': {description: ok}}
+ref_cycle_2: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      post:
+        requestBody: {content: {application/json: {schema: {$ref: '#/components/schemas/A'}}}}
+        responses: {'200': {description: ok}}
+  components:
+    schemas:
+      A: {$ref: '#/components/schemas/B'}
+      B: {$ref: '#/components/schemas/A'}
+ref_cycle_in_paths: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p: {$ref: '#/paths/~1q'}
+    /q: {$ref: '#/paths/~1p'}
+ref_cycle_required: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {$ref: '#/components/schemas/A'}}}}
+        responses: {'200': {description: ok}}
+  components:
+    schemas:
+      A: {type: object, required: [amount, child], properties: {amount: {type: number}, child: {$ref: '#/components/schemas/A'}}}
+json_ext_yaml_content: |
+  openapi: 3.0.3
+  info: {title: X, version: '1'}
+  paths: {/p: {post: {responses: {'200': {description: ok}}}}}
+json_dup_keys: '{"openapi":"3.0.3","openapi":"2","info":{"title":"X"},"paths":{"/p":{"post":{"responses":{"200":{"description":"ok"}}}}}}'
+yaml_multi_doc: |
+  ---
+  openapi: 3.0.3
+  info: {title: X, version: '1'}
+  paths: {/p: {post: {responses: {'200': {description: ok}}}}}
+  ---
+  foo: bar
+yaml_keys_nonstring: |
+  openapi: 3.0.3
+  info: {title: X, version: '1'}
+  5: x
+  null: y
+  true: z
+  [1,2]: w
+  paths:
+    /p:
+      post:
+        responses: {200: {description: ok}}
+        requestBody: {content: {application/json: {schema: {type: object, properties: {1: {type: string}, null: {type: string}, true: {type: string}, 2.5: {type: number}}}}}}
+yaml_date_key: |
+  openapi: 3.0.3
+  info: {title: X, version: 2024-01-01}
+  paths:
+    /p:
+      post:
+        responses: {'200': {description: ok}}
+        requestBody: {content: {application/json: {schema: {type: object, properties: {created: {type: string, example: 2024-01-01, default: 2024-01-01T10:00:00Z, enum: [2024-01-01]}}}}}}
+yaml_tabs: "openapi: 3.0.3\ninfo:\n\ttitle: X\npaths: {}\n"
+only_get: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /p:
+      get:
+        responses: {'200': {description: ok}}
+status_map_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object, properties: {status: {type: string, enum: [pending, completed, failed, 'weird status !@#', '', 'a b']}}}}}}}
+    /payouts/{id}:
+      get:
+        parameters: [{name: id, in: path, required: true, schema: {type: string}}]
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object, properties: {status: {type: integer, enum: [1,2,3]}}}}}}}
+x_status_table: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object, properties: {status: {type: string, enum: [a, b], x-status-map: nope, x-forge-statuses: [1]}}}}}}}
+headers_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /webhook:
+      post:
+        parameters: [{name: X-Signature, in: header, schema: nope, description: 5}, {name: X-Sig2, in: header, schema: {type: 5}}]
+        requestBody: {content: {application/json: {schema: {type: object, properties: {event: {type: string, enum: [payout.completed]}, id: {type: string}}}}}}
+        responses: {'200': {description: ok, headers: nope}}
+    /webhook2:
+      post:
+        responses: {'200': {description: ok, headers: {X-Sig: nope, X-Sig2: {schema: nope}, X-Sig3: {description: 5}}}}
+x_webhook_sig: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  x-webhook-signature: nope
+  components: {x-forge: 5}
+  paths:
+    /payouts:
+      post:
+        x-forge-role: nope
+        x-role: 5
+        responses: {'200': {description: ok}}
+oneOf_top: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {oneOf: [{type: object, properties: {type: {type: string, enum: [sbp]}, bank_code: {type: string}}}, nope, 5, {type: string}], discriminator: {propertyName: 5, mapping: nope}}}}}
+        responses: {'200': {description: ok}}
+oneOf_discriminator_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {method: {oneOf: [{title: 5, properties: nope}, {properties: {type: {const: 5, enum: [1,2]}}}], discriminator: nope}}}}}}
+        responses: {'200': {description: ok}}
+allOf_nested: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {allOf: [{allOf: [{allOf: [{$ref: '#/components/schemas/A'}]}]}, {required: nope}, {properties: {amount: {allOf: [{type: number}, {minimum: 1}, {minimum: nope}]}}}]}}}}
+        responses: {'200': {description: ok}}
+  components: {schemas: {A: {allOf: [{$ref: '#/components/schemas/A'}]}}}
+content_types_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {'': {schema: {type: object}}, 'text/plain': {schema: {type: string}}, 'application/x-www-form-urlencoded': {schema: {type: object, properties: {amount: {type: string}}}}, 'multipart/form-data': {schema: {type: object, properties: {file: {type: string, format: binary}}}}, 'application/vnd.api+json;charset=utf-8': {schema: nope}, 5: {schema: {}}}}
+        responses: {'200': {description: ok, content: {'*/*': {schema: {type: object, properties: {status: {type: string}}}}, 'application/xml': {schema: {type: object}}}}}
+examples_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {amount: {type: number}}}, example: nope, examples: nope}}}
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object}, example: [1], examples: {a: nope, b: {value: nope}, c: {externalValue: x}, d: 5}}}}}
+    /x:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {a: {type: string, example: {b: 1}, examples: 5, default: [1]}}}, examples: {a: {value: {amount: 5}}}}}}
+        responses: {'200': {description: ok}}
+array_items_missing: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: array}}}}
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: array, items: {type: array, items: nope}}}}}}
+    /payouts2:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, properties: {items: {type: array, items: {type: object, properties: {amount: {type: number}, status: {enum: [a]}}}}, additionalProperties: nope}}}}
+        responses: {'200': {description: ok}}
+additional_props: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {type: object, additionalProperties: {type: object, properties: {amount: {type: number}}}, patternProperties: {'^x-': {type: string}, '[': {type: string}}, properties: {meta: {type: object, additionalProperties: true}, meta2: {type: object, additionalProperties: 5}}}}}}
+        responses: {'200': {description: ok}}
+not_schema: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      post:
+        requestBody: {content: {application/json: {schema: {not: {type: object, properties: {amount: {type: number}}}, properties: {a: {not: nope}}}}}}
+        responses: {'200': {description: ok}}
+ext_ref: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /payouts:
+      $ref: 'other.yaml#/paths/x'
+    /q:
+      post:
+        requestBody: {$ref: 'http://x/y'}
+        responses: {$ref: 'file.json'}
+    /r:
+      post:
+        responses: {'200': {$ref: 'nope.yaml'}}
+unicode_keys: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /выплаты/{ид}:
+      post:
+        parameters: [{name: ид, in: path, required: true, schema: {type: string}}]
+        requestBody: {content: {application/json: {schema: {type: object, properties: {сумма: {type: number}, 'amount ': {type: number}, 'a-b': {type: string}, 'a.b': {type: string}, 'a/b': {type: string}, 'a"b': {type: string}, "a'b": {type: string}, 'a\nb': {type: string}, '#{x}': {type: string}, 'end': {type: string}, 'class': {type: string}, 'def': {type: string}, '': {type: string}, ' ': {type: string}, '123': {type: string}, 'amount': {type: number}}}}}}
+        responses: {'200': {description: ok}}
+op_ids_weird: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /a:
+      post:
+        operationId: 'create payout!'
+        responses: {'200': {description: ok}}
+    /b:
+      post:
+        operationId: 'create payout!'
+        responses: {'200': {description: ok}}
+    /c:
+      post:
+        operationId: ''
+        responses: {'200': {description: ok}}
+    /d:
+      post:
+        operationId: 'end'
+        responses: {'200': {description: ok}}
+    /e:
+      post:
+        operationId: '#{x}'
+        responses: {'200': {description: ok}}
+stripe_like_form: |
+  openapi: 3.0.3
+  info: {title: Fz, version: '1'}
+  paths:
+    /v1/payouts:
+      post:
+        requestBody: {content: {application/x-www-form-urlencoded: {schema: {type: object, properties: {amount: {type: integer}, currency: {type: string}, metadata: {type: object, additionalProperties: {type: string}}, destination: {anyOf: [{type: string}, {type: object}]}}, required: [amount, currency]}, encoding: {metadata: {explode: true, style: deepObject}}}}}
+        responses: {'200': {description: ok, content: {application/json: {schema: {type: object, properties: {status: {type: string, enum: [paid, pending, in_transit, canceled, failed]}}}}}}}
+    /v1/payouts/{payout}:
+      get:
+        parameters: [{name: payout, in: path, required: true, schema: {type: string, maxLength: 5000}}]
+        responses: {'200': {description: ok}}

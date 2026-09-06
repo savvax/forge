@@ -330,6 +330,9 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 - Ruby 3.3: `.mise.toml` в корне, `mise install && bundle install`.
 - `bundle exec rake check` — lint + тесты + guard. `bundle exec rake ci` — всё, что делает CI.
 - Golden обновляются осознанно: `UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb`, затем diff.
+- `bundle exec rake fuzz` — фаззинг: враждебные спеки/overrides/параметры формы против веб-приложения,
+  случайные структурные мутации спек через конвейер (`SEED=… ROUNDS=…`), враждебные запросы к мокам.
+  Красный = исключение вне `Forge::Error` или ответ 5xx. Корпус — `spec/fuzz/corpus/*.yml`.
 - Решения и обратная связь экспертов — `NOTES.md`.
 
 ## Что дальше

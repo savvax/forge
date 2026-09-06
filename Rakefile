@@ -232,10 +232,24 @@ end
 desc 'Реальные спеки: fetch → analyze → spec'
 task real: %w[real:fetch real:analyze real:spec]
 
+namespace :fuzz do
+  desc 'Враждебные спеки, overrides, параметры формы и URL против веб-приложения (spec/fuzz/corpus)'
+  task(:web) { ruby '-Ilib', 'spec/fuzz/web.rb' }
+
+  desc 'Мутационный фаззинг конвейера (SEED=42 ROUNDS=100; красный — исключение вне Forge::Error)'
+  task(:mutate) { ruby '-Ilib', 'spec/fuzz/mutate.rb' }
+
+  desc 'Враждебные запросы к сгенерированным мок-серверам'
+  task(:mock) { ruby '-Ilib', 'spec/fuzz/mock.rb' }
+end
+
+desc 'Фаззинг: web + mutate + mock (падение или 5xx = красный)'
+task fuzz: %w[fuzz:web fuzz:mutate fuzz:mock]
+
 desc 'Локальная проверка карточки: lint + test + guard:vendor'
 task check: %w[lint test guard:vendor]
 
 desc 'Полный CI локально'
-task ci: %w[check generate:all generated:spec determinism licenses readme:check]
+task ci: %w[check generate:all generated:spec determinism fuzz licenses readme:check]
 
 task default: :check

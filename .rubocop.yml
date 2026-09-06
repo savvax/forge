@@ -48,6 +48,11 @@ RSpec/MultipleExpectations:
 RSpec/NestedGroups:
   Max: 4
 
+# spec/fuzz/*.rb — не rspec, а скрипты rake fuzz: печатают отчёт.
+RSpec/Output:
+  Exclude:
+    - 'spec/fuzz/**/*'
+
 RSpec/DescribeClass:
   Exclude:
     - 'spec/golden_spec.rb'

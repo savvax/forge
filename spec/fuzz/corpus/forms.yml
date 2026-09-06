@@ -1,0 +1,125 @@
+# Параметры формы не того типа для rake fuzz:web (имя → params POST /runs).
+---
+spec_string:
+  spec: hello
+spec_array:
+  spec:
+  - a
+  - b
+spec_hash:
+  spec:
+    a: b
+spec_hash_tempfile_str:
+  spec:
+    tempfile: x
+    filename: "y"
+spec_text_array:
+  spec_text:
+  - a
+  - b
+spec_text_hash:
+  spec_text:
+    a: b
+example_array:
+  example:
+  - examples/specs/novapay.yaml
+example_hash:
+  example:
+    a: b
+example_traversal:
+  example: "../Gemfile"
+example_abs:
+  example: "/etc/passwd"
+example_dir:
+  example: examples/specs
+example_null:
+  example: "examples/specs/nova\0pay.yaml"
+example_missing:
+  example: examples/specs/nope.yaml
+overrides_string:
+  example: examples/specs/novapay.yaml
+  overrides: x
+overrides_example_traversal:
+  example: examples/specs/novapay.yaml
+  overrides_example: "../Gemfile"
+overrides_example_array:
+  example: examples/specs/novapay.yaml
+  overrides_example:
+  - a
+provider_array:
+  example: examples/specs/novapay.yaml
+  provider:
+  - a
+  verify: '0'
+provider_hash:
+  example: examples/specs/novapay.yaml
+  provider:
+    a: b
+  verify: '0'
+provider_empty:
+  example: examples/specs/novapay.yaml
+  provider: "   "
+  verify: '0'
+provider_traversal:
+  example: examples/specs/novapay.yaml
+  provider: "../../x"
+  verify: '0'
+provider_symbols:
+  example: examples/specs/novapay.yaml
+  provider: "!!!"
+  verify: '0'
+provider_digits:
+  example: examples/specs/novapay.yaml
+  provider: '123'
+  verify: '0'
+provider_kw:
+  example: examples/specs/novapay.yaml
+  provider: class
+  verify: '0'
+provider_unicode:
+  example: examples/specs/novapay.yaml
+  provider: Платёж
+  verify: '0'
+provider_long:
+  example: examples/specs/novapay.yaml
+  provider: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  verify: '0'
+provider_newline:
+  example: examples/specs/novapay.yaml
+  provider: |-
+    a
+    b
+  verify: '0'
+provider_null:
+  example: examples/specs/novapay.yaml
+  provider: "a\0b"
+  verify: '0'
+include_paths_array:
+  example: examples/specs/novapay.yaml
+  include_paths:
+  - a
+  - b
+  verify: '0'
+include_paths_hash:
+  example: examples/specs/novapay.yaml
+  include_paths:
+    a: b
+  verify: '0'
+include_paths_bad_glob:
+  example: examples/specs/novapay.yaml
+  include_paths: "["
+  verify: '0'
+include_paths_nomatch:
+  example: examples/specs/novapay.yaml
+  include_paths: "/nope/**"
+  verify: '0'
+include_paths_only_status:
+  example: examples/specs/novapay.yaml
+  include_paths: "/payouts/{id}"
+  verify: '0'
+strict_array:
+  example: examples/specs/novapay.yaml
+  strict:
+  - '1'
+  verify:
+  - '0'
