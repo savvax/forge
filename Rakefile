@@ -98,8 +98,12 @@ namespace :generate do
     end
   end
 
-  desc 'Сгенерировать все примеры в tmp/out/'
-  task all: SPECS.keys.map(&:to_sym)
+  # generated:spec берёт все tmp/out/*/ — чужой старый каталог там ломал бы прогон.
+  desc 'Очистить tmp/out/'
+  task(:clean) { rm_rf 'tmp/out' }
+
+  desc 'Сгенерировать все примеры в tmp/out/ (каталог очищается)'
+  task all: [:clean, *SPECS.keys.map(&:to_sym)]
 end
 
 namespace :generated do
