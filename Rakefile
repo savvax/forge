@@ -173,10 +173,8 @@ end
 
 desc 'e2e: мок-сервер + сгенерированный сервис + webhook → approved'
 task :e2e do
-  %w[novapay cardpay raiffeisen].each { |name| sh_or_fail("bin/e2e #{SPECS[name]}") }
-  out, status = Open3.capture2e("bin/e2e #{SPECS['swiftpay']}") # подпись с timestamp — UNSUPPORTED: e2e честно падает
-  clean_failure = !status.success? && out.include?('signature_unsupported')
-  abort "swiftpay e2e must fail cleanly with signature_unsupported:\n#{out}" unless clean_failure
+  SPECS.each_value { |path| sh_or_fail("bin/e2e #{path}") }
+  sh_or_fail('bin/e2e spec/fixtures/oauth2_payout.yaml') # OAuth2 client_credentials: токен у мока
 end
 
 namespace :readme do

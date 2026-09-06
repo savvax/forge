@@ -54,7 +54,7 @@ VTEX, GOV.UK — через apis.guru, лицензия провайдера. С
 |---|---|---|
 | Adyen Payout | `analyze --spec examples/real/adyen_payout.json` | create = `POST /payout` с **confidence ≈ 0.75 → WARN low_confidence** (нет create-слова); WARN `no_status_endpoint`, WARN `no_webhook`; auth apiKey X-API-Key; amount `amount.value` minor 0.9; exit 0. С `overrides: endpoints.post-payout: create` → без WARN роли |
 | Adyen Transfers | `analyze --spec examples/real/adyen_transfers.json` | create `POST /transfers` 0.85+; status `GET /transfers/{id}` 0.9; cancel `POST /transfers/cancel` (без path param, есть body) ≥ 0.5 + WARN; **много unmapped_status** (ожидаем > 50 WARN — это честно; отчёт сворачивает список: «и ещё N»); WARN `api_key_in_query_ignored`; exit 0 |
-| PayPal Payouts | `analyze --spec examples/real/paypal_payouts.json` | UNSUPPORTED `oauth2` (bearer с TODO); create `POST /v1/payments/payouts` 0.95; WARN `array_field_unsupported` (`items[]`); статусы `batch_status` enum: PENDING/PROCESSING → in_progress, SUCCESS → approved, DENIED/CANCELED → rejected; exit 0 |
+| PayPal Payouts | `analyze --spec examples/real/paypal_payouts.json` | auth `oauth2` client_credentials (`POST /v1/oauth2/token`, D-30); create `POST /v1/payments/payouts` 0.95; WARN `array_field_unsupported` (`items[]`); статусы `batch_status` enum: PENDING/PROCESSING → in_progress, SUCCESS → approved, DENIED/CANCELED → rejected; exit 0 |
 | Paystack | `analyze --spec examples/real/paystack.yaml --include-paths '/transfer*' --include-paths '/balance'` | media type → json; create `POST /transfer` 0.85; status `GET /transfer/{code}` 0.9 (или verify — конфликт → WARN); balance; amount minor по маркеру `kobo`; `$ref` с `~1` резолвится; exit 0 |
 | Stripe | `analyze --spec examples/real/stripe.json --include-paths '/v1/payouts*'` | загрузка ≤ 10 с; create/status/cancel 0.9+; WARN `media_type_form` (генерируем `form:`); WARN `status_from_description`; WARN `no_webhook`; exit 0. Без `--include-paths` — WARN `role_conflict` для transfers/treasury и подсказка про `--include-paths` |
 | Square | `generate --spec examples/real/square.json --include-paths '/v2/payouts*'` | `GenerationError: no create endpoint` exit 2 с подсказкой; `analyze` — exit 0 с WARN `no_create_endpoint` |
@@ -89,4 +89,4 @@ rake real               # REAL=1 bundle exec rspec spec/real_specs_spec.rb
 3. Form-urlencoded (Stripe) — поддержан в `HttpClient` (`form:`), но вложенные объекты Stripe-стиля
    (`destination[account]`) кодируются плоско — WARN.
 4. Огромные enum статусов (Adyen Transfers) — мапятся только общеупотребительные; остальное — overrides.
-5. OAuth2 — токен не получаем; генерируем bearer с TODO.
+5. OAuth2 — `client_credentials` генерируется (токен по `tokenUrl`, D-30); другие flows → bearer с TODO.

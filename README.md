@@ -9,9 +9,9 @@
 что получается, где в коде каждый критерий и что мы сознательно не делаем.
 
 > Статус: все этапы M1–M4 закрыты (`docs/PLAN.md`); `rake ci` зелёный за ~15 с; `bin/e2e` доводит
-> выплату до `approved` на сгенерированном моке для NovaPay и CardPay; 7 реальных API анализируются без падений.
+> выплату до `approved` на сгенерированном моке для NovaPay, CardPay, SwiftPay, Райффайзена и OAuth2-провайдера; 25 реальных API анализируются без падений.
 
-> Статус: **M4 Proof закрыт** — `bin/e2e examples/specs/novapay.yaml` поднимает сгенерированный мок, создаёт выплату, получает подписанный webhook и печатает `operation approved ✓`; то же для CardPay. Реальные спеки (7 API) — exit 0, отчёты в `examples/real/reports/`.
+> Статус: **M4 Proof закрыт** — `bin/e2e examples/specs/novapay.yaml` поднимает сгенерированный мок, создаёт выплату, получает подписанный webhook и печатает `operation approved ✓`; то же для CardPay, SwiftPay (подпись `t=…,v1=…`), Райффайзена и OAuth2-провайдера (`spec/fixtures/oauth2_payout.yaml`). Реальные спеки (25 API) — отчёты в `examples/real/reports/`; PayPal, Velo, Dwolla и Open Banking получают токен OAuth2 client_credentials.
 >
 > Ранее: **M3 (спеки) закрыт** — golden для NovaPay, CardPay и SwiftPay (с overrides и без), `generate --overrides … --strict` для CardPay даёт exit 0. Далее — реальные спеки (T18), мок и e2e (T15).
 >

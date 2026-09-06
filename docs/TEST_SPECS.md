@@ -108,7 +108,7 @@ Exit 0 (UNSUPPORTED не фатальны: не затрагивают create-з
 
 `statuses.PENDING_APPROVAL: in_progress`, `statuses.RETURNED: rejected`, `fields.beneficiary.address.source`
 → остаётся 1 WARN (`one_of_first_variant` — нельзя закрыть overrides, только выбрать вариант через
-`fields.beneficiary.variant: IbanBeneficiary` — реализовать, если хватит времени) и 3 UNSUPPORTED.
+`fields.beneficiary.variant: IbanBeneficiary` — реализовать, если хватит времени) и 2 UNSUPPORTED.
 
 ## 4. Битые спеки (`spec/fixtures/broken/`) — T02, T07, T12
 

@@ -42,7 +42,7 @@
 | RefResolver | локальный ref; вложенный; `~0`/`~1` в pointer (`#/paths/~1transfer/post`); `x-forge-ref-name`; цикл; внешний (fatal vs warning в зависимости от места) |
 | IR::Builder | path-level parameters мержатся; security по умолчанию из корня; `security: []`; `examples`+`example`; 3.1 `type: [..]`; `allOf` слияние; `oneOf` сохранён; `callbacks`; top-level `webhooks`; несколько media types → приоритет json |
 | EndpointRoles | таблица NovaPay; список → other; конфликт → WARN; `--include-paths`; negative_words; `requires` |
-| Auth | apiKey header; apiKey query → WARN; bearer; basic; oauth2 → UNSUPPORTED; несколько альтернатив → первая поддерживаемая; нет схем → WARN `no_auth` |
+| Auth | apiKey header; apiKey query → WARN; bearer; basic; oauth2 с clientCredentials → oauth2 (token_url); oauth2 без него → UNSUPPORTED + bearer; несколько альтернатив → первая поддерживаемая; нет схем → WARN `no_auth` |
 | Statuses | enum; статусы из description (Stripe-стиль); camelCase; unmapped; поле `state`; wrapper `data` |
 | Errors | пример → код; enum → код; `errors.0.code`; `problem+json`; схема успеха на 4xx → treat_as_success; Retry-After |
 | Webhooks | paths; callbacks; top-level webhooks; sha256/sha512; hex/base64; payload из description; timestamp → UNSUPPORTED; event enum; общий тип события; нет webhook → WARN |
@@ -88,7 +88,8 @@ Ruby-скрипт: поднимает `mock_server.rb` на свободном �
 Rack-приёмник webhook, создаёт `Provider::Operation`, вызывает `check_conditions` → `create_request` →
 `fetch_status` → `POST /_simulate/<id>/completed` на мок → ждёт (≤ 5 с) `approved` в `MemoryOperations`
 → печатает шаги и `operation approved ✓`, exit 0; любое расхождение → exit 1 с диагностикой.
-Запускается для novapay и cardpay в CI.
+`rake e2e` (в CI) гоняет все четыре спеки из `examples/` (SwiftPay — подпись `t=…,v1=…`) и
+`spec/fixtures/oauth2_payout.yaml` (OAuth2 client_credentials: токен у мока).
 
 ## 9. Реальные спеки
 

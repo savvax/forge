@@ -83,7 +83,7 @@ module Forge
              hint: "webhook.signature_#{kind}: #{values}  (overrides.yml)")
       end
 
-      # `t=<ts>,v1=<hmac>` (Stripe-стиль) → HMAC над "<t>.<raw body>": описано текстом → WARN + overrides.
+      # `t=<ts>,v1=<hmac>` → HMAC над "<t>.<raw body>": описано текстом → WARN + overrides.
       # Другие timestamp/nonce-схемы → UNSUPPORTED (verify_signature! бросает NotImplementedError).
       def scheme(header, text)
         lower = text.downcase
