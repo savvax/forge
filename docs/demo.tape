@@ -27,7 +27,7 @@ Sleep 6s
 
 # 3. Что получилось: файлы и гайд интеграции
 Type "clear" Enter
-Type "ls output/novapay && sed -n '1,34p' output/novapay/INTEGRATION.md" Enter
+Type "ls output/novapay && sed -n '1,40p' output/novapay/INTEGRATION.md" Enter
 Sleep 6s
 
 # 4. Сгенерированный RSpec — доказательство, что сервис работает (WebMock + фикстуры)
