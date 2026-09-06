@@ -95,6 +95,8 @@ module Provider
       end
     rescue Provider::SignatureError
       failure(:unauthorized, 'invalid_signature')
+    rescue NotImplementedError => e # схема подписи не сгенерирована (UNSUPPORTED в report.txt): callback отклоняем, не падаем
+      failure(:not_implemented, 'signature_unsupported', message: e.message)
     end
 
     # Endpoints outside the BaseService contract (cancel, balance)

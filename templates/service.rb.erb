@@ -136,6 +136,10 @@ module Provider
     rescue Provider::SignatureError
       failure(:unauthorized, 'invalid_signature')
 <% end -%>
+<% if view.timestamp_unsupported? -%>
+    rescue NotImplementedError => e # схема подписи не сгенерирована (UNSUPPORTED в report.txt): callback отклоняем, не падаем
+      failure(:not_implemented, 'signature_unsupported', message: e.message)
+<% end -%>
     end
 <% else -%>
     def process_callback(_payload, raw_body: nil, headers: {})
