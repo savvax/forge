@@ -31,7 +31,11 @@ module Forge
         end
       end
 
-      def url(role) = "\"\#{described_class::BASE_URL}#{op(role).path.gsub(/\{\w+\}/, ID_EXPR)}#{query_suffix}\""
+      def url(role)
+        own = role == :create ? nil : op(role).path.scan(/\{(\w+)\}/).flatten.last
+        path = op(role).path.gsub(/\{(\w+)\}/) { |m| m[1..-2] == own ? ID_EXPR : "test_#{m[1..-2]}" }
+        "\"\#{described_class::BASE_URL}#{path}#{query_suffix}\""
+      end
 
       # apiKey в query: заглушки WebMock ждут URL с ключом.
       def query_suffix

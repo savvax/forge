@@ -81,7 +81,7 @@ Errors: 401 (create) invalid_credentials → alert_block;
 Webhook signature: no webhook found
 Amount: field not found
 Fields: 13 request fields, 10 unmapped
-Warnings (50):
+Warnings (51):
   WARN         role_conflict              POST /balanceAccounts/{id}/transferLimits (post-balanceAccounts-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)
         hint: endpoints.post-balanceAccounts-id-transferLimits: create
   WARN         role_conflict              POST /balancePlatforms/{id}/transferLimits (post-balancePlatforms-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)
@@ -102,10 +102,7 @@ Warnings (50):
         hint: endpoints.get-balanceAccounts-balanceAccountId-sweeps: balance
   WARN         role_conflict              GET /balanceAccounts/{id}/paymentInstruments (get-balanceAccounts-id-paymentInstruments) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)
         hint: endpoints.get-balanceAccounts-id-paymentInstruments: balance
-  … and 40 more (see --format json)
-Unsupported (1):
-  UNSUPPORTED  path_params_unresolved     POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules): path params balanceAccountId cannot be filled from the operation (only the payout id is known); provider_operation_key is substituted
-        hint: connection-level ids in the path are not supported yet: edit the URL in the generated service or choose another endpoint via endpoints.<operationId>: create
+  … and 41 more (see --format json)
 Info (95):
   INFO         outside_contract           GET /balanceAccounts/{id} (get-balanceAccounts-id) — generated as `fetch_balance` helper
   INFO         outside_contract           POST /accountHolders (post-accountHolders) — not used
@@ -118,4 +115,4 @@ Info (95):
   INFO         outside_contract           GET /balanceAccounts/{balanceAccountId}/sweeps (get-balanceAccounts-balanceAccountId-sweeps) — not used
   INFO         outside_contract           POST /balanceAccounts/{balanceAccountId}/sweeps (post-balanceAccounts-balanceAccountId-sweeps) — not used
   … and 85 more (see --format json)
-Done: 50 warnings, 1 unsupported. Exit 0.
+Done: 51 warnings, 0 unsupported. Exit 0.

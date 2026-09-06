@@ -11,7 +11,7 @@ RSpec.describe Provider::<%= class_name %> do
   let(:operation) { build_operation.tap { |op| operations.save(op) } }
   let(:create_fixture) { fixtures['create_request'] }
   let(:provider_id) { dig_path(create_fixture['<%= create_response_key %>'], <%= provider_id_path %>) }
-  let(:create_url) { "#{described_class::BASE_URL}<%= op(:create).path %><%= query_suffix %>" }
+  let(:create_url) { <%= url(:create) %> }
 <% unless overridden_paths.empty? -%>
   let(:overridden) { <%= overridden_paths.inspect %> } # source задан в overrides.yml — не сравнивается
 <% end -%>

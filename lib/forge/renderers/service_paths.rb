@@ -14,8 +14,12 @@ module Forge
 
       ID_EXPR = '#{operation.provider_operation_key}' # rubocop:disable Lint/InterpolationCheck
 
+      # {param}: id выплаты (последний у status/cancel) → provider_operation_key, остальные → credentials.<param>.
       def url(role)
-        path = op(role).path.gsub(/\{\w+\}/, ID_EXPR)
+        own = role == :create ? nil : op(role).path.scan(/\{(\w+)\}/).flatten.last
+        path = op(role).path.gsub(/\{(\w+)\}/) do |m|
+          m[1..-2] == own ? ID_EXPR : "\#{credentials.fetch('#{m[1..-2]}')}"
+        end
         literal = "\"\#{BASE_URL}#{path}\""
         query_api_key? ? "with_auth(#{literal})" : literal
       end

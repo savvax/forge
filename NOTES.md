@@ -171,6 +171,8 @@ pending; примеры ответов копируются глубоко (об
 integer в мажорных единицах → `.to_i`; реквизиты по умолчанию режутся по `maxLength`.
 Правила: tie-break status/cancel в пользу пути под create (`/v2/payouts/{id}` > `/v2/unmatched-credit-transfers/{id}`);
 negative words `calculate, estimate, validate, preview, link, links, methods`; balance только по `balance/funds` и не список.
+Идентификаторы подключения в пути (`/balanceAccounts/{balanceAccountId}/payoutSchedules`) больше не UNSUPPORTED: все `{param}`, кроме id
+выплаты, берутся из `credentials.<param>` (сервис, сгенерированный spec, фикстуры и INTEGRATION.md согласованы; WARN `path_params_from_credentials`).
 Корпус из 12 спек: роли и confidence не изменились.
 
 ## Реальные спеки (T18 записывает сюда падения и странности)

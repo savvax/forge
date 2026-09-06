@@ -26,10 +26,18 @@ module Forge
 
       # credentials.fetch('x') без значения в примере → плейсхолдер, иначе сгенерированный spec упадёт на KeyError.
       def credential_defaults
-        @f[:fields].value[:request].each do |m|
-          key = m.source_expr.to_s[/credentials\.fetch\('(\w+)'\)/, 1]
-          (@extras['credentials'] ||= {})[key] ||= "test_#{key}" if key
-        end
+        keys = @f[:fields].value[:request].filter_map { |m| m.source_expr.to_s[/credentials\.fetch\('(\w+)'\)/, 1] }
+        keys += path_credential_params
+        keys.each { |key| (@extras['credentials'] ||= {})[key] ||= "test_#{key}" }
+      end
+
+      # ids подключения в пути (/client/{clientId}/payouts/{payoutId}): все у create, кроме последнего у status/cancel.
+      def path_credential_params
+        roles = @f[:endpoint_roles].value
+        %i[create status cancel].flat_map do |role|
+          params = roles[role]&.path.to_s.scan(/\{(\w+)\}/).flatten
+          role == :create ? params : params[0..-2].to_a
+        end.uniq
       end
 
       # Чего нет в примере: реквизиты типа по умолчанию, минимальная сумма, первая валюта (BaseService требует их).

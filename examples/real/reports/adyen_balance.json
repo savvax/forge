@@ -632,11 +632,11 @@
       "hint": "endpoints.get-balanceAccounts-id: balance"
     },
     {
-      "level": "unsupported",
-      "code": "path_params_unresolved",
-      "message": "POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules): path params balanceAccountId cannot be filled from the operation (only the payout id is known); provider_operation_key is substituted",
+      "level": "warn",
+      "code": "path_params_from_credentials",
+      "message": "POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules): path params balanceAccountId are connection-level ids, taken from credentials.balanceAccountId",
       "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post",
-      "hint": "connection-level ids in the path are not supported yet: edit the URL in the generated service or choose another endpoint via endpoints.<operationId>: create"
+      "hint": "fill them in credentials (INTEGRATION.md) or choose another endpoint via endpoints.<operationId>: create"
     },
     {
       "level": "info",

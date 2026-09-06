@@ -113,19 +113,20 @@ module Forge
         warn(:low_confidence, message, pointer: endpoint.pointer, hint: "endpoints.#{name(endpoint)}: #{role}")
       end
 
-      # В URL подставляется только id выплаты (для status/cancel — последний {param}); остальные — ids подключения.
+      # В URL из operation подставляется только id выплаты (для status/cancel — последний {param});
+      # остальные {param} — ids подключения, сервис берёт их из credentials.<param>.
       def check_path_params(assigned)
         assigned.slice(:create, :status, :cancel).each do |role, (endpoint, _score)|
           params = endpoint.path.scan(/\{(\w+)\}/).flatten
-          unresolved = role == :create ? params : params[0..-2]
-          next if unresolved.empty?
+          from_credentials = role == :create ? params : params[0..-2]
+          next if from_credentials.empty?
 
-          unsupported(:path_params_unresolved,
-                      "#{label(endpoint)}: path params #{unresolved.join(', ')} cannot be filled from the operation " \
-                      '(only the payout id is known); provider_operation_key is substituted',
-                      pointer: endpoint.pointer,
-                      hint: 'connection-level ids in the path are not supported yet: edit the URL in the generated ' \
-                            "service or choose another endpoint via endpoints.<operationId>: #{role}")
+          warn(:path_params_from_credentials,
+               "#{label(endpoint)}: path params #{from_credentials.join(', ')} are connection-level ids, taken from " \
+               "#{from_credentials.map { |p| "credentials.#{p}" }.join(', ')}",
+               pointer: endpoint.pointer,
+               hint: 'fill them in credentials (INTEGRATION.md) or choose another endpoint via ' \
+                     "endpoints.<operationId>: #{role}")
         end
       end
 

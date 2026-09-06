@@ -19,6 +19,6 @@
 | klarna |  | exit 0 | Done: 7 warnings, 0 unsupported. Exit 0. |
 | payone_link |  | exit 0 | Done: 7 warnings, 0 unsupported. Exit 0. |
 | vtex_gateway |  | exit 0 | Done: 16 warnings, 0 unsupported. Exit 0. |
-| adyen_balance |  | exit 0 | Done: 50 warnings, 1 unsupported. Exit 0. |
+| adyen_balance |  | exit 0 | Done: 51 warnings, 0 unsupported. Exit 0. |
 | adyen_checkout |  | exit 0 | Done: 390 warnings, 1 unsupported. Exit 0. |
 | govuk_pay |  | exit 1 | error: Swagger 2.0 is not supported; convert to OpenAPI 3 at #/swagger in examples/real/govuk_pay.json |

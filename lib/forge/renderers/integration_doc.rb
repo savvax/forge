@@ -39,7 +39,16 @@ module Forge
       def credential_keys
         keys = plan.auth[:credential_keys].to_a.dup
         keys << plan.webhook[:signature][:secret_key] if plan.webhook&.dig(:signature, :header)
-        keys + plan.fields[:request].filter_map { |m| m.source_expr&.[](/credentials\.fetch\('(\w+)'\)/, 1) }
+        keys += plan.fields[:request].filter_map { |m| m.source_expr&.[](/credentials\.fetch\('(\w+)'\)/, 1) }
+        keys + path_credential_params
+      end
+
+      # ids подключения в пути: все {param} у create, кроме последнего у status/cancel (он — id выплаты).
+      def path_credential_params
+        %i[create status cancel].flat_map do |role|
+          params = plan.operations[role]&.path.to_s.scan(/\{(\w+)\}/).flatten
+          role == :create ? params : params[0..-2].to_a
+        end.uniq
       end
 
       def method_rows

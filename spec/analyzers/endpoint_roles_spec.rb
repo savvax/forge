@@ -154,16 +154,18 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       expect(finding.value[:create]).to be_nil
     end
 
-    it 'reports UNSUPPORTED path params that cannot be filled from the operation' do
+    it 'takes connection-level path params from credentials (WARN, not UNSUPPORTED)' do
       create = post_op('/client/{clientId}/payouts', 'createPayout', params: [path_param('clientId')])
       status = { '/client/{clientId}/payouts/{payoutId}' => { 'get' => {
         'operationId' => 'getPayout', 'parameters' => [path_param('clientId'), path_param('payoutId')],
         'responses' => { '200' => { 'description' => 'ok' } }
       } } }
       finding = described_class.new(ir_for(build_spec(paths: create.merge(status))), rules).call
-      expect(finding).to have_warning(:path_params_unresolved, level: :unsupported, message: /createPayout.*clientId/)
-      expect(finding).to have_warning(:path_params_unresolved, level: :unsupported, message: /getPayout.*clientId/)
-      expect(finding.warnings.count { |w| w.code == :path_params_unresolved }).to eq(2)
+      expect(finding).to have_warning(:path_params_from_credentials, level: :warn,
+                                                                     message: /createPayout.*credentials.clientId/)
+      expect(finding).to have_warning(:path_params_from_credentials, level: :warn,
+                                                                     message: /getPayout.*credentials.clientId/)
+      expect(finding.warnings.count { |w| w.code == :path_params_from_credentials }).to eq(2)
     end
 
     it 'accepts a status endpoint identified by an id query param' do
