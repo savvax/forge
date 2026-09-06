@@ -7,10 +7,11 @@ encoding:
 payload:
   raw_body: [body, тела, тело, payload, raw, request body]
   fields:   [concatenat, конкатен, joined, fields, параметров, "+"]
-timestamp_markers: ["t=", timestamp, "v1=", nonce, signed_payload]
+timestamped_markers: ["t=", "v1="]                            # оба → scheme timestamped: HMAC над "<t>.<raw body>"
+timestamp_markers: ["t=", timestamp, "v1=", nonce, signed_payload]  # иначе → UNSUPPORTED signature_with_timestamp
 secret_credential_key: callback_secret
 event_fields:  [event, type, event_type, name, action, topic]
-defaults: { algorithm: sha256, encoding: hex, payload: raw_body }
+defaults: { algorithm: sha256, encoding: hex, payload: raw_body, scheme: plain }
 signals:
   header_found: 0.40
   algorithm_in_description: 0.30

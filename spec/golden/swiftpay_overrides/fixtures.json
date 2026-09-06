@@ -109,7 +109,7 @@
   },
   "callback": {
     "headers": {
-      "Swift-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+      "Swift-Signature": "t=<unix timestamp>,v1=<HMAC-SHA256(\"<t>.<raw_body>\", callback_secret) hex>"
     },
     "payload": {
       "id": "evt_5f1",
@@ -125,7 +125,7 @@
   },
   "callback_failed": {
     "headers": {
-      "Swift-Signature": "<HMAC-SHA256(raw_body, callback_secret) hex>"
+      "Swift-Signature": "t=<unix timestamp>,v1=<HMAC-SHA256(\"<t>.<raw_body>\", callback_secret) hex>"
     },
     "payload": {
       "id": "evt_5f2",

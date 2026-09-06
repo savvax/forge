@@ -80,8 +80,9 @@ class SwiftpayMock < Sinatra::Base
       uri = URI(url)
       req = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.request_uri, 'Content-Type' => 'application/json')
       secret = ENV.fetch('MOCK_CALLBACK_SECRET', 'secret')
-      digest = OpenSSL::HMAC.digest('SHA256', secret, raw)
-      req['Swift-Signature'] = digest.unpack1('H*')
+      timestamp = Time.now.to_i
+      digest = OpenSSL::HMAC.digest('SHA256', secret, "#{timestamp}.#{raw}")
+      req['Swift-Signature'] = "t=#{timestamp},v1=#{digest.unpack1('H*')}"
       req.body = raw
       res = Net::HTTP.start(uri.host, uri.port, read_timeout: 5, open_timeout: 5) { |http| http.request(req) }
       { delivered: res.code.to_i.between?(200, 299), status: res.code.to_i }

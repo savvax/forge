@@ -241,7 +241,7 @@ paths:
 |---|---|---|---|
 | `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 4 INFO (один — расхождение примера 401 с enum в самом ТЗ), exit 0 | не нужны |
 | `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
-| `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись с timestamp, `problem+json`, top-level `webhooks` | 4 WARN, 3 UNSUPPORTED, exit 0 | 0 WARN (3 UNSUPPORTED) |
+| `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись `t=…,v1=…` с timestamp, `problem+json`, top-level `webhooks` | 5 WARN, 2 UNSUPPORTED, exit 0; e2e → approved | 0 WARN (2 UNSUPPORTED) |
 | `examples/specs/raiffeisen.yaml` (реальная спека Райффайзенбанка, СБП) | OpenAPI 3.0 на русском, bearer в тексте, контейнер `payoutParams`, тип `payoutMethod: SBP`, статус в объекте `status.value`, `x-webhooks` + `x-examples`, подпись описана текстом | 4 WARN, exit 0; e2e → approved | 1 WARN |
 
 Все три покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без).
@@ -302,8 +302,9 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
   «что дальше».
 - Внешние `$ref` (`other.yaml#/…`, `http…`) и циклы: в схеме запроса create — ошибка exit 1, иначе
   UNSUPPORTED + заглушка `{}`.
-- OAuth2-флоу не генерируется (bearer с `TODO`). Подпись с timestamp (`t=…,v1=…`) →
-  `NotImplementedError` в `verify_signature!` с пояснением.
+- OAuth2-флоу не генерируется (bearer с `TODO`). Подпись `t=…,v1=…` (Stripe-стиль) проверяется как HMAC над
+  `"<t>.<raw body>"` (WARN: схема взята из описания); прочие timestamp/nonce-схемы → `NotImplementedError`
+  в `verify_signature!` с пояснением.
 - `oneOf` получателя: по умолчанию первый вариант + WARN; выбор — `fields.<path>.variant: <SchemaName>`.
 - Form-urlencoded тела (Stripe): отправляются как `form:` с плоскими ключами `parent[child]` + WARN
   `media_type_form`; Stripe-стиль вложенности совпадает, другие кодировки — проверить с провайдером.

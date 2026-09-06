@@ -26,7 +26,9 @@
 - Нет webhook → `process_callback` возвращает `failure(:not_implemented, 'callbacks_not_supported')` + WARN `no_webhook`.
 - Нет status-эндпоинта → `fetch_status` возвращает `failure(:not_implemented, 'status_endpoint_missing')` + WARN.
 - Неизвестное поле → `field_name: nil, # TODO(forge): map '<path>' (see overrides.yml)`.
-- Подпись с timestamp (UNSUPPORTED) → `verify_signature!` бросает `NotImplementedError` с TODO.
+- Подпись `t=<ts>,v1=<hmac>` (scheme timestamped, WARN) → `verify_signature!` разбирает заголовок и считает HMAC над
+  `"<t>.<raw body>"`; окно повтора по `t` не проверяется (комментарий в коде). Другие timestamp/nonce-схемы
+  (UNSUPPORTED) → `verify_signature!` бросает `NotImplementedError` с TODO.
 - Minor units → `to_minor_units(amount)`: `(amount * AMOUNT_MULTIPLIER).round.to_i`; major string →
   `format('%.2f', amount)`; major number → `amount.to_f.round(2)`.
 

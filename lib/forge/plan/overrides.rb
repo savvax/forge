@@ -13,8 +13,8 @@ module Forge
         'base_url' => %w[default production env_var], 'endpoints' => :any,
         'auth' => %w[type header prefix credential_key], 'statuses' => :any, 'events' => :any,
         'amount' => %w[unit multiplier minimum_major], 'fields' => :fields,
-        'webhook' => %w[signature_header signature_algorithm signature_encoding signature_payload event_field
-                        id_field status_field],
+        'webhook' => %w[signature_header signature_algorithm signature_encoding signature_payload signature_scheme
+                        event_field id_field status_field],
         'errors' => :any
       }.freeze
       FIELD_KEYS = %w[source required required_if variant].freeze

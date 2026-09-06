@@ -3,6 +3,16 @@
     def verify_signature!(_raw_body, _headers)
       raise NotImplementedError, 'signature scheme with timestamp is not generated (see report.txt)'
     end
+<% elsif view.timestamped? -%>
+    # <%= view.signature_comment %>
+    # Replay window (age of `t`) is not checked: add it if the provider documents a tolerance.
+    def verify_signature!(raw_body, headers)
+      pairs = header_value(headers, SIGNATURE_HEADER).to_s.split(',').select { |kv| kv.include?('=') }
+      parts = pairs.to_h { |kv| kv.split('=', 2) }
+      expected = <%= view.hmac_expr('"#{parts[\'t\']}.#{raw_body}"') %>
+      valid = parts['t'] && secure_compare(parts['v1'], expected)
+      raise Provider::SignatureError, "invalid #{SIGNATURE_HEADER}" unless valid
+    end
 <% else -%>
     # <%= view.signature_comment %>
     def verify_signature!(raw_body, headers)

@@ -95,8 +95,6 @@ module Provider
       end
     rescue Provider::SignatureError
       failure(:unauthorized, 'invalid_signature')
-    rescue NotImplementedError => e # схема подписи не сгенерирована (UNSUPPORTED в report.txt): callback отклоняем, не падаем
-      failure(:not_implemented, 'signature_unsupported', message: e.message)
     end
 
     # Endpoints outside the BaseService contract (cancel, balance)
@@ -182,9 +180,14 @@ module Provider
       ERROR_MAP.fetch(response.status) { response.body['code'] || 'unknown_error' }
     end
 
-    # TODO(forge): Swift-Signature includes a timestamp/nonce; implement per provider docs.
-    def verify_signature!(_raw_body, _headers)
-      raise NotImplementedError, 'signature scheme with timestamp is not generated (see report.txt)'
+    # HMAC-SHA256 over the "<t>.<raw request body>" from the t=<timestamp>,v1=<hmac> header (scheme from the description), hex-encoded.
+    # Replay window (age of `t`) is not checked: add it if the provider documents a tolerance.
+    def verify_signature!(raw_body, headers)
+      pairs = header_value(headers, SIGNATURE_HEADER).to_s.split(',').select { |kv| kv.include?('=') }
+      parts = pairs.to_h { |kv| kv.split('=', 2) }
+      expected = OpenSSL::HMAC.hexdigest('SHA256', credentials.fetch('callback_secret'), "#{parts['t']}.#{raw_body}")
+      valid = parts['t'] && secure_compare(parts['v1'], expected)
+      raise Provider::SignatureError, "invalid #{SIGNATURE_HEADER}" unless valid
     end
   end
 end

@@ -116,7 +116,9 @@ RSpec.describe Forge::Plan::Overrides do
     end
 
     it 'webhook keys' do
-      _s, findings, = novapay('webhook' => { 'signature_encoding' => 'base64', 'id_field' => 'data.id' })
+      _s, findings, = novapay('webhook' => { 'signature_encoding' => 'base64', 'id_field' => 'data.id',
+                                             'signature_scheme' => 'timestamped' })
+      expect(findings[:webhooks].value[:signature][:scheme]).to eq('timestamped')
       expect(findings[:webhooks].value[:signature][:encoding]).to eq('base64')
       expect(findings[:webhooks].value[:id_field]).to eq(%w[data id])
       expect(warnings(findings).map(&:code)).not_to include(:signature_encoding_assumed)

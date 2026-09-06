@@ -118,7 +118,7 @@ bin/forge analyze --spec examples/specs/novapay.yaml         # 5 ролей 0.95
 bin/forge generate --spec examples/specs/novapay.yaml --out tmp/out/novapay --force
                                           # Verifying… ok (ruby -c ×4, rspec 13 examples, 0 failures); Done: 7 files
 bin/forge generate --spec examples/specs/cardpay.yaml --overrides examples/overrides/cardpay.yml --out tmp/out/c --force --strict; echo $?   # 0 (0 WARN)
-bin/forge generate --spec examples/specs/swiftpay.json --out tmp/out/s --force   # 4 WARN, 3 UNSUPPORTED, 1 pending, exit 0
+bin/forge generate --spec examples/specs/swiftpay.json --out tmp/out/s --force   # 5 WARN, 2 UNSUPPORTED, exit 0
 bin/forge analyze --spec spec/fixtures/broken/cyclic_ref.yaml; echo $?           # error: circular $ref … hint: … ; 1
 bin/forge generate --spec spec/fixtures/broken/no_create.yaml --out tmp/x --force; echo $?   # error: no create endpoint … ; 2
 bin/integrate --spec examples/specs/novapay.yaml --provider novapay --lang python; echo $?   # only ruby is supported; 1
@@ -128,7 +128,7 @@ docker build -t forge . && docker run --rm -v "$PWD/examples:/app/examples" -v "
 UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/golden   # пусто = golden актуальны
 ```
 
-Ожидания по спекам — `docs/TEST_SPECS.md` (§ 2 CardPay: 5 WARN + 4 INFO; § 3 SwiftPay: 4 WARN + 3 UNSUPPORTED;
+Ожидания по спекам — `docs/TEST_SPECS.md` (§ 2 CardPay: 5 WARN + 4 INFO; § 3 SwiftPay: 5 WARN + 2 UNSUPPORTED;
 § 4 битые спеки) и `docs/SPEC_ANALYSIS_NOVAPAY.md` (числа для NovaPay). Снапшоты `analyze` —
 `spec/snapshots/`.
 
@@ -152,8 +152,8 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 
 ## 5. Известные ограничения (README «Ограничения»)
 
-Только OpenAPI 3.x; только payout; OAuth2-флоу не генерируется (bearer + TODO); подпись с timestamp →
-`NotImplementedError` с TODO; массивы полей (PayPal `items[]`) не мапятся. Закрыто 5.09 (D-17…D-20): выбор
+Только OpenAPI 3.x; только payout; OAuth2-флоу не генерируется (bearer + TODO); подпись `t=…,v1=…` проверяется
+(D-29), прочие timestamp/nonce-схемы → `NotImplementedError` с TODO; массивы полей (PayPal `items[]`) не мапятся. Закрыто 5.09 (D-17…D-20): выбор
 варианта `oneOf` через overrides, form-urlencoded тела (`form:` + WARN), статус через POST с id в теле,
 валидация фикстур по схемам спеки (INFO). NovaPay теперь даёт 3 WARN + 4 INFO: четвёртый INFO —
 `fixture_schema_mismatch` (пример 401 в ТЗ не входит в enum кодов ошибок).

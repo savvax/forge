@@ -218,7 +218,9 @@ module Forge
         return nil unless sig[:header]
 
         algorithm = sig[:algorithm].to_s.upcase
-        { sig[:header] => "<HMAC-#{algorithm}(#{sig[:payload]}, #{sig[:secret_key]}) #{sig[:encoding]}>" }
+        over = sig[:scheme] == 'timestamped' ? "\"<t>.<#{sig[:payload]}>\"" : sig[:payload]
+        hmac = "<HMAC-#{algorithm}(#{over}, #{sig[:secret_key]}) #{sig[:encoding]}>"
+        { sig[:header] => (sig[:scheme] == 'timestamped' ? "t=<unix timestamp>,v1=#{hmac}" : hmac) }
       end
     end
   end

@@ -42,7 +42,7 @@ module Forge
         text = [header.description, endpoint.description, endpoint.summary].compact.join("\n")
         found = detect(text)
         found.each { |kind, value| assumed(kind, header.name) unless value }
-        timestamp(header.name, text)
+        found[:scheme] = scheme(header.name, text)
         [{ header: header.name, **dict['defaults'].transform_keys(&:to_sym).merge(found.compact),
            secret_key: dict['secret_credential_key'] }, score(found)]
       end
@@ -83,17 +83,28 @@ module Forge
              hint: "webhook.signature_#{kind}: #{values}  (overrides.yml)")
       end
 
-      def timestamp(header, text)
-        return unless dict['timestamp_markers'].any? { |m| text.downcase.include?(m) }
+      # `t=<ts>,v1=<hmac>` (Stripe-стиль) → HMAC над "<t>.<raw body>": описано текстом → WARN + overrides.
+      # Другие timestamp/nonce-схемы → UNSUPPORTED (verify_signature! бросает NotImplementedError).
+      def scheme(header, text)
+        lower = text.downcase
+        if dict['timestamped_markers'].all? { |m| lower.include?(m) }
+          warn(:signature_timestamped, "#{header}: t=<timestamp>,v1=<hmac> scheme (from description); " \
+                                       'HMAC over "<t>.<raw body>" is verified',
+               hint: 'webhook.signature_scheme: plain|timestamped  (overrides.yml)')
+          return 'timestamped'
+        end
+        return nil unless dict['timestamp_markers'].any? { |m| lower.include?(m) }
 
         unsupported(:signature_with_timestamp, "#{header}: signature includes a timestamp/nonce; verify is a TODO",
                     hint: 'implement verify_signature! by hand following the provider docs')
+        nil
       end
 
       def no_header
         warn(:signature_not_found, 'webhook has no signature header parameter; callbacks will not be verified',
              hint: 'webhook.signature_header: <Header-Name>  (overrides.yml)')
-        { header: nil, algorithm: nil, encoding: nil, payload: nil, secret_key: dict['secret_credential_key'] }
+        { header: nil, algorithm: nil, encoding: nil, payload: nil, scheme: nil,
+          secret_key: dict['secret_credential_key'] }
       end
 
       # Поле события с enum → {event => internal_status}; без enum → {}.

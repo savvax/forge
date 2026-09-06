@@ -91,9 +91,34 @@ RSpec.describe Provider::SwiftpayService do
   end
 
   describe '#process_callback' do
-    it 'needs a hand-written signature check' do
-      pending 'signature with timestamp is not generated (see report.txt)'
-      raise 'implement verify_signature! first'
+    let(:callback) { fixtures['callback'] }
+    let(:body) { JSON.generate(callback['payload']) }
+    let(:headers) { { 'Swift-Signature' => sign_timestamped(body, timestamp: 1_700_000_000, algorithm: 'sha256', encoding: 'hex') } }
+
+    before do
+      operation.provider_operation_key = dig_path(callback['payload'], ["data", "payment_id"])
+      operations.save(operation)
+    end
+
+    it 'approves on payment.status_changed with valid signature' do
+      result = service.process_callback(callback['payload'], raw_body: body, headers: headers)
+      expect(result).to be_success
+      expect(result.data[:status]).to eq('approved')
+    end
+
+    it 'rejects on payment.status_changed' do
+      failed = fixtures['callback_failed']['payload']
+      failed_body = JSON.generate(failed)
+      failed_headers = { 'Swift-Signature' => sign_timestamped(failed_body, timestamp: 1_700_000_000, algorithm: 'sha256', encoding: 'hex') }
+      operation.provider_operation_key = dig_path(failed, ["data", "payment_id"])
+      result = service.process_callback(failed, raw_body: failed_body, headers: failed_headers)
+      expect(result.data[:status]).to eq('rejected')
+      expect(result.data[:error_code]).to eq('account_closed')
+    end
+
+    it 'fails on invalid signature' do
+      result = service.process_callback(callback['payload'], raw_body: body, headers: { 'Swift-Signature' => 'bad' })
+      expect(result.code).to eq('invalid_signature')
     end
   end
 

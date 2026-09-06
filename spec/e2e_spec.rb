@@ -26,10 +26,9 @@ RSpec.describe 'bin/e2e' do
     expect(out).not_to include('.rb:')
   end
 
-  it 'fails cleanly for swiftpay: the timestamped signature scheme is UNSUPPORTED, no stack trace' do
+  it 'approves swiftpay: the t=…,v1=… timestamped signature is verified end-to-end' do
     out, status = e2e('examples/specs/swiftpay.json')
-    expect(status.exitstatus).to eq(1)
-    expect(out).to include('webhook received', 'process_callback: signature_unsupported')
-    expect(out).not_to include('NotImplementedError', 'from bin/e2e')
+    expect(status.exitstatus).to eq(0), out
+    expect(out).to include('webhook received', 'operation approved ✓')
   end
 end

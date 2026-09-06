@@ -76,7 +76,10 @@ module Forge
       def signature_line
         sig = plan.webhook[:signature]
         over = sig[:payload] == 'fields' ? 'fields' : 'body'
-        "HMAC-#{sig[:algorithm].to_s.upcase}(#{over}, #{sig[:secret_key]}) → #{sig[:encoding]} → #{sig[:header]}"
+        line = "HMAC-#{sig[:algorithm].to_s.upcase}(#{over}, #{sig[:secret_key]}) → #{sig[:encoding]} → #{sig[:header]}"
+        return line unless sig[:scheme] == 'timestamped'
+
+        "#{line.sub("(#{over},", "(\"<t>.<#{over}>\",")}: `t=<unix timestamp>,v1=<hmac>`"
       end
 
       def field_rows

@@ -113,6 +113,7 @@ module Forge
         end
         @log.close(:"#{key}_assumed", nil)
         @log.close(:signature_not_found, nil) if key == 'signature_header'
+        @log.close(:signature_timestamped, nil) if key == 'signature_scheme'
       end
 
       def field(mapping, rules)

@@ -90,8 +90,14 @@ class <%= class_name %> < Sinatra::Base
       req = Net::HTTP::Post.new(uri.path.empty? ? '/' : uri.request_uri, 'Content-Type' => 'application/json')
 <% if signature && signature[:header] -%>
       secret = ENV.fetch('MOCK_CALLBACK_SECRET', 'secret')
+<% if signature[:scheme] == 'timestamped' -%>
+      timestamp = Time.now.to_i
+      digest = OpenSSL::HMAC.digest('<%= signature[:algorithm].to_s.upcase %>', secret, "#{timestamp}.#{raw}")
+      req['<%= signature[:header] %>'] = "t=#{timestamp},v1=#{<%= signature[:encoding] == 'base64' ? 'Base64.strict_encode64(digest)' : "digest.unpack1('H*')" %>}"
+<% else -%>
       digest = OpenSSL::HMAC.digest('<%= signature[:algorithm].to_s.upcase %>', secret, raw)
       req['<%= signature[:header] %>'] = <%= signature[:encoding] == 'base64' ? 'Base64.strict_encode64(digest)' : "digest.unpack1('H*')" %>
+<% end -%>
 <% end -%>
       req.body = raw
       res = Net::HTTP.start(uri.host, uri.port, read_timeout: 5, open_timeout: 5) { |http| http.request(req) }

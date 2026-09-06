@@ -27,9 +27,9 @@ RSpec.describe Forge::Analyzers::Runner do
     expect(findings.values.flat_map(&:warnings).map(&:code)).to include(:production_default, :no_cancel_endpoint)
   end
 
-  it 'swiftpay: 4 WARN + 3 UNSUPPORTED' do
+  it 'swiftpay: 5 WARN + 2 UNSUPPORTED' do
     findings = run('examples/specs/swiftpay.json')
-    expect(counts(findings)).to include(warn: 4, unsupported: 3)
+    expect(counts(findings)).to include(warn: 5, unsupported: 2)
   end
 
   it 'passes include_paths through' do

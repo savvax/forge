@@ -52,7 +52,8 @@ module Forge
         return 'нет' unless sig['header']
 
         algo = "HMAC-#{sig['algorithm'].to_s.upcase}"
-        "#{sig['header']} · #{algo} · #{sig['payload']} · #{sig['encoding']} → credentials.#{sig['secret_key']}"
+        over = sig['scheme'] == 'timestamped' ? "#{sig['payload']} · t=…,v1=…" : sig['payload']
+        "#{sig['header']} · #{algo} · #{over} · #{sig['encoding']} → credentials.#{sig['secret_key']}"
       end
 
       def amount_line

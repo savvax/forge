@@ -12,7 +12,7 @@ Errors: 400 validation_error → reject; 401 (create) unauthorized → alert_blo
         401 (status) unauthorized → alert_block; 404 not_found → reject;
         409 (create) duplicate_request → treat_as_success; 409 (cancel) invalid_status → reject;
         422 validation_error → reject; 500 internal_error → retry
-Webhook signature: Swift-Signature (HMAC-SHA256, raw body, hex) → credentials.callback_secret
+Webhook signature: Swift-Signature (HMAC-SHA256, t=…,v1=… over "<t>.<raw body>", hex) → credentials.callback_secret
 Webhook events: type → status from data.status
 Amount: number, major units (×100), min 1 EUR — source: amount (number, min 1) → major units: 'Amount in major units (e.g. 100.50)'
 Fields: 8 request fields, 0 unmapped (beneficiary: bank_account)
@@ -31,18 +31,17 @@ Output:
   ./swiftpay_extras.rb
   ./mock_server.rb
   ./report.txt
-Unsupported (3):
+Unsupported (2):
   UNSUPPORTED  oauth2_alternative         alternative security scheme 'oauth2' (oauth2) is ignored
         hint: the first supported scheme is used
-  UNSUPPORTED  signature_with_timestamp   Swift-Signature: signature includes a timestamp/nonce; verify is a TODO
-        hint: implement verify_signature! by hand following the provider docs
   UNSUPPORTED  external_ref               GET /v1/accounts/balance: external $ref → {} (available → https://schemas.swiftpay.example/common/Money.json, reserved → https://schemas.swiftpay.example/common/Money.json)
         hint: inline the schema if this response matters
-Info (6):
+Info (7):
   INFO         webhook_source_webhooks    webhook taken from webhooks: POST paymentStatusChanged (paymentStatusChanged)
   INFO         outside_contract           DELETE /v1/payments/outbound/{payment_id} (cancelOutboundPayment) — generated as `cancel_request` helper
   INFO         outside_contract           GET /v1/accounts/balance (getAccountBalance) — generated as `fetch_balance` helper
   INFO         override_applied           statuses.PENDING_APPROVAL → in_progress
   INFO         override_applied           statuses.RETURNED → rejected
+  INFO         override_applied           webhook → signature_scheme
   INFO         override_applied           fields.beneficiary.address → source
-Done: 7 files, 0 warnings, 3 unsupported. Exit 0.
+Done: 7 files, 0 warnings, 2 unsupported. Exit 0.

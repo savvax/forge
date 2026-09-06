@@ -76,6 +76,9 @@ module GeneratedSpecHelper
     encoding == 'base64' ? Base64.strict_encode64(digest) : digest.unpack1('H*')
   end
 
+  # Stripe-style header: t=<timestamp>,v1=<HMAC over "<t>.<body>">.
+  def sign_timestamped(body, timestamp:, **) = "t=#{timestamp},v1=#{sign("#{timestamp}.#{body}", **)}"
+
   # Тело запроса → Hash: JSON или form-urlencoded (parent[child] → вложенный Hash, числа как строки).
   def parse_body(req)
     return JSON.parse(req.body) if req.headers['Content-Type'].to_s.include?('json')

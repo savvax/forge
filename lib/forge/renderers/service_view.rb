@@ -125,14 +125,17 @@ module Forge
         RESERVED.include?(name) || name.match?(/\A\d/) ? "field_#{name}" : name
       end
 
-      def hmac_expr
+      def timestamped? = signature[:scheme] == 'timestamped'
+
+      # Выражение HMAC над `data` (raw_body или "<t>.<raw body>") в кодировке из плана.
+      def hmac_expr(data = 'raw_body')
         algo = signature[:algorithm].to_s.upcase
         secret = "credentials.fetch('#{signature[:secret_key]}')"
         if signature[:encoding] == 'base64'
-          return "Base64.strict_encode64(OpenSSL::HMAC.digest('#{algo}', #{secret}, raw_body))"
+          return "Base64.strict_encode64(OpenSSL::HMAC.digest('#{algo}', #{secret}, #{data}))"
         end
 
-        "OpenSSL::HMAC.hexdigest('#{algo}', #{secret}, raw_body)"
+        "OpenSSL::HMAC.hexdigest('#{algo}', #{secret}, #{data})"
       end
 
       def signature_comment
@@ -140,6 +143,7 @@ module Forge
         note = assumed.empty? ? '' : " (#{assumed.join(', ')} assumed: not stated in the spec)"
         over = { 'raw_body' => 'raw request body', 'fields' => 'concatenated fields' }.fetch(signature[:payload].to_s,
                                                                                              'body')
+        over = "\"<t>.<#{over}>\" from the t=<timestamp>,v1=<hmac> header (scheme from the description)" if timestamped?
         "HMAC-#{signature[:algorithm].to_s.upcase} over the #{over}, #{signature[:encoding]}-encoded#{note}."
       end
 

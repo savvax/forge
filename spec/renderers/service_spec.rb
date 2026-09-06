@@ -84,7 +84,9 @@ RSpec.describe Forge::Renderers::Service do
     expect(cardpay).to include("Base64.strict_encode64(OpenSSL::HMAC.digest('SHA512'",
                                "expiry: nil, # TODO(forge): map 'destination.card.expiry'")
     swiftpay_plan = plan_for('examples/specs/swiftpay.json')
-    expect(render(swiftpay_plan)).to include('raise NotImplementedError', 'operation.amount.to_f.round(2)')
+    expect(render(swiftpay_plan)).to include("parts['t']", '"#{parts[\'t\']}.#{raw_body}"',
+                                             'operation.amount.to_f.round(2)')
+    expect(render(swiftpay_plan)).not_to include('NotImplementedError')
     expect(render(swiftpay_plan)).not_to include('def cancel_request')
     expect(Forge::Renderers::Extras.new(swiftpay_plan).render).to include('class SwiftpayExtras < SwiftpayService',
                                                                           'client.delete(')

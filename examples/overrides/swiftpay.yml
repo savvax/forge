@@ -1,9 +1,12 @@
 # examples/overrides/swiftpay.yml — закрывает WARN спеки SwiftPay, которые можно закрыть настройкой.
-# Остаются 3 UNSUPPORTED (внешний $ref, подпись с timestamp, oauth2 как альтернативная схема) — они требуют ручного кода.
+# Остаются 2 UNSUPPORTED (внешний $ref, oauth2 как альтернативная схема) — они требуют ручного кода.
 
 statuses:
   PENDING_APPROVAL: in_progress
   RETURNED: rejected
+
+webhook:
+  signature_scheme: timestamped               # WARN signature_timestamped: подтверждаем t=<ts>,v1=<hmac> из описания
 
 fields:
   beneficiary:

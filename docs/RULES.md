@@ -267,10 +267,11 @@ encoding:
 payload:
   raw_body: [body, тела, тело, payload, raw, request body]
   fields:   [concatenat, конкатен, joined, fields, параметров, "+"]
-timestamp_markers: ["t=", timestamp, "v1=", nonce, "signed_payload"]   # → UNSUPPORTED signature_with_timestamp
+timestamped_markers: ["t=", "v1="]          # оба в описании → scheme: timestamped (HMAC над "<t>.<raw body>"), WARN signature_timestamped
+timestamp_markers: ["t=", timestamp, "v1=", nonce, "signed_payload"]   # иначе → UNSUPPORTED signature_with_timestamp
 secret_credential_key: callback_secret
 event_fields:  [event, type, event_type, name, action, topic]
-defaults: { algorithm: sha256, encoding: hex, payload: raw_body }
+defaults: { algorithm: sha256, encoding: hex, payload: raw_body, scheme: plain }
 signals:
   header_found: 0.40
   algorithm_in_description: 0.30
@@ -281,8 +282,10 @@ signals:
 Алгоритм `Webhooks`: источник — эндпоинт роли `webhook` из `paths`, иначе `callbacks` create-эндпоинта,
 иначе top-level `webhooks` (3.1). Подпись: header-параметр по `header_markers`; алгоритм/кодировка/payload
 из `description` заголовка и операции. Не указано → default + `WARN signature_encoding_assumed` /
-`signature_payload_assumed` (по одному на каждое допущение). `timestamp_markers` → `UNSUPPORTED
-signature_with_timestamp` (в коде `verify_signature!` бросает `NotImplementedError` с TODO).
+`signature_payload_assumed` (по одному на каждое допущение). Оба `timestamped_markers` в описании (`t=<ts>,v1=<hmac>`,
+Stripe-стиль) → `scheme: timestamped`: `verify_signature!` разбирает заголовок и считает HMAC над `"<t>.<raw body>"`;
+это взято из текста → `WARN signature_timestamped` + `webhook.signature_scheme`. Прочие `timestamp_markers` →
+`UNSUPPORTED signature_with_timestamp` (в коде `verify_signature!` бросает `NotImplementedError` с TODO).
 События: поле из `event_fields` с `enum` → каждое значение → суффикс после `.`/`_` → словарь статусов
 → `event_map`; нет `enum` (общий тип события) → `event_map: {}` и статус берётся из `status_field`.
 `id_field` — по `id_fields` (в т. ч. внутри `wrappers`: `data.transfer_id`).
@@ -329,6 +332,7 @@ webhook:
   signature_algorithm: sha512   # sha256 | sha512 | sha1
   signature_encoding: base64    # hex | base64
   signature_payload: raw_body   # raw_body | fields
+  signature_scheme: timestamped # plain | timestamped (t=<ts>,v1=<hmac>, HMAC над "<t>.<raw body>")
   event_field: type
   id_field: data.transfer_id
   status_field: data.state

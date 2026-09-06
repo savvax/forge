@@ -47,7 +47,7 @@ RSpec.describe Forge::Renderers do
       expect(out[/(\d+) examples/, 1].to_i).to be >= 11
     end
 
-    it 'generates green specs for cardpay and swiftpay (pending signature for swiftpay)' do
+    it 'generates green specs for cardpay and swiftpay (timestamped signature verified)' do
       %w[cardpay.yaml swiftpay.json].each do |file|
         name = file.split('.').first
         dir = generate(plan_for("examples/specs/#{file}"), "tmp/out_spec/#{name}")

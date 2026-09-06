@@ -52,7 +52,7 @@
 
 ## Webhook signature
 
-HMAC-SHA256(body, callback_secret) → hex → Swift-Signature
+HMAC-SHA256("<t>.<body>", callback_secret) → hex → Swift-Signature: `t=<unix timestamp>,v1=<hmac>`
 
 Подпись считается по сырым байтам тела. Платформа передаёт в `process_callback` уже разобранный JSON, поэтому передавайте и сырое тело: `process_callback(payload, raw_body: request.body.read, headers: request.headers)`. Без `raw_body` сервис подписывает `JSON.generate(payload)` — подпись сойдётся, только если провайдер шлёт компактный JSON с тем же порядком ключей.
 
@@ -79,7 +79,6 @@ HMAC-SHA256(body, callback_secret) → hex → Swift-Signature
 | Решение | Источник | Уровень | Как переопределить |
 |---------|----------|---------|--------------------|
 | alternative security scheme 'oauth2' (oauth2) is ignored | oauth2_alternative at `#/components/securitySchemes/oauth2` | UNSUPPORTED | `the first supported scheme is used` |
-| Swift-Signature: signature includes a timestamp/nonce; verify is a TODO | signature_with_timestamp | UNSUPPORTED | `implement verify_signature! by hand following the provider docs` |
 | GET /v1/accounts/balance: external $ref → {} (available → https://schemas.swiftpay.example/common/Money.json, reserved → https://schemas.swiftpay.example/common/Money.json) | external_ref at `#/paths/~1v1~1accounts~1balance/get` | UNSUPPORTED | `inline the schema if this response matters` |
 
 ## Проверка

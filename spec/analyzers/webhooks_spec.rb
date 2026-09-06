@@ -13,7 +13,7 @@ RSpec.describe Forge::Analyzers::Webhooks do
   it 'novapay: signature from header, sha256, raw body, hex assumed' do
     finding = for_file('examples/specs/novapay.yaml')
     expect(finding.value[:signature]).to eq(header: 'X-NovaPay-Signature', algorithm: 'sha256', encoding: 'hex',
-                                            payload: 'raw_body', secret_key: 'callback_secret')
+                                            payload: 'raw_body', scheme: 'plain', secret_key: 'callback_secret')
     expect(finding.value).to include(source: :paths, event_field: 'event', id_field: ['payout_id'],
                                      status_field: ['status'])
     expect(finding.value[:event_map]).to eq('payout.completed' => 'approved', 'payout.failed' => 'rejected',
@@ -34,13 +34,27 @@ RSpec.describe Forge::Analyzers::Webhooks do
                                                      hint: /statuses\.on_hold|events\.transfer\.on_hold/)
   end
 
-  it 'swiftpay: top-level webhooks, timestamp signature unsupported, no event enum' do
+  it 'swiftpay: top-level webhooks, t=…,v1=… signature → timestamped scheme (WARN, from description), no event enum' do
     finding = for_file('examples/specs/swiftpay.json')
     expect(finding.value).to include(source: :webhooks, event_map: {}, status_field: %w[data status],
                                      id_field: %w[data payment_id])
-    expect(finding.value[:signature]).to include(header: 'Swift-Signature', encoding: 'hex', payload: 'raw_body')
+    expect(finding.value[:signature]).to include(header: 'Swift-Signature', encoding: 'hex', payload: 'raw_body',
+                                                 scheme: 'timestamped')
+    expect(finding).to have_warning(:signature_timestamped, level: :warn, hint: /webhook\.signature_scheme/)
+    expect(finding.warnings.map(&:level)).not_to include(:unsupported)
+  end
+
+  it 'a nonce/timestamp scheme that is not t=…,v1=… stays UNSUPPORTED' do
+    spec = ir_for(build_spec(paths: { '/webhooks' => { 'post' => {
+                               'operationId' => 'hook', 'security' => [],
+                               'parameters' => [{ 'name' => 'X-Signature', 'in' => 'header',
+                                                  'description' => 'HMAC-SHA256 hex over nonce + body' }],
+                               'requestBody' => body_json({ 'id' => { 'type' => 'string' } }),
+                               'responses' => { '200' => { 'description' => 'ok' } }
+                             } } }))
+    finding = webhooks_for(spec)
+    expect(finding.value[:signature]).to include(scheme: 'plain')
     expect(finding).to have_warning(:signature_with_timestamp, level: :unsupported)
-    expect(finding.warnings.map(&:level)).not_to include(:warn)
   end
 
   it 'no webhook → WARN no_webhook and empty value' do

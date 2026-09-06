@@ -19,7 +19,7 @@ webhook, подпись, версия OpenAPI, формат файла). Фай�
 | Ответ | плоский `{id, status}` | **обёртка `data`**, `transfer_id`, `state` | плоский | разные |
 | Webhook | paths + `security: []` | **`callbacks`** у create | **top-level `webhooks`** (3.1) | нет в спеке |
 | Событие | `event` enum с суффиксом | `type` enum | общий `type`, статус в `data.status` | — |
-| Подпись | HMAC-SHA256, hex не указан | **HMAC-SHA512 base64**, payload не указан | **с timestamp** → UNSUPPORTED | — |
+| Подпись | HMAC-SHA256, hex не указан | **HMAC-SHA512 base64**, payload не указан | **t=…,v1=… с timestamp** → scheme timestamped, WARN | — |
 | Ошибки | `{error: {code}}` | **`{errors: [{code}]}`** | **`application/problem+json`** | разные |
 | Cancel | POST …/cancel | **нет** | **DELETE** | POST без path param (Adyen) |
 | Idempotency | header uuid | нет | header string | — |
@@ -89,17 +89,17 @@ webhook, подпись, версия OpenAPI, формат файла). Фай�
 | Статусы | `status` enum: CREATED, SENT → in_progress; SETTLED → approved; REJECTED → rejected; **PENDING_APPROVAL, RETURNED → unmapped** |
 | Ошибки | `application/problem+json` (`{type, title, status, detail, code}`) — media type принимается; код из `code` |
 | Webhook | top-level `webhooks.paymentStatusChanged` → `INFO webhook_source_webhooks`; событие `type` без enum (общее `payment.status_changed`) → `event_map: {}`, статус из `data.status`; id `data.payment_id` |
-| Подпись | header `Swift-Signature`, description «t=<timestamp>,v1=<hex>» → `UNSUPPORTED signature_with_timestamp` → `verify_signature!` бросает `NotImplementedError` с TODO |
+| Подпись | header `Swift-Signature`, description «t=<timestamp>,v1=<hex>» → `scheme: timestamped` + `WARN signature_timestamped` (из текста) → `verify_signature!` разбирает `t`/`v1` и считает HMAC над `"<t>.<raw body>"`; мок шлёт такой же заголовок, e2e → approved |
 | Внешний `$ref` | в ответе balance: `https://schemas.swiftpay.example/common/Money.json` → `UNSUPPORTED external_ref` (схема → `{}`), генерация продолжается |
 | Поля | `reference` → id; `amount`, `currency`; `purpose` → description; `beneficiary.iban` → `dig('bank_account', 'iban')`; `beneficiary.bic` → `dig('bank_account', 'bic')`; `beneficiary.name` → holder; **`beneficiary.address` (object: country, city, line1) → unmapped** |
 | Requisite types | `['bank_account']` |
 | Idempotency | header `Idempotency-Key` (string) |
 
-**Предупреждения — 4 WARN, 3 UNSUPPORTED (INFO — не фиксируем числом):**
+**Предупреждения — 5 WARN, 2 UNSUPPORTED (INFO — не фиксируем числом):**
 WARN `one_of_first_variant`, `unmapped_status PENDING_APPROVAL`, `unmapped_status RETURNED`,
-`unmapped_field beneficiary.address`; UNSUPPORTED `external_ref`, `signature_with_timestamp`, `oauth2_alternative`.
+`unmapped_field beneficiary.address`, `signature_timestamped`; UNSUPPORTED `external_ref`, `oauth2_alternative`.
 Exit 0 (UNSUPPORTED не фатальны: не затрагивают create-запрос). Сгенерированный spec swiftpay зелёный,
-пример на подпись помечен `pending` («signature with timestamp is not generated»).
+включая три примера на подпись (`sign_timestamped` в `generated_spec_helper.rb`).
 
 Внешний `$ref` в **схеме запроса create** (другой файл, `spec/fixtures/broken/external_ref_in_create.yaml`)
 → фатально: `UnsupportedError`, exit 1.

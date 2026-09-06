@@ -205,6 +205,19 @@ Loader и Overrides, параметры формы не того типа (`spec
 битые узлы (противоречит «не угадывать молча»). Alias-бомба YAML не ограничена (20 МБ на файл, `aliases: true`
 нужен реальным спекам) — известный предел.
 
+### D-29 · Webhook только с уверенностью ≥ 0.6; подпись `t=…,v1=…` проверяется
+Контекст: на реальном корпусе все семь webhook с 0.50 (Stripe `POST /v1/webhook_endpoints`, Square `/v2/events`,
+Velo, Mollie, Paystack, Dwolla, Plaid) — ложные: слово в пути + POST даёт ровно 0.5, а это управление подписками,
+не приёмник callback'ов. `roles.webhook.min_confidence: 0.6` в `rules/endpoint_roles.yml`: ниже роль не назначается,
+`WARN webhook_rejected` называет эндпоинт и ключ overrides, чтобы принудить. Побочный эффект в плюс: у Velo нашёлся
+настоящий webhook из top-level `webhooks` (0.95), которого раньше не было видно за ложным. Настоящие приёмники
+(`security: []` или подпись в заголовке) набирают 0.7+ и не затронуты.
+Подпись Stripe-стиля `t=<ts>,v1=<hmac>`: оба маркера в описании → `scheme: timestamped`, `verify_signature!`
+разбирает заголовок и считает HMAC над `"<t>.<raw body>"`; мок шлёт такой же заголовок, сгенерированный spec
+проверяет три случая через `sign_timestamped`, e2e SwiftPay → approved (был exit 1 с `NotImplementedError`). Схема
+взята из текста → `WARN signature_timestamped` и `webhook.signature_scheme: timestamped` в overrides (закрывает WARN).
+Прочие timestamp/nonce-схемы по-прежнему UNSUPPORTED. Окно повтора по `t` не проверяется — комментарий в коде.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

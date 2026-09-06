@@ -76,7 +76,10 @@ module Forge
       def event_of(key) = fx.dig(key, 'payload', plan.webhook[:event_field].to_s)
 
       def sign_expr(body_var)
-        "sign(#{body_var}, algorithm: '#{signature[:algorithm]}', encoding: '#{signature[:encoding]}')"
+        opts = "algorithm: '#{signature[:algorithm]}', encoding: '#{signature[:encoding]}'"
+        return "sign_timestamped(#{body_var}, timestamp: 1_700_000_000, #{opts})" if signature[:scheme] == 'timestamped'
+
+        "sign(#{body_var}, #{opts})"
       end
 
       def callback_error_code
