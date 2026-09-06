@@ -8,14 +8,13 @@
 Зачем читать: это вход для жюри и экспертов. Пять минут — и вы знаете, как запустить,
 что получается, где в коде каждый критерий и что мы сознательно не делаем.
 
-> Статус: все этапы M1–M4 закрыты (`docs/PLAN.md`); `rake ci` зелёный за ~15 с; `bin/e2e` доводит
-> выплату до `approved` на сгенерированном моке для NovaPay, CardPay, SwiftPay, Райффайзена и OAuth2-провайдера; 25 реальных API анализируются без падений.
-
-> Статус: **M4 Proof закрыт** — `bin/e2e examples/specs/novapay.yaml` поднимает сгенерированный мок, создаёт выплату, получает подписанный webhook и печатает `operation approved ✓`; то же для CardPay, SwiftPay (подпись `t=…,v1=…`), Райффайзена и OAuth2-провайдера (`spec/fixtures/oauth2_payout.yaml`). Реальные спеки (25 API) — отчёты в `examples/real/reports/`; PayPal, Velo, Dwolla и Open Banking получают токен OAuth2 client_credentials.
->
-> Ранее: **M3 (спеки) закрыт** — golden для NovaPay, CardPay и SwiftPay (с overrides и без), `generate --overrides … --strict` для CardPay даёт exit 0. Далее — реальные спеки (T18), мок и e2e (T15).
->
-> Ранее: **M2 Generate закрыт** — `bin/forge generate` для NovaPay даёт сервис, spec (14 примеров, зелёный), `INTEGRATION.md`, `fixtures.json`, `report.txt`; golden и determinism зелёные. Дальше — M3 Universal (CardPay/SwiftPay golden, реальные спеки).
+> Статус: этапы M1–M4 закрыты, M5 (Docker, CI, README) собран (`docs/PLAN.md`). `rake ci` зелёный за ~50 с (rubocop,
+> 325 тестов, покрытие ≥ 97 %, generate всех примеров и их сгенерированные RSpec, детерминизм, фаззинг, лицензии).
+> `bin/e2e` доводит выплату до
+> `approved` на сгенерированном моке для NovaPay, CardPay, SwiftPay (подпись `t=…,v1=…`), Райффайзена и
+> OAuth2-провайдера (`spec/fixtures/oauth2_payout.yaml`). 20 реальных API (Stripe, Adyen, PayPal, Wise, Mollie…)
+> анализируются без падений, отчёты — `examples/real/reports/`; PayPal, Velo, Dwolla и Open Banking получают токен
+> OAuth2 client_credentials. Живой веб-интерфейс — http://2.56.121.34.
 
 ## Демо: весь CLI за три минуты
 
@@ -69,7 +68,7 @@ docker run --rm -v "$PWD/examples:/app/examples" -v "$PWD/output:/app/output" fo
 Полная проверка (то же, что CI): `bundle exec rake ci`. Быстрая: `bundle exec rake check`.
 
 
-<details><summary>Вывод <code>bin/forge generate --spec examples/specs/novapay.yaml --out output/novapay</code></summary>
+<details><summary>Вывод <code>bin/forge generate --spec examples/specs/novapay.yaml --out output/novapay --force</code></summary>
 
 ```
 Parsing spec... ok (openapi 3.0.3, NovaPay Payout API 1.0.0)
@@ -97,15 +96,15 @@ Generating test fixtures...
 Generating service spec...
 Generating extras...
 Generating mock server...
-Verifying generated code... ok (ruby -c ×4, rspec skipped: --no-verify)
+Verifying generated code... ok (ruby -c ×4, rspec 15 examples, 0 failures)
 Output:
-  ./novapay_service.rb
-  ./INTEGRATION.md
-  ./fixtures.json
-  ./novapay_service_spec.rb
-  ./novapay_extras.rb
-  ./mock_server.rb
-  ./report.txt
+  ./output/novapay/novapay_service.rb
+  ./output/novapay/INTEGRATION.md
+  ./output/novapay/fixtures.json
+  ./output/novapay/novapay_service_spec.rb
+  ./output/novapay/novapay_extras.rb
+  ./output/novapay/mock_server.rb
+  ./output/novapay/report.txt
 Warnings (3):
   WARN         signature_encoding_assumed X-NovaPay-Signature: encoding not stated; hex assumed
         hint: webhook.signature_encoding: hex|base64  (overrides.yml)
@@ -130,7 +129,9 @@ output/novapay/
 ├── novapay_service.rb        # Provider::NovapayService < BaseService: ровно четыре метода контракта
 ├── novapay_extras.rb         # Provider::NovapayExtras < NovapayService: cancel_request, fetch_balance (вне контракта)
 ├── novapay_service_spec.rb   # RSpec на WebMock и fixtures.json — доказательство, что сервис работает
-├── INTEGRATION.md            # авторизация, методы, маппинг статусов, ошибки, подпись webhook, ДОПУЩЕНИЯ
+├── generated_spec_helper.rb  # учётные данные, подпись, парсинг тел для сгенерированного RSpec
+├── INTEGRATION.md            # исчерпывающий гайд: кратко, поток контракта, все ключи настройки, методы с примерами,
+│                             #   сумма, реквизиты, проверки, приём webhook и подпись, ошибки, файлы, ДОПУЩЕНИЯ
 ├── fixtures.json             # примеры запросов/ответов/уведомлений и ожидаемые статусы операции
 ├── mock_server.rb            # Sinatra-мок провайдера из той же спеки (demo и e2e)
 └── report.txt                # что распознано, confidence, WARN / UNSUPPORTED с подсказками
@@ -181,6 +182,8 @@ CLI — основной интерфейс (по условиям задачи)
 жюри: загрузить спеку и overrides, увидеть отчёт, открыть/скачать 7 файлов, запустить сгенерированный
 RSpec и e2e (мок + webhook) кнопкой. Без базы и без новых гемов (Sinatra + Puma уже в Gemfile).
 
+Развёрнутый экземпляр для жюри: **http://2.56.121.34** (те же 20 МБ на спеку, прогоны хранятся на сервере).
+
 ```bash
 bin/forge-web                                  # http://localhost:8080 (PORT, FORGE_WORKDIR)
 docker compose up --build                      # то же в контейнере, данные прогонов — в volume forge-data
@@ -189,7 +192,9 @@ docker build --target web -t forge-web . && docker run --rm -p 8080:8080 forge-w
 
 Деплой на сервер: любой хост с Docker — `docker compose up -d`; за reverse-proxy (nginx/Caddy) на 8080.
 Прогоны хранятся на диске (`FORGE_WORKDIR`), секретов в них нет: `credentials` в сгенерированном коде —
-плейсхолдеры. Ограничение размера спеки — 20 МБ. Обработчик `Forge::Error` показывает ошибку с pointer и hint.
+плейсхолдеры. Ограничение размера спеки — 20 МБ. `Forge::Error` показывается с pointer и hint; любая другая ошибка —
+страницей с текстом, а не «Internal Server Error» (см. фаззинг ниже). Кнопки «rspec» и «e2e» на странице прогона
+запускают сгенерированный RSpec и e2e через мок; все файлы открываются и скачиваются, есть `.tar` и `report.json`.
 
 ## Как это работает
 
@@ -203,7 +208,7 @@ provider_api.yaml ─▶ Load ─▶ IR ─▶ Analyze ─▶ Plan ─▶ Render
 
 | Стадия | Что делает | Где |
 |---|---|---|
-| Load | YAML/JSON → hash, проверка `openapi: 3.x`, резолв локальных `$ref`, ошибки с JSON-pointer и подсказкой | `lib/forge/loader.rb`, `ref_resolver.rb` |
+| Load | YAML/JSON → hash, проверка `openapi: 3.x`, резолв локальных `$ref`, проверка формы документа (контейнеры там, где их ждут анализаторы), ошибки с JSON-pointer и подсказкой | `lib/forge/loader.rb`, `ref_resolver.rb`, `shape.rb` |
 | IR | неизменяемые `Data.define`: Spec, Endpoint, Schema… — ничего не знает о платежах | `lib/forge/ir/` |
 | Analyze | 7 анализаторов (роли эндпоинтов, auth, статусы, ошибки, webhook, единицы суммы, поля) → `Finding(value, confidence, source, warnings)` | `lib/forge/analyzers/`, словари `rules/*.yml` |
 | Plan | findings → `IntegrationPlan`; наложение `overrides.yml`; валидации из схемы; фикстуры | `lib/forge/plan/` |
@@ -230,8 +235,9 @@ provider_api.yaml ─▶ Load ─▶ IR ─▶ Analyze ─▶ Plan ─▶ Render
 - **Любой файл пользователя — не крэш.** Битая структура (`responses: nope`, `parameters: {…}`, `$ref: 5`,
   YAML-теги `!ruby/…`, вложенность в тысячи уровней) → `SpecError` с pointer (exit 1). Всё, чего
   конвейер не ожидал, → `internal error: …` с подсказкой (exit 2, стектрейс только с `--debug`);
-  веб показывает то же сообщение вместо «Internal Server Error». Проверено фаззингом: 170 враждебных
-  спек, overrides и параметров формы.
+  веб показывает то же сообщение вместо «Internal Server Error». Проверено фаззингом в CI (`rake fuzz`):
+  159 ручных враждебных случаев, ~900 случайных структурных мутаций спек и overrides, ~250 враждебных запросов
+  к мокам на каждый прогон — 0 падений.
 
 ## Как переопределить решение (overrides)
 
@@ -249,6 +255,7 @@ fields:
 webhook:
   signature_encoding: hex                # hex | base64
   signature_payload: raw_body            # raw_body | fields
+  signature_scheme: timestamped          # plain | timestamped (t=<ts>,v1=<hmac>, HMAC над "<t>.<raw body>")
 endpoints:
   createTransfer: create                 # роль эндпоинта, если эвристика ошиблась
 paths:
@@ -263,12 +270,13 @@ paths:
 
 | Спека | Что отличается от NovaPay | Результат без overrides | С overrides |
 |---|---|---|---|
-| `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 4 INFO (один — расхождение примера 401 с enum в самом ТЗ), exit 0 | не нужны |
+| `examples/specs/novapay.yaml` (ТЗ) | эталон | 3 WARN, 3 INFO, exit 0; e2e → approved | 0 WARN (`examples/overrides/novapay.yml`) |
 | `examples/specs/cardpay.yaml` | bearer, сумма строкой в рублях, статусы `NEW/SUCCESS/DECLINED/ON_HOLD` в поле `state`, обёртка `data`, webhook через `callbacks`, HMAC-SHA512 base64, нет отмены | 5 WARN, 4 INFO | 0 WARN |
 | `examples/specs/swiftpay.json` | OpenAPI 3.1 JSON, basic auth + oauth2, `oneOf` получателя, внешний `$ref`, подпись `t=…,v1=…` с timestamp, `problem+json`, top-level `webhooks` | 5 WARN, 2 UNSUPPORTED, exit 0; e2e → approved | 0 WARN (2 UNSUPPORTED) |
-| `examples/specs/raiffeisen.yaml` (реальная спека Райффайзенбанка, СБП) | OpenAPI 3.0 на русском, bearer в тексте, контейнер `payoutParams`, тип `payoutMethod: SBP`, статус в объекте `status.value`, `x-webhooks` + `x-examples`, подпись описана текстом | 4 WARN, exit 0; e2e → approved | 1 WARN |
+| `examples/specs/raiffeisen.yaml` (реальная спека Райффайзенбанка, СБП) | OpenAPI 3.0 на русском, bearer в тексте, контейнер `payoutParams`, тип `payoutMethod: SBP`, статус в объекте `status.value`, `x-webhooks` + `x-examples`, подпись описана текстом | 4 WARN, exit 0; e2e → approved | 0 WARN |
 
-Все три покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без).
+Все четыре покрыты golden-тестами байт-в-байт (`spec/golden/`, с overrides и без); e2e для всех четырёх и для
+OAuth2-провайдера — `rake e2e`.
 
 Реальные спецификации (Stripe, Adyen Payout и Transfers, PayPal Payouts, Paystack, Square, Plaid):
 `bundle exec rake real` скачивает их и прогоняет `analyze`; отчёты — `examples/real/reports/`.
@@ -287,7 +295,7 @@ paths:
 | Adyen Transfers v4 | create/status, apiKey в query (WARN), 20+ статусов из enum по словарю | 100+ редких статусов → `statuses.<X>` (отчёт сворачивает список) | [adyen_transfers.txt](examples/real/reports/adyen_transfers.txt) |
 | PayPal Payouts | create/status/cancel, OAuth2 client_credentials: токен по `POST /v1/oauth2/token`, затем Bearer | batch `items[]` — массивы не мапятся (WARN) | [paypal_payouts.txt](examples/real/reports/paypal_payouts.txt) |
 | Paystack | `--include-paths /transfer*`: create `transfer_initiate`, status, balance; `$ref` на path-pointer с `~1` и `%7B` | конфликт status/verify и DELETE recipient как cancel → `endpoints.*` | [paystack.txt](examples/real/reports/paystack.txt) |
-| Stripe (8 МБ) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents, form-urlencoded тело (WARN); загрузка 0.1 с | webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
+| Stripe (8 МБ, 594 эндпоинта) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents, form-urlencoded тело (WARN); анализ 0.4 с | webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
 | Square | статус-эндпоинт; create нет → WARN `no_create_endpoint` (`generate` → exit 2 с подсказкой); битые `$ref` вне контракта → UNSUPPORTED | — | [square.txt](examples/real/reports/square.txt) |
 | Plaid | `--include-paths /transfer/*`: create `/transfer/create`, status `POST /transfer/get` (id в теле), cancel; apiKey в заголовках | 40+ полей запроса без источника → overrides | [plaid.txt](examples/real/reports/plaid.txt) |
 
@@ -295,7 +303,8 @@ paths:
 
 Вторая волна (13 спек, `rake real` скачивает и их): Velo, Increase, Mollie, Dwolla, Wise, Open Banking UK — выплаты,
 сервисы генерируются, сгенерированные RSpec зелёные; NOWPayments, Klarna, PAYONE Link — честный `no_create_endpoint`
-(exit 2); VTEX, Adyen Balance Platform и Adyen Checkout — pay-in/конфигурация, create только с WARN `low_confidence`;
+(exit 2); VTEX и Adyen Balance Platform — pay-in/конфигурация, create только с WARN `low_confidence`; Adyen Checkout —
+pay-in (`POST /payments`), сервис генерируется, но это не выплаты;
 GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и ссылки — `docs/REAL_SPECS.md` § 1a. Этот прогон вскрыл и закрыл
 9 дефектов генератора на «диких» спеках (ключи с точкой, пустое тело 201, минимум в один цент, `Currency` как имя
 переменной, общий `$ref`-пример у create и status и др. — `NOTES.md` D-27).
@@ -312,11 +321,11 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 | Разбор спецификации: методы, параметры, auth, статусы, ошибки, webhook | `lib/forge/analyzers/*.rb`, `rules/*.yml`, `bin/forge analyze`, `spec/analyzers/`, `spec/snapshots/` |
 | Сервис по контракту `Provider::BaseService`, запросы, статус, ошибки, уведомления, конфигурация | `templates/service.rb.erb`, `lib/provider/base_service.rb` (контракт — `docs/CONTRACT.md`), `output/<p>/<p>_service.rb`, `BASE_URL`/`credentials` |
 | Преобразование данных: статусы, поля, единицы, обязательность | `rules/status_map.yml`, `rules/field_aliases.yml`, `rules/amount_units.yml`, `lib/forge/analyzers/fields.rb`, `.compact` и `required_if` в шаблоне |
-| Универсальность | три спеки + golden, `examples/overrides/`, `--templates-dir`, `rake guard:vendor`, секция UNSUPPORTED |
+| Универсальность | четыре спеки + golden, 20 реальных API (`examples/real/reports/`), `examples/overrides/`, `--templates-dir`, `rake guard:vendor`, секция UNSUPPORTED |
 | Документация и тестовые материалы | `output/<p>/INTEGRATION.md` (с «Допущениями»), `fixtures.json`, генерируемый `*_service_spec.rb` |
 | Удобство и демонстрация | этот README, `bin/integrate`, коды выхода 0–4, ошибки с pointer + hint, `bin/e2e`, `bin/demo` |
-| Качество реализации | шесть стадий по каталогам, `rubocop` 0, покрытие ≥ 90 %, обработка ошибок разбора/генерации (`spec/fixtures/broken/`, `spec/cli_spec.rb`), CI |
-| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved`; отчёт с confidence; overrides как рекомендованный механизм; прогон на реальных API; детерминизм |
+| Качество реализации | шесть стадий по каталогам, `rubocop` 0, покрытие ≥ 97 %, обработка ошибок разбора/генерации (`spec/fixtures/broken/`, `spec/cli_spec.rb`, `lib/forge/shape.rb`), фаззинг (`spec/fuzz/`), CI |
+| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved` (5 сценариев, включая OAuth2 и подпись с timestamp); отчёт с confidence; overrides как рекомендованный механизм; веб-интерфейс с кнопками rspec/e2e (http://2.56.121.34); фаззинг в CI; прогон на 20 реальных API; детерминизм |
 
 Подробная разбалловка — `docs/CRITERIA.md`.
 
