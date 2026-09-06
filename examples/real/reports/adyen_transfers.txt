@@ -15,19 +15,15 @@ Errors: 401 (create) invalid_credentials → alert_block;
 Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
 Fields: 48 request fields, 38 unmapped (counterparty: bank_account, card)
-Warnings (106):
-  WARN         role_conflict              GET /transfers (get-transfers) also looks like status (0.7); GET /transfers/{id} (get-transfers-id) wins (0.9)
-        hint: endpoints.get-transfers: status
-  WARN         role_conflict              GET /grants/{id} (get-grants-id) also looks like status (0.65); GET /transfers/{id} (get-transfers-id) wins (0.9)
-        hint: endpoints.get-grants-id: status
-  WARN         role_conflict              GET /transactions/{id} (get-transactions-id) also looks like status (0.65); GET /transfers/{id} (get-transfers-id) wins (0.9)
-        hint: endpoints.get-transactions-id: status
+Warnings (104):
   WARN         role_conflict              POST /transfers/approve (post-transfers-approve) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)
         hint: endpoints.post-transfers-approve: create
   WARN         role_conflict              POST /transfers/cancel (post-transfers-cancel) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)
         hint: endpoints.post-transfers-cancel: create
   WARN         role_conflict              POST /transfers/{transferId}/returns (post-transfers-transferId-returns) also looks like create (0.6); POST /transfers (post-transfers) wins (0.95)
         hint: endpoints.post-transfers-transferId-returns: create
+  WARN         role_conflict              GET /transfers (get-transfers) also looks like status (0.7); GET /transfers/{id} (get-transfers-id) wins (0.9)
+        hint: endpoints.get-transfers: status
   WARN         api_key_in_query           apiKey 'clientKey' is sent in query, not header
         hint: the generated client passes it as a query param
   WARN         unmapped_status            status 'approvalPending' (approval_pending) of status is unknown
@@ -36,7 +32,11 @@ Warnings (106):
         hint: statuses.atmWithdrawal: in_progress|approved|rejected  (overrides.yml)
   WARN         unmapped_status            status 'atmWithdrawalReversalPending' (atm_withdrawal_reversal_pending) of status is unknown
         hint: statuses.atmWithdrawalReversalPending: in_progress|approved|rejected  (overrides.yml)
-  … and 96 more (see --format json)
+  WARN         unmapped_status            status 'atmWithdrawalReversed' (atm_withdrawal_reversed) of status is unknown
+        hint: statuses.atmWithdrawalReversed: in_progress|approved|rejected  (overrides.yml)
+  WARN         unmapped_status            status 'authAdjustmentAuthorised' (auth_adjustment_authorised) of status is unknown
+        hint: statuses.authAdjustmentAuthorised: in_progress|approved|rejected  (overrides.yml)
+  … and 94 more (see --format json)
 Unsupported (2):
   UNSUPPORTED  http_alternative           alternative security scheme 'BasicAuth' (http) is ignored
         hint: the first supported scheme is used
@@ -54,4 +54,4 @@ Info (12):
   INFO         outside_contract           POST /transfers/{transferId}/returns (post-transfers-transferId-returns) — not used
   INFO         outside_contract           POST /cashouts (post-cashouts) — not used
   … and 2 more (see --format json)
-Done: 106 warnings, 2 unsupported. Exit 0.
+Done: 104 warnings, 2 unsupported. Exit 0.

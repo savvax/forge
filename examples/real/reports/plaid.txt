@@ -196,26 +196,26 @@ Webhook signature: no webhook found
 Amount: string, major units (×100) — source: amount (string) → major units: 'The amount of the transfer (decimal string with two digits of precision e.g. "10.00"). When calling `/transfer/authorization/create`, specify the maximum amount to authorize. When calling `/transfer/create`, specify the exact amount of the transfer, up to a maximum of the amount authorized. If this field is left blank when calling `/transfer/create`, the maximum amount authorized in the `authorization_id` will be sent.'
 Fields: 23 request fields, 18 unmapped
 Warnings (57):
-  WARN         role_conflict              POST /transfer/recurring/get (transferRecurringGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferRecurringGet: status
-  WARN         role_conflict              POST /transfer/balance/get (transferBalanceGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferBalanceGet: status
-  WARN         role_conflict              POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferCapabilitiesGet: status
-  WARN         role_conflict              POST /transfer/configuration/get (transferConfigurationGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferConfigurationGet: status
-  WARN         role_conflict              POST /transfer/ledger/get (transferLedgerGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferLedgerGet: status
-  WARN         role_conflict              POST /transfer/metrics/get (transferMetricsGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferMetricsGet: status
-  WARN         role_conflict              POST /transfer/sweep/get (transferSweepGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferSweepGet: status
-  WARN         role_conflict              POST /transfer/intent/get (transferIntentGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferIntentGet: status
-  WARN         role_conflict              POST /transfer/originator/get (transferOriginatorGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferOriginatorGet: status
-  WARN         role_conflict              POST /transfer/originator/list (transferOriginatorList) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)
-        hint: endpoints.transferOriginatorList: status
+  WARN         role_conflict              POST /transfer/recurring/create (transferRecurringCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferRecurringCreate: create
+  WARN         role_conflict              POST /transfer/intent/create (transferIntentCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferIntentCreate: create
+  WARN         role_conflict              POST /transfer/originator/create (transferOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferOriginatorCreate: create
+  WARN         role_conflict              POST /transfer/questionnaire/create (transferQuestionnaireCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferQuestionnaireCreate: create
+  WARN         role_conflict              POST /transfer/diligence/submit (transferDiligenceSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferDiligenceSubmit: create
+  WARN         role_conflict              POST /transfer/originator/funding_account/create (transferOriginatorFundingAccountCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferOriginatorFundingAccountCreate: create
+  WARN         role_conflict              POST /transfer/platform/requirement/submit (transferPlatformRequirementSubmit) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformRequirementSubmit: create
+  WARN         role_conflict              POST /transfer/platform/originator/create (transferPlatformOriginatorCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformOriginatorCreate: create
+  WARN         role_conflict              POST /transfer/platform/person/create (transferPlatformPersonCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferPlatformPersonCreate: create
+  WARN         role_conflict              POST /transfer/list (transferList) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)
+        hint: endpoints.transferList: create
   … and 47 more (see --format json)
 Info (42):
   INFO         outside_contract           POST /transfer/cancel (transferCancel) — generated as `cancel_request` helper

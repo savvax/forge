@@ -35,10 +35,14 @@ payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, tra
                disbursement, disbursements, send, remittance, outbound]
 weak_payout_words: [payment, payments]   # слово выплаты, только если в спеке нет путей с сильным словом;
                                          # иначе create-кандидат на пути без сильного слова получает −0.5
+# status/cancel принимаются, только если в пути есть слово выплаты или путь лежит под create-эндпоинтом:
+# в спеке без выплат (pay-in) GET /x/{id} иначе набирал 0.65 и становился status.
+# status/cancel принимаются, только если в пути есть слово выплаты или путь лежит под create-эндпоинтом:
+# в спеке без выплат (pay-in) GET /x/{id} иначе набирал 0.65 и становился status.
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
                  recipients, otp, export, bulk, search, resend, finalize,
-                 simulate, simulation, inward, incoming, payin, deposit, deposits]   # каждое совпадение: −0.5
+                 simulate, simulation, inward, incoming, payin, deposit, deposits, health]   # каждое совпадение: −0.5
 
 roles:
   create:

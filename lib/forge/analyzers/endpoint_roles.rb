@@ -29,11 +29,30 @@ module Forge
 
       # {role => [endpoint, score]}: каждый эндпоинт — одна роль, каждая роль — один эндпоинт.
       def assign(candidates)
-        best = candidates.filter_map do |endpoint|
+        groups = best_roles(candidates).group_by { |(_endpoint, role, _score)| role }
+        create = groups.key?(:create) ? pick_winner(:create, groups.delete(:create)) : nil
+        winners = groups.filter_map do |role, group|
+          related = group.select { |(endpoint, _role, _score)| related?(endpoint, role, create) }
+          [role, pick_winner(role, related)] unless related.empty?
+        end
+        create ? { create: create }.merge(winners.to_h) : winners.to_h
+      end
+
+      # [endpoint, лучшая роль, очки] для кандидатов, прошедших порог warn.
+      def best_roles(candidates)
+        candidates.filter_map do |endpoint|
           role, score = scores(endpoint).max_by { |_role, points| points }
           [endpoint, role, score] if score && score >= threshold(:warn)
         end
-        best.group_by { |(_endpoint, role, _score)| role }.to_h { |role, group| [role, pick_winner(role, group)] }
+      end
+
+      # status/cancel вне ресурса выплат — шум (GET /static-qr/{id} в спеке без выплат): нужен payout-слово в пути
+      # или путь под create-эндпоинтом.
+      def related?(endpoint, role, create)
+        return true unless %i[status cancel].include?(role)
+
+        facts = Facts.new(endpoint, rules.fetch(:endpoint_roles), weak_ok: weak_ok?)
+        facts.payout_path? || (create && endpoint.path.start_with?(create[0].path.sub(/\{.*\z/, '')))
       end
 
       def pick_winner(role, group)
@@ -150,6 +169,7 @@ module Forge
         end
 
         def strong_payout_path? = tokens(bare_path).intersect?(@dict['payout_words'])
+        def payout_path? = word?('payout', bare_path)
 
         def requires?(req)
           return true unless req

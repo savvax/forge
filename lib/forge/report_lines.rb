@@ -71,8 +71,10 @@ module Forge
     def webhook_events
       w = @f[:webhooks].value
       return nil unless w[:endpoint]
+
       if w[:event_map].empty?
-        return "Webhook events: #{w[:event_field] || 'no event field'} → status from #{w[:status_field]&.join('.')}"
+        from = w[:status_field] ? "status from #{w[:status_field].join('.')}" : 'no known event values or status field'
+        return "Webhook events: #{w[:event_field] || 'no event field'} → #{from}"
       end
 
       "Webhook events: #{w[:event_map].map { |e, s| "#{e} → #{s}" }.join('; ')}"

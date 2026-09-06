@@ -140,6 +140,14 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       expect(finding.value[:status].operation_id).to eq('GetPayout')
     end
 
+    it 'drops status/cancel candidates off the payout resource when there is no create (pay-in spec)' do
+      paths = { '/static-qr/{id}' => { 'get' => { 'operationId' => 'getStaticQr', 'parameters' => [path_param('id')],
+                                                  'responses' => { '200' => { 'description' => 'ok' } } } } }
+      finding = described_class.new(ir_for(build_spec(paths: paths)), rules).call
+      expect(finding.value.values_at(:create, :status, :cancel)).to all(be_nil)
+      expect(finding).not_to have_warning(:low_confidence)
+    end
+
     it 'treats sandbox simulation and inward payment endpoints as negative' do
       finding = described_class.new(ir_for(build_spec(paths: post_op('/inward/payment/manual', 'simulatePayment'))),
                                     rules).call

@@ -11,7 +11,7 @@ negative_words: [order, orders, inventory, subscription, subscriptions, booking,
                  recipients, otp, export, bulk, search, resend, finalize, authorization, authorize,
                  auth, login, logout, token, tokens, connection, connections, session, sessions, phone_code,
                  send_phone, verify_phone, settings, callback_settings, draft, banks, dictionary,
-                 simulate, simulation, inward, incoming, payin, deposit, deposits]   # песочница и входящие платежи — не выплата
+                 simulate, simulation, inward, incoming, payin, deposit, deposits, health]   # песочница, входящие платежи, health-check — не выплата
 negative_penalty: 0.5   # больше веса payout_word_in_path + create_word: /v2/transfer-orders не проходит порог warn
 
 words:

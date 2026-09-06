@@ -487,76 +487,6 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfer/recurring/get (transferRecurringGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1recurring~1get/post",
-      "hint": "endpoints.transferRecurringGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/balance/get (transferBalanceGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1balance~1get/post",
-      "hint": "endpoints.transferBalanceGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
-      "hint": "endpoints.transferCapabilitiesGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/configuration/get (transferConfigurationGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1configuration~1get/post",
-      "hint": "endpoints.transferConfigurationGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/ledger/get (transferLedgerGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1ledger~1get/post",
-      "hint": "endpoints.transferLedgerGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/metrics/get (transferMetricsGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1metrics~1get/post",
-      "hint": "endpoints.transferMetricsGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/sweep/get (transferSweepGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1sweep~1get/post",
-      "hint": "endpoints.transferSweepGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/intent/get (transferIntentGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1intent~1get/post",
-      "hint": "endpoints.transferIntentGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/originator/get (transferOriginatorGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1originator~1get/post",
-      "hint": "endpoints.transferOriginatorGet: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/originator/list (transferOriginatorList) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
-      "pointer": "#/paths/~1transfer~1originator~1list/post",
-      "hint": "endpoints.transferOriginatorList: status"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "POST /transfer/recurring/create (transferRecurringCreate) also looks like create (0.95); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1recurring~1create/post",
       "hint": "endpoints.transferRecurringCreate: create"
@@ -714,6 +644,76 @@
       "message": "POST /transfer/diligence/document/upload (transferDiligenceDocumentUpload) also looks like create (0.75); POST /transfer/create (transferCreate) wins (0.95)",
       "pointer": "#/paths/~1transfer~1diligence~1document~1upload/post",
       "hint": "endpoints.transferDiligenceDocumentUpload: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/recurring/get (transferRecurringGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1recurring~1get/post",
+      "hint": "endpoints.transferRecurringGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/balance/get (transferBalanceGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1balance~1get/post",
+      "hint": "endpoints.transferBalanceGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/capabilities/get (transferCapabilitiesGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1capabilities~1get/post",
+      "hint": "endpoints.transferCapabilitiesGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/configuration/get (transferConfigurationGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1configuration~1get/post",
+      "hint": "endpoints.transferConfigurationGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/ledger/get (transferLedgerGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1ledger~1get/post",
+      "hint": "endpoints.transferLedgerGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/metrics/get (transferMetricsGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1metrics~1get/post",
+      "hint": "endpoints.transferMetricsGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/sweep/get (transferSweepGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1sweep~1get/post",
+      "hint": "endpoints.transferSweepGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/intent/get (transferIntentGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1intent~1get/post",
+      "hint": "endpoints.transferIntentGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/get (transferOriginatorGet) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1originator~1get/post",
+      "hint": "endpoints.transferOriginatorGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfer/originator/list (transferOriginatorList) also looks like status (0.8); POST /transfer/get (transferGet) wins (0.8)",
+      "pointer": "#/paths/~1transfer~1originator~1list/post",
+      "hint": "endpoints.transferOriginatorList: status"
     },
     {
       "level": "warn",
