@@ -47,7 +47,7 @@ forge/
 │   └── real/                      # reports/*.txt (коммитим), *.json|yaml (скачиваются, gitignore)
 ├── spec/                          # см. docs/TESTING.md
 ├── docs/  Rakefile  Gemfile  Dockerfile  .rubocop.yml  .rspec  .github/workflows/ci.yml
-├── CLAUDE.md  README.md  NOTES.md  .claude/commands/
+├── CLAUDE.md  README.md  NOTES.md
 ```
 
 ## CLI

@@ -3,7 +3,7 @@
 Документ для независимого проверяющего (человека или агента): что требовалось, что реализовано, где это
 лежит, как проверить каждое утверждение командой и какие отклонения от документов приняты осознанно.
 Актуально на тег `v1.0.0` (5.09.2026). Первоисточники: `docs/TASK.md`, `docs/QA_SESSION_1.md`,
-`docs/CRITERIA.md`, `CLAUDE.md`, `docs/AGENT_TASKS.md`, `NOTES.md` (решения D-01…D-20).
+`docs/CRITERIA.md`, `CLAUDE.md`, `NOTES.md` (решения D-01…D-30).
 
 ## 1. Требования
 
@@ -143,7 +143,7 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 | 5 | OUTPUT_FORMAT § 2: тело запроса == fixtures.request | тело ⊆ примера (без nil), поля с override `source` исключены | D-13 |
 | 6 | TEST_SPECS § 4: `cyclic_ref`, `bad_ref` → `SpecError` из загрузчика | маркеры в загрузчике, `SpecError` из `Analyzers::Fields` (CLI: exit 1 те же) | D-14: реальные спеки рекурсивны |
 | 7 | RULES § 0: `Rules.load('rules')` относительно cwd | относительно корня проекта | `bin/integrate` из любого каталога |
-| 8 | AGENT_TASKS T01: Thor в `lib/forge/cli.rb` | так и есть (после T07) | — |
+| 8 | Thor в `lib/forge/cli.rb` | так и есть | — |
 | 9 | Карточка T15: Rack::Test | `Rack::MockRequest` из rack | гем `rack-test` не в Gemfile, новый гем требует согласия |
 | 10 | ТЗ пример `report.txt`: «Done: 6 files» | `report.txt` содержит пути относительно каталога вывода (`./novapay_service.rb`), stdout — полные | детерминизм между каталогами (`rake determinism`) |
 | 11 | RULES § 9: `fields.<path>.variant` для `oneOf` | реализовано (D-17) | — |
@@ -192,6 +192,5 @@ Adyen Payout 9, Adyen Transfers 10, PayPal 8, Paystack 8, Stripe 9, Plaid 8 пр
 ## 6. Что не входит в проверенное состояние
 
 - Push на GitHub и CI на `main` не выполнялись из этой сессии (remote `savvax/forge` есть, тег `v1.0.0` локальный).
-- Отметки `[x]` в `docs/AGENT_TASKS.md` ведёт человек — не проставлены.
 - T17 (полировка по замечаниям CP3) — по определению после чек-поинта.
 - Job `real-specs` в CI ручной (`workflow_dispatch`/schedule), `continue-on-error`.

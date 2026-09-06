@@ -246,7 +246,7 @@ namespace :fuzz do
 end
 
 namespace :demo do
-  desc 'Записать docs/demo.gif и docs/demo.mp4 по docs/demo.tape (нужен vhs)'
+  desc 'Записать docs/demo.gif по docs/demo.tape (нужен vhs)'
   task(:gif) { sh 'vhs docs/demo.tape' }
 end
 

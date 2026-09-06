@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Сценарий демо (docs/DEMO_CP3.md): analyze → generate → rspec сгенерированного → e2e → файлы.
+# Сценарий демо: analyze → generate → rspec сгенерированного → e2e → файлы.
 # usage: bin/demo [SPEC] [--fast]   (--fast без пауз)
 require 'open3'
 

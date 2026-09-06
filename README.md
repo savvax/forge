@@ -8,13 +8,13 @@
 Зачем читать: это вход для жюри и экспертов. Пять минут — и вы знаете, как запустить,
 что получается, где в коде каждый критерий и что мы сознательно не делаем.
 
-> Статус: этапы M1–M4 закрыты, M5 (Docker, CI, README) собран (`docs/PLAN.md`). `rake ci` зелёный за ~50 с (rubocop,
+> Статус: этапы M1–M4 закрыты, M5 (Docker, CI, README) собран. `rake ci` зелёный за ~50 с (rubocop,
 > 325 тестов, покрытие ≥ 97 %, generate всех примеров и их сгенерированные RSpec, детерминизм, фаззинг, лицензии).
 > `bin/e2e` доводит выплату до
 > `approved` на сгенерированном моке для NovaPay, CardPay, SwiftPay (подпись `t=…,v1=…`), Райффайзена и
 > OAuth2-провайдера (`spec/fixtures/oauth2_payout.yaml`). 20 реальных API (Stripe, Adyen, PayPal, Wise, Mollie…)
 > анализируются без падений, отчёты — `examples/real/reports/`; PayPal, Velo, Dwolla и Open Banking получают токен
-> OAuth2 client_credentials. Живой веб-интерфейс — https://forge.savvax.com.
+> OAuth2 client_credentials. Живой веб-интерфейс — http://forge.savvax.com.
 
 ## Демо: весь CLI за три минуты
 
@@ -35,10 +35,10 @@
 9. **e2e** — `bin/e2e`: мок-сервер из той же спеки, `create_request → fetch_status → подписанный webhook → approved`.
 10. **e2e на других схемах** — SwiftPay (подпись `t=…,v1=…`) и OAuth2 client_credentials (токен выдаёт мок): оба approved.
 11. **Overrides** — CardPay с `examples/overrides/cardpay.yml` и `--strict`: все WARN закрыты, exit 0.
-12. **Честные ошибки** — циклический `$ref`: exit 1 с JSON-pointer и подсказкой; pay-in спека Kaspi без выплат: exit 2 с подсказкой про overrides.
+12. **Честные ошибки** — циклический `$ref`: exit 1 с JSON-pointer и подсказкой; pay-in спека Kaspi (`examples/payin/kaspi.yaml`) без выплат: exit 2 с подсказкой про overrides.
 13. **Реальная спека** — Stripe (594 эндпоинта) с `--include-paths`: те же правила, никакой привязки к провайдеру.
 
-Видео без сжатия — `docs/demo.mp4`; перезаписать: `rake demo:gif` (нужен [vhs](https://github.com/charmbracelet/vhs)).
+Перезаписать: `rake demo:gif` (нужен [vhs](https://github.com/charmbracelet/vhs); сценарий — `docs/demo.tape`).
 
 ## Быстрый старт
 
@@ -182,7 +182,8 @@ CLI — основной интерфейс (по условиям задачи)
 жюри: загрузить спеку и overrides, увидеть отчёт, открыть/скачать 7 файлов, запустить сгенерированный
 RSpec и e2e (мок + webhook) кнопкой. Без базы и без новых гемов (Sinatra + Puma уже в Gemfile).
 
-Развёрнутый экземпляр для жюри: **https://forge.savvax.com** (те же 20 МБ на спеку, прогоны хранятся на сервере).
+Развёрнутый экземпляр для жюри: **http://forge.savvax.com** — демо-стенд по HTTP без TLS, поэтому загружайте туда только
+открытые спецификации; лимит 20 МБ на спеку, прогоны хранятся на сервере.
 
 ```bash
 bin/forge-web                                  # http://localhost:8080 (PORT, FORGE_WORKDIR)
@@ -325,7 +326,7 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 | Документация и тестовые материалы | `output/<p>/INTEGRATION.md` (с «Допущениями»), `fixtures.json`, генерируемый `*_service_spec.rb` |
 | Удобство и демонстрация | этот README, `bin/integrate`, коды выхода 0–4, ошибки с pointer + hint, `bin/e2e`, `bin/demo` |
 | Качество реализации | шесть стадий по каталогам, `rubocop` 0, покрытие ≥ 97 %, обработка ошибок разбора/генерации (`spec/fixtures/broken/`, `spec/cli_spec.rb`, `lib/forge/shape.rb`), фаззинг (`spec/fuzz/`), CI |
-| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved` (5 сценариев, включая OAuth2 и подпись с timestamp); отчёт с confidence; overrides как рекомендованный механизм; веб-интерфейс с кнопками rspec/e2e (https://forge.savvax.com); фаззинг в CI; прогон на 20 реальных API; детерминизм |
+| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved` (5 сценариев, включая OAuth2 и подпись с timestamp); отчёт с confidence; overrides как рекомендованный механизм; веб-интерфейс с кнопками rspec/e2e (http://forge.savvax.com); фаззинг в CI; прогон на 20 реальных API; детерминизм |
 
 Подробная разбалловка — `docs/CRITERIA.md`.
 
@@ -361,7 +362,7 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 
 ## Разработка
 
-- Контекст для агентов и людей — `CLAUDE.md`; процесс — `docs/PROCESS.md`; бэклог — `docs/AGENT_TASKS.md`.
+- Контекст для кодовых агентов и людей — `CLAUDE.md`; карта документов — там же.
 - Ruby 3.3: `.mise.toml` в корне, `mise install && bundle install`.
 - `bundle exec rake check` — lint + тесты + guard. `bundle exec rake ci` — всё, что делает CI.
 - Golden обновляются осознанно: `UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb`, затем diff.

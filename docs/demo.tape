@@ -1,8 +1,7 @@
-# Запись демо для README: `vhs docs/demo.tape` (или `rake demo:gif`) → docs/demo.gif + docs/demo.mp4.
+# Запись демо для README: `vhs docs/demo.tape` (или `rake demo:gif`) → docs/demo.gif.
 # Фазы совпадают с нумерованным списком под гифкой в README («Демо: весь CLI»).
 # Нужны: vhs, скачанный examples/real/stripe.json (`rake real:fetch`), свободный порт 4567.
 Output docs/demo.gif
-Output docs/demo.mp4
 
 Set Shell bash
 Set FontSize 13
@@ -85,7 +84,7 @@ Sleep 5s
 # 12. Честные ошибки: циклический $ref (exit 1 с pointer), pay-in спека без create (exit 2 с подсказкой)
 Type `bin/forge analyze --spec spec/fixtures/broken/cyclic_ref.yaml; echo "exit: $?"` Enter
 Sleep 4s
-Type `bin/forge generate --spec apipay_kz_kaspi_openapi.yaml --out tmp/demo/kaspi; echo "exit: $?"` Enter
+Type `bin/forge generate --spec examples/payin/kaspi.yaml --out tmp/demo/kaspi; echo "exit: $?"` Enter
 Sleep 5s
 
 # 13. Реальная спека (Stripe, 594 эндпоинта): --include-paths, те же правила, без привязки к провайдеру

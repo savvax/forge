@@ -9,3 +9,5 @@ examples/real/*.yml
 vendor/bundle/
 *.log
 .DS_Store
+*.docx
+*.pdf
