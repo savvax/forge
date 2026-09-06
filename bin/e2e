@@ -61,6 +61,14 @@ class E2E
     puts "operation approved ✓ (#{@plan.provider[:name]})"
   end
 
+  # Подсказка по коду failure: что сделать, чтобы e2e дошёл до approved.
+  HINTS = {
+    'signature_unsupported' => 'implement verify_signature! per the provider docs ' \
+                               '(UNSUPPORTED signature_with_timestamp in report.txt)',
+    'invalid_signature' => 'check webhook.signature_encoding / signature_payload in overrides.yml',
+    'requisite_missing' => 'payout_requisite must contain one of the requisite types (see INTEGRATION.md)'
+  }.freeze
+
   private
 
   def step(name) = puts("• #{name}")
@@ -130,7 +138,7 @@ class E2E
   def check(name, result)
     if result.failed?
       detail = result.data[:message] || result.data
-      hint = 'fields marked TODO in build_payout_payload need a source (overrides.yml)'
+      hint = HINTS.fetch(result.code, 'fields marked TODO in build_payout_payload need a source (overrides.yml)')
       fail!("#{name}: #{result.code} — #{detail}\n  hint: #{hint}")
     end
     step "#{name} ok" if name == 'check_conditions'

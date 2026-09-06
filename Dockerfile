@@ -19,11 +19,6 @@ COPY . .
 # Быстрая самопроверка сборки: CLI загружается и показывает команды
 RUN bin/forge help
 
-# --- CLI (по умолчанию): docker run --rm forge analyze --spec … ---
-FROM base AS cli
-ENTRYPOINT ["bin/forge"]
-CMD ["help"]
-
 # --- Веб-интерфейс: docker build --target web -t forge-web . && docker run -p 8080:8080 forge-web ---
 FROM base AS web
 ENV PORT=8080 FORGE_WORKDIR=/data/web RACK_ENV=production
@@ -31,3 +26,8 @@ RUN mkdir -p /data/web
 EXPOSE 8080
 ENTRYPOINT ["bundle", "exec", "puma", "-b", "tcp://0.0.0.0:8080", "-e", "production", "config.ru"]
 CMD []
+
+# --- CLI (по умолчанию — последняя стадия, её собирает `docker build -t forge .`): docker run --rm forge analyze --spec … ---
+FROM base AS cli
+ENTRYPOINT ["bin/forge"]
+CMD ["help"]
