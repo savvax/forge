@@ -191,6 +191,13 @@ RSpec.describe Forge::Shape do
         expect { overrides(text) }.to raise_error(Forge::SpecError, Regexp.new(Regexp.escape(message)))
       end
     end
+
+    it 'treats an empty section (`base_url:`) as absent' do
+      File.write('tmp/hostile.yml', "base_url:\nprovider:\nstatuses:\n")
+      opts = { spec: 'examples/specs/novapay.yaml', out: 'tmp/hostile_out', overrides: 'tmp/hostile.yml', force: true,
+               verify: false, format: 'json', include_paths: [] }
+      expect(Forge::GenerateCommand.new(opts).run).to eq(0)
+    end
   end
 
   describe Forge::Plan::Naming do

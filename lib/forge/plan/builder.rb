@@ -85,7 +85,8 @@ module Forge
 
       def find_server(servers, pattern) = servers.find { |s| pattern.match?("#{s.url} #{s.description}") }
 
-      def override(key) = @overrides.to_h.fetch(key, {}).transform_keys(&:to_sym)
+      # `base_url:` без значения в overrides.yml = секции нет.
+      def override(key) = (@overrides.to_h[key] || {}).transform_keys(&:to_sym)
 
       def provider_naming
         name = override('provider')[:name] || @provider_name
