@@ -28,7 +28,8 @@ RSpec.describe Provider::RaiffeisenService do
       result = service.create_request(operation, 'create')
       expect(result).to be_success
       expect(stub).to have_been_requested
-      expect(operations.find(operation.id).provider_operation_id).to eq(provider_id)
+      expect(operations.find(operation.id).provider_operation_key).to eq(provider_id)
+      expect(result.data.dig(:result, :id)).to eq(provider_id) # платформа: provider_operation_key = payload.dig(:result, :id)
       expect(result.data[:status]).to eq(create_fixture['expected_operation_status'])
     end
 
@@ -55,7 +56,7 @@ RSpec.describe Provider::RaiffeisenService do
     end
 
     it 'delegates status request_method to fetch_status' do
-      operation.provider_operation_id = provider_id
+      operation.provider_operation_key = provider_id
       stub = stub_request(:get, "#{described_class::BASE_URL}/payout/v1/payouts/#{provider_id}")
              .to_return(status: 200, body: fixtures.dig('fetch_status', 'response_200').to_json,
                         headers: { 'Content-Type' => 'application/json' })
@@ -66,7 +67,7 @@ RSpec.describe Provider::RaiffeisenService do
 
   describe '#fetch_status' do
     it 'maps the provider status to approved' do
-      operation.provider_operation_id = provider_id
+      operation.provider_operation_key = provider_id
       stub_request(:get, "#{described_class::BASE_URL}/payout/v1/payouts/#{provider_id}")
         .to_return(status: 200, body: fixtures.dig('fetch_status', 'response_200').to_json,
                    headers: { 'Content-Type' => 'application/json' })
@@ -82,7 +83,7 @@ RSpec.describe Provider::RaiffeisenService do
     let(:headers) { {} }
 
     before do
-      operation.provider_operation_id = dig_path(callback['payload'], ["payout", "id"])
+      operation.provider_operation_key = dig_path(callback['payload'], ["payout", "id"])
       operations.save(operation)
     end
 
@@ -96,7 +97,7 @@ RSpec.describe Provider::RaiffeisenService do
       failed = fixtures['callback_failed']['payload']
       failed_body = JSON.generate(failed)
       failed_headers = {}
-      operation.provider_operation_id = dig_path(failed, ["payout", "id"])
+      operation.provider_operation_key = dig_path(failed, ["payout", "id"])
       result = service.process_callback(failed, raw_body: failed_body, headers: failed_headers)
       expect(result.data[:status]).to eq('rejected')
     end

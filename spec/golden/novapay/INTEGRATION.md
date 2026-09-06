@@ -66,6 +66,8 @@
 
 HMAC-SHA256(body, callback_secret) → hex → X-NovaPay-Signature
 
+Подпись считается по сырым байтам тела. Платформа передаёт в `process_callback` уже разобранный JSON, поэтому передавайте и сырое тело: `process_callback(payload, raw_body: request.body.read, headers: request.headers)`. Без `raw_body` сервис подписывает `JSON.generate(payload)` — подпись сойдётся, только если провайдер шлёт компактный JSON с тем же порядком ключей.
+
 ## Поля запроса
 
 | Поле | Источник | Обязательность | Преобразование |
@@ -77,7 +79,7 @@ HMAC-SHA256(body, callback_secret) → hex → X-NovaPay-Signature
 | recipient.phone | `operation.payout_requisite.dig(requisite_type, 'phone')` | да | - |
 | recipient.bank_code | `operation.payout_requisite.dig('sbp', 'bank_code')` | если type=sbp | - |
 | recipient.bank_name | `operation.payout_requisite.dig('sbp', 'bank_name')` | нет | - |
-| recipient.card_number | `operation.payout_requisite.dig('card', 'number')` | если type=card | - |
+| recipient.card_number | `operation.payout_requisite.dig('card', 'card_number')` | если type=card | - |
 
 ## Вне контракта
 

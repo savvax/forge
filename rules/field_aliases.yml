@@ -25,7 +25,7 @@ requisite_fields:    # хвост пути → поле реквизита; type
   phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone, types: [sbp, card, wallet] }
   bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code, bank_alias, bank_member_id], field: bank_code, types: [sbp, bank_account] }
   bank_name:      { names: [bank_name, bank], field: bank_name, types: [sbp, bank_account] }
-  number:         { names: [card_number, pan, number, card, card_pan], field: number, types: [card] }
+  number:         { names: [card_number, pan, number, card, card_pan], field: card_number, types: [card] }
   holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name, owner_name, recipient_name], field: holder, types: [card, bank_account] }
   first_name:     { names: [first_name, firstname, given_name], field: first_name, types: [sbp, card, bank_account] }
   last_name:      { names: [last_name, lastname, surname, family_name], field: last_name, types: [sbp, card, bank_account] }
@@ -43,7 +43,7 @@ conditional_required_patterns:   # regex по description → required_if
   - "required\\s+(?:only\\s+)?(?:for|when)\\s+(?<field>\\w+)\\s+(?:is|=)\\s*(?<value>\\w+)"
 requisite_defaults:  # канонические реквизиты docs/CONTRACT.md § 3 — значения для fixtures, когда пример спеки их не содержит
   sbp:          { phone: "79000000000", bank_code: "044525225", bank_name: "Bank", first_name: "Ivan", last_name: "Ivanov", middle_name: "Ivanovich", tax_id: "123456789012" }
-  card:         { number: "4111111111111111", holder: "CARD HOLDER", expiry_month: 12, expiry_year: 2030, phone: "79000000000" }
+  card:         { card_number: "4111111111111111", holder: "CARD HOLDER", expiry_month: 12, expiry_year: 2030, phone: "79000000000" }
   bank_account: { account_number: "40817810000000000001", bank_code: "044525225", bank_name: "Bank", iban: "DE89370400440532013000",
                   bic: "COBADEFFXXX", holder: "ACCOUNT HOLDER", country: "DE" }
   wallet:       { id: "wallet_0001", provider: "wallet", phone: "79000000000" }

@@ -79,8 +79,19 @@ module Forge
 
       def pattern_checks = plan.validations.select { |v| v[:rule] == :pattern }.map { |v| pattern_check(v) }
 
+      DIG = /operation\.payout_requisite\.dig\((requisite_type|'[^']+'), '([^']+)'\)/
+
+      # dig(type, field) → requisite_for(operation, type)[field]: реквизиты платформы бывают плоскими (QA 2).
+      def requisite_access(expr)
+        expr.gsub(DIG) do
+          type = Regexp.last_match(1)
+          type = 'requisite_type_for(operation, request_method)' if type == 'requisite_type'
+          "requisite_for(operation, #{type})['#{Regexp.last_match(2)}']"
+        end
+      end
+
       def length_expr(validation)
-        expr = validation[:expr].sub('requisite_type', 'requisite_type_for(operation, request_method)')
+        expr = requisite_access(validation[:expr])
         return "#{expr}.length" if expr.end_with?('.to_s')
 
         expr.match?(/\A[\w.]+\z/) ? "#{expr}.to_s.length" : "(#{expr}).to_s.length"
@@ -88,7 +99,7 @@ module Forge
 
       def pattern_check(validation)
         name = validation[:field].split('.').last
-        expr = validation[:expr].sub('requisite_type', 'requisite_type_for(operation, request_method)')
+        expr = requisite_access(validation[:expr])
         regexp = validation[:value].sub(/\A\^/, '\A').sub(/\$\z/, '\z').gsub('/', '\/')
         check = "#{name}.to_s.match?(/#{regexp}/)"
         type = validation[:requisite_type]

@@ -109,7 +109,7 @@ RSpec.describe Forge::Renderers::Service do
     end
 
     it 'renders form: payload and a POST fetch_status, and the generated spec is green' do
-      expect(render(plan)).to include('form: payload', "body = { 'transfer_id' => operation.provider_operation_id }",
+      expect(render(plan)).to include('form: payload', "body = { 'transfer_id' => operation.provider_operation_key }",
                                       '/transfer/get", json: body, headers: auth_headers)')
       dir = 'tmp/form_status'
       Forge::Renderers::Runner.render(plan, out_dir: dir, force: true)

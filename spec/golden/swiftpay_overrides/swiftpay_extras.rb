@@ -9,7 +9,7 @@ require_relative 'swiftpay_service'
 module Provider
   class SwiftpayExtras < SwiftpayService
     def cancel_request(operation)
-      response = client.delete("#{BASE_URL}/v1/payments/outbound/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.delete("#{BASE_URL}/v1/payments/outbound/#{operation.provider_operation_key}", headers: auth_headers)
       return apply_status(operation, response.body['status']) if response.status == 200
 
       failure(http_symbol(response.status), "provider.#{error_code_for(response)}")

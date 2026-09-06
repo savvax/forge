@@ -12,7 +12,7 @@ module Forge
 
       def op(role) = @plan.operations[role]
 
-      ID_EXPR = '#{operation.provider_operation_id}' # rubocop:disable Lint/InterpolationCheck
+      ID_EXPR = '#{operation.provider_operation_key}' # rubocop:disable Lint/InterpolationCheck
 
       def url(role)
         path = op(role).path.gsub(/\{\w+\}/, ID_EXPR)
@@ -58,7 +58,7 @@ module Forge
       def cancel_client_call
         field = op(:cancel).status_request_field
         if field
-          return "client.post(#{url(:cancel)}, json: { '#{field}' => operation.provider_operation_id }, " \
+          return "client.post(#{url(:cancel)}, json: { '#{field}' => operation.provider_operation_key }, " \
                  'headers: auth_headers)'
         end
 

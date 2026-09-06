@@ -32,7 +32,7 @@
       "currency": "RUB",
       "payout_requisite": {
         "card": {
-          "number": "4111111111111111",
+          "card_number": "4111111111111111",
           "holder": "IVAN IVANOV",
           "expiry_month": 12,
           "expiry_year": 2030,

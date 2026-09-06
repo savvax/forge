@@ -222,7 +222,7 @@ requisite_fields:    # хвост пути → поле реквизита; ти
   phone:          { names: [phone, phone_number, msisdn, mobile, mobile_number], field: phone }
   bank_code:      { names: [bank_code, bic, bank_id, bank_bic, member_id, bank_identifier, routing_number, sort_code], field: bank_code }
   bank_name:      { names: [bank_name, bank], field: bank_name }
-  number:         { names: [card_number, pan, number, card, card_pan], field: number, types: [card] }
+  number:         { names: [card_number, pan, number, card, card_pan], field: card_number, types: [card] }
   holder:         { names: [holder, cardholder, card_holder, name, full_name, account_holder, beneficiary_name, holder_name], field: holder }
   expiry_month:   { names: [expiry_month, exp_month, month], field: expiry_month, types: [card] }
   expiry_year:    { names: [expiry_year, exp_year, year], field: expiry_year, types: [card] }

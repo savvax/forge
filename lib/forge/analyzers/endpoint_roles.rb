@@ -89,7 +89,7 @@ module Forge
 
           unsupported(:path_params_unresolved,
                       "#{label(endpoint)}: path params #{unresolved.join(', ')} cannot be filled from the operation " \
-                      '(only the payout id is known); provider_operation_id is substituted',
+                      '(only the payout id is known); provider_operation_key is substituted',
                       pointer: endpoint.pointer,
                       hint: 'connection-level ids in the path are not supported yet: edit the URL in the generated ' \
                             "service or choose another endpoint via endpoints.<operationId>: #{role}")

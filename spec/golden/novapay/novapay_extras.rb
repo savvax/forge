@@ -9,7 +9,7 @@ require_relative 'novapay_service'
 module Provider
   class NovapayExtras < NovapayService
     def cancel_request(operation)
-      response = client.post("#{BASE_URL}/payouts/#{operation.provider_operation_id}/cancel", headers: auth_headers)
+      response = client.post("#{BASE_URL}/payouts/#{operation.provider_operation_key}/cancel", headers: auth_headers)
       return apply_status(operation, response.body['status']) if response.status == 200
 
       failure(http_symbol(response.status), "provider.#{error_code_for(response)}")

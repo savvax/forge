@@ -110,7 +110,7 @@ module Provider
     end
 
     def fetch_status(operation)
-      response = client.get("#{BASE_URL}/payouts/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.get("#{BASE_URL}/payouts/#{operation.provider_operation_key}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
       apply_status(operation, response.body['status'])
@@ -139,7 +139,7 @@ module Provider
     # --- Outside BaseService contract (optional helpers found in the spec) ---
 
     def cancel_request(operation)
-      response = client.post("#{BASE_URL}/payouts/#{operation.provider_operation_id}/cancel", headers: auth_headers)
+      response = client.post("#{BASE_URL}/payouts/#{operation.provider_operation_key}/cancel", headers: auth_headers)
       return apply_status(operation, response.body['status']) if response.status == 200
 
       failure(http_symbol(response.status), "provider.#{error_code_for(response)}")
@@ -193,7 +193,7 @@ module Provider
                        provider_code: response.body.dig('error', 'code'), message: response.body.dig('error', 'message'))
       end
 
-      operations.update(operation.id, provider_operation_id: response.body['id'])
+      operations.update(operation.id, provider_operation_key: response.body['id'])
       apply_status(operation, response.body['status'])
     end
 
@@ -233,7 +233,7 @@ RSpec + WebMock, читает `fixtures.json` из своего каталога
 | describe | it | ожидание |
 |---|---|---|
 | `#check_conditions` | rejects amount below minimum | `failure.code == 'amount_too_low'` (если есть min) |
-| `#create_request` | creates payout (201) | `success?`, `operation.provider_operation_id == '<id из fixtures>'`, статус `in_progress`, тело запроса == `fixtures.create_request.request` |
+| `#create_request` | creates payout (201) | `success?`, `operation.provider_operation_key == '<id из fixtures>'`, статус `in_progress`, тело запроса == `fixtures.create_request.request` |
 | | maps 422 to validation_error | `code == 'provider.validation_error'` |
 | | maps 401 to invalid_credentials | `code == 'provider.invalid_credentials'` |
 | | maps 429 to rate_limit with retry_after | `data[:retry_after] == 60` |

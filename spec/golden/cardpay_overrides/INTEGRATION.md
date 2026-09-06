@@ -62,6 +62,8 @@
 
 HMAC-SHA512(body, callback_secret) → base64 → X-Signature
 
+Подпись считается по сырым байтам тела. Платформа передаёт в `process_callback` уже разобранный JSON, поэтому передавайте и сырое тело: `process_callback(payload, raw_body: request.body.read, headers: request.headers)`. Без `raw_body` сервис подписывает `JSON.generate(payload)` — подпись сойдётся, только если провайдер шлёт компактный JSON с тем же порядком ключей.
+
 ## Поля запроса
 
 | Поле | Источник | Обязательность | Преобразование |
@@ -72,7 +74,7 @@ HMAC-SHA512(body, callback_secret) → base64 → X-Signature
 | currency | `operation.currency` | да | - |
 | description | `operation.description || "Payout #{operation.id}"` | нет | - |
 | callback_url | `callback_url` | да | - |
-| destination.card.pan | `operation.payout_requisite.dig('card', 'number')` | да | - |
+| destination.card.pan | `operation.payout_requisite.dig('card', 'card_number')` | да | - |
 | destination.card.holder | `operation.payout_requisite.dig('card', 'holder')` | да | - |
 | destination.card.expiry | `format('%02d/%02d', operation.payout_requisite.dig('card', 'expiry_month'), operation.payout_requisite.dig('card', 'expiry_year') % 100)` | нет | - |
 

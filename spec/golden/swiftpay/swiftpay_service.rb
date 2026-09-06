@@ -42,7 +42,7 @@ module Provider
       return failure(:unprocessable_entity, 'purpose_too_long') if (operation.description || "Payout #{operation.id}").to_s.length > 140
       return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type_for(operation, request_method)
 
-      iban = operation.payout_requisite.dig('bank_account', 'iban')
+      iban = requisite_for(operation, 'bank_account')['iban']
       return failure(:unprocessable_entity, 'iban_invalid') if requisite_type_for(operation, request_method) == 'bank_account' && !iban.to_s.match?(/\A[A-Z]{2}\d{2}[A-Z0-9]{11,30}\z/)
 
       success
@@ -67,7 +67,7 @@ module Provider
     end
 
     def fetch_status(operation)
-      response = client.get("#{BASE_URL}/v1/payments/outbound/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.get("#{BASE_URL}/v1/payments/outbound/#{operation.provider_operation_key}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
       apply_status(operation, response.body['status'], strict: true)
@@ -113,6 +113,11 @@ module Provider
       (operation.payout_requisite.keys & REQUISITE_TYPES).first
     end
 
+    # Реквизиты на платформе: вложенные (payout_requisite['sbp'] = {…}) или плоские (payout_requisite['card_number']).
+    def requisite_for(operation, requisite_type)
+      operation.payout_requisite.fetch(requisite_type) { operation.payout_requisite }
+    end
+
     def build_payout_payload(operation, requisite_type)
       deep_compact(
         {
@@ -135,7 +140,7 @@ module Provider
     end
 
     def build_recipient(operation, requisite_type)
-      requisite = operation.payout_requisite.fetch(requisite_type)
+      requisite = requisite_for(operation, requisite_type)
       {
         name: requisite['holder'],
         iban: requisite['iban'],
@@ -150,7 +155,7 @@ module Provider
                        provider_code: response.body['code'], message: response.body['message'])
       end
 
-      operations.update(operation.id, provider_operation_id: response.body['payment_id'])
+      operations.update(operation.id, provider_operation_key: response.body['payment_id'])
       apply_status(operation, response.body['status'])
     end
 

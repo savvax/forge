@@ -96,7 +96,7 @@ module Provider
 <% if view.op(:status) -%>
     def fetch_status(operation)
 <% if view.op(:status).status_request_field -%>
-      body = { '<%= view.op(:status).status_request_field %>' => operation.provider_operation_id }
+      body = { '<%= view.op(:status).status_request_field %>' => operation.provider_operation_key }
       response = client.post(<%= view.paths.url(:status) %>, json: body, headers: auth_headers)
 <% else -%>
       response = client.get(<%= view.paths.url(:status) %>, headers: auth_headers)
@@ -160,7 +160,12 @@ module Provider
     def requisite_type_for(operation, request_method)
       return request_method if REQUISITE_TYPES.include?(request_method)
 
-      (operation.payout_requisite.keys & REQUISITE_TYPES).first
+      (operation.payout_requisite.keys & REQUISITE_TYPES).first<% if plan.requisite_types.include?('card') %> || ('card' if operation.payout_requisite.key?('card_number'))<% end %>
+    end
+
+    # Реквизиты на платформе: вложенные (payout_requisite['sbp'] = {…}) или плоские (payout_requisite['card_number']).
+    def requisite_for(operation, requisite_type)
+      operation.payout_requisite.fetch(requisite_type) { operation.payout_requisite }
     end
 <% end -%>
 
@@ -190,7 +195,7 @@ module Provider
       <%= line %>
 <% end -%>
 <% else -%>
-      requisite = operation.payout_requisite.fetch(requisite_type)
+      requisite = requisite_for(operation, requisite_type)
       {
 <% view.recipient_lines.each do |line| -%>
         <%= line %>
@@ -206,7 +211,7 @@ module Provider
                        provider_code: <%= view.paths.create_error_code %>, message: <%= view.paths.create_error_message %>)
       end
 
-      operations.update(operation.id, provider_operation_id: <%= view.paths.body(view.op(:create).response_id_path) %>)
+      operations.update(operation.id, provider_operation_key: <%= view.paths.body(view.op(:create).response_id_path) %>)
       apply_status(operation, <%= view.paths.body(view.op(:create).response_status_path) %>)
     end
 

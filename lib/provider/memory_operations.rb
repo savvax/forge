@@ -16,16 +16,16 @@ module Provider
       @by_id[id]
     end
 
-    def find_by_provider_id(provider_operation_id)
-      @by_id.values.find { |op| op.provider_operation_id == provider_operation_id }
+    def find_by_provider_id(provider_operation_key)
+      @by_id.values.find { |op| op.provider_operation_key == provider_operation_key }
     end
 
-    def update(id, status: nil, provider_status: nil, error_code: nil, provider_operation_id: nil)
+    def update(id, status: nil, provider_status: nil, error_code: nil, provider_operation_key: nil)
       operation = @by_id.fetch(id)
       operation.status = status if status
       operation.provider_status = provider_status if provider_status
       operation.error_code = error_code if error_code
-      operation.provider_operation_id = provider_operation_id if provider_operation_id
+      operation.provider_operation_key = provider_operation_key if provider_operation_key
       operation
     end
   end

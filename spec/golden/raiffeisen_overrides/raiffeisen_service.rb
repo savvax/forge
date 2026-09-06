@@ -36,11 +36,11 @@ module Provider
       return failure(:unprocessable_entity, 'currency_not_supported') unless SUPPORTED_CURRENCIES.include?(operation.currency)
       return failure(:unprocessable_entity, 'currency_too_long') if operation.currency.to_s.length > 3
       return failure(:unprocessable_entity, 'paymentDetails_too_long') if (operation.description || "Payout #{operation.id}").to_s.length > 140
-      return failure(:unprocessable_entity, 'phone_too_long') if (operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'phone')).to_s.length > 15
-      return failure(:unprocessable_entity, 'bankAlias_too_long') if (operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'bank_code')).to_s.length > 255
-      return failure(:unprocessable_entity, 'firstName_too_long') if (operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'first_name')).to_s.length > 140
-      return failure(:unprocessable_entity, 'middleName_too_long') if (operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'middle_name')).to_s.length > 140
-      return failure(:unprocessable_entity, 'lastName_too_long') if (operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'last_name')).to_s.length > 140
+      return failure(:unprocessable_entity, 'phone_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['phone']).to_s.length > 15
+      return failure(:unprocessable_entity, 'bankAlias_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['bank_code']).to_s.length > 255
+      return failure(:unprocessable_entity, 'firstName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['first_name']).to_s.length > 140
+      return failure(:unprocessable_entity, 'middleName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['middle_name']).to_s.length > 140
+      return failure(:unprocessable_entity, 'lastName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['last_name']).to_s.length > 140
       return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type_for(operation, request_method)
 
       success
@@ -64,7 +64,7 @@ module Provider
     end
 
     def fetch_status(operation)
-      response = client.get("#{BASE_URL}/payout/v1/payouts/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.get("#{BASE_URL}/payout/v1/payouts/#{operation.provider_operation_key}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
       apply_status(operation, response.body.dig('status', 'value'), strict: true)
@@ -102,6 +102,11 @@ module Provider
       (operation.payout_requisite.keys & REQUISITE_TYPES).first
     end
 
+    # Реквизиты на платформе: вложенные (payout_requisite['sbp'] = {…}) или плоские (payout_requisite['card_number']).
+    def requisite_for(operation, requisite_type)
+      operation.payout_requisite.fetch(requisite_type) { operation.payout_requisite }
+    end
+
     def build_payout_payload(operation, requisite_type)
       deep_compact(
         {
@@ -127,7 +132,7 @@ module Provider
     end
 
     def build_recipient(operation, requisite_type)
-      requisite = operation.payout_requisite.fetch(requisite_type)
+      requisite = requisite_for(operation, requisite_type)
       base = { phone: requisite['phone'], bankAlias: requisite['bank_code'], firstName: requisite['first_name'], middleName: requisite['middle_name'], lastName: requisite['last_name'], inn: requisite['tax_id'] }
       base
     end
@@ -138,7 +143,7 @@ module Provider
                        provider_code: response.body.dig('error', 'code'), message: response.body.dig('error', 'message'))
       end
 
-      operations.update(operation.id, provider_operation_id: response.body['id'])
+      operations.update(operation.id, provider_operation_key: response.body['id'])
       apply_status(operation, response.body.dig('status', 'value'))
     end
 

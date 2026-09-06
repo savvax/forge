@@ -91,3 +91,29 @@
 - Killer-фичи (генерируемый RSpec, мок-сервер, e2e, отчёт с confidence) явно подсветить в README и на питче — под «дополнительные идеи».
 - Стоп-код: последний пуш не позднее 00:00 ALA (22:00 MSK) вс 6.09, дальше репозиторий не трогать.
 - Присутствие на CP3 (вс 6.09, 15:00 ALA) обязательно.
+
+## 10. QA 2 (6.09) — ответы по контракту `Provider::BaseService` и NovaPay
+
+### Раунд 1
+
+- **Как сервис сохраняет ID операции у провайдера?** Сохранение происходит вне сервиса провайдера. Сервис делает запрос к провайдеру через абстрактный client и отдаёт ответ; реальный запрос к провайдеру не нужен.
+- **`process_callback` получает разобранный JSON или сырое тело + заголовки?** Уже разобранный JSON внутри `payload`.
+- **Статусы NovaPay (accepted, cancelled, HTTP 402, event vs status)?** Ориентироваться на «Маппинг статусов» из `INTEGRATION.md` в файле задания.
+- **Нужен ли отдельный конфиг регистрации провайдера (адрес, авторизация, лимиты)?** Нет. Из OpenAPI провайдера формируются сервис + документация + тестовые фикстуры; адрес, авторизация и т.д. берутся из OpenAPI-документа.
+- **Учитывается ли сгенерированный код при подсчёте доли Ruby?** Сама реализация должна быть на Ruby, а не на другом языке.
+
+### Раунд 2
+
+- **Поля `operation`.** Гарантированы `operation.id`, `operation.amount`, `operation.payout_requisite` (JSONB-хеш, не плоские `recipient_phone`/`bank_code`). Формы реквизитов: СБП — `payout_requisite.dig('sbp', 'phone')`, `…('sbp', 'bank_code')`, `…('sbp', 'bank_name')`; карта — часто `payout_requisite['card_number']` (или вложенная card-структура). При необходимости также `gateway`, `provider_operation_key`, `status`.
+- **Что возвращает `create_request`.** Не «голый» `success`. Сервис разбирает ответ провайдера и возвращает `success(result: { id: "np_7f3a9b2c" })` (опционально `rate` и т.п.). Платформа делает `provider_operation_key = payload.dig(:result, :id)`. Сырой HTTP-ответ наружу не обязателен.
+- **Коды в `failure(:code, 'i18n.key')`.** Первый аргумент — символ в духе HTTP/доменного кода платформы: `:bad_request`, `:unauthorized`, `:unprocessable_entity`, `:too_many_requests`, `:internal_server_error`, `:forbidden`… Второй — i18n-ключ или строка (`'operation.provider_error'`, `'provider.rate_limit'`). Маппить HTTP провайдера → эти коды (401 → `unauthorized`, 429 → `too_many_requests`); свои `:novapay_whatever` не выдумывать.
+- **Ветвление по `request_method`.** Это логический метод шлюза (`gateway.payment_method`: `sbp`, `p2p`, …), не HTTP. СБП и карта на платформе обычно разные gateway/payment_method; в одном сервисе — ветки по `request_method` и/или форме `payout_requisite`. Для NovaPay: один сервис, внутри `create_request` ветка по типу получателя / `request_method`.
+- **`amount_limit_exceeded` у NovaPay.** Канон: лимит на эту выплату (сумма вне диапазона / max на операцию) → отклонять операцию (`rejected` / validation), не отдавать человеку. Суточный лимит — другие сценарии (`insufficient_balance` / лимиты оркестратора). Иная трактовка — явно описать в `INTEGRATION.md`.
+
+### Следствия для forge (реализовано 6.09)
+
+- `transition` в `BaseService` кладёт в success `result: { id: <provider id> }` — платформа читает `payload.dig(:result, :id)`.
+- Поле операции переименовано в `provider_operation_key` (заглушка `Operation`, шаблоны, golden); `provider_operation_id` оставлен алиасом под пример ТЗ.
+- Реквизиты читаются через `requisite_for(operation, type)`: вложенная форма `payout_requisite['card']` или плоская `payout_requisite['card_number']`; `requisite_type_for` распознаёт плоскую карту по ключу `card_number`. Канонический реквизит карты — `card_number` (`rules/field_aliases.yml`).
+- В `INTEGRATION.md` (раздел «Webhook signature») описано, что платформа передаёт разобранный JSON, и как передать `raw_body:`; без него подпись считается от `JSON.generate(payload)`.
+- Статусы, 402, коды `failure`, `amount_limit_exceeded → reject`, ветвление по `request_method`, адрес/авторизация из OpenAPI — уже соответствовали.

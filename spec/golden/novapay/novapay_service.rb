@@ -52,7 +52,7 @@ module Provider
       return failure(:unprocessable_entity, 'external_id_too_long') if operation.id.to_s.length > 64
       return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type_for(operation, request_method)
 
-      phone = operation.payout_requisite.dig(requisite_type_for(operation, request_method), 'phone')
+      phone = requisite_for(operation, requisite_type_for(operation, request_method))['phone']
       return failure(:unprocessable_entity, 'phone_invalid') unless phone.to_s.match?(/\A7\d{10}\z/)
 
       success
@@ -77,7 +77,7 @@ module Provider
     end
 
     def fetch_status(operation)
-      response = client.get("#{BASE_URL}/payouts/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.get("#{BASE_URL}/payouts/#{operation.provider_operation_key}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
       apply_status(operation, response.body['status'], strict: true)
@@ -119,7 +119,12 @@ module Provider
     def requisite_type_for(operation, request_method)
       return request_method if REQUISITE_TYPES.include?(request_method)
 
-      (operation.payout_requisite.keys & REQUISITE_TYPES).first
+      (operation.payout_requisite.keys & REQUISITE_TYPES).first || ('card' if operation.payout_requisite.key?('card_number'))
+    end
+
+    # Реквизиты на платформе: вложенные (payout_requisite['sbp'] = {…}) или плоские (payout_requisite['card_number']).
+    def requisite_for(operation, requisite_type)
+      operation.payout_requisite.fetch(requisite_type) { operation.payout_requisite }
     end
 
     def build_payout_payload(operation, requisite_type)
@@ -143,11 +148,11 @@ module Provider
     end
 
     def build_recipient(operation, requisite_type)
-      requisite = operation.payout_requisite.fetch(requisite_type)
+      requisite = requisite_for(operation, requisite_type)
       base = { type: requisite_type, phone: requisite['phone'] }
       case requisite_type
       when 'sbp' then base.merge(bank_code: requisite['bank_code'], bank_name: requisite['bank_name']).compact # bank_code required for type=sbp (from description)
-      when 'card' then base.merge(card_number: requisite['number']).compact # card_number required for type=card (from description)
+      when 'card' then base.merge(card_number: requisite['card_number']).compact # card_number required for type=card (from description)
       else base
       end
     end
@@ -158,7 +163,7 @@ module Provider
                        provider_code: response.body.dig('error', 'code'), message: response.body.dig('error', 'message'))
       end
 
-      operations.update(operation.id, provider_operation_id: response.body['id'])
+      operations.update(operation.id, provider_operation_key: response.body['id'])
       apply_status(operation, response.body['status'])
     end
 

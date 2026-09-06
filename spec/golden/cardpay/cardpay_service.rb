@@ -47,7 +47,7 @@ module Provider
       return failure(:unprocessable_entity, 'description_too_long') if (operation.description || "Payout #{operation.id}").to_s.length > 140
       return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type_for(operation, request_method)
 
-      pan = operation.payout_requisite.dig('card', 'number')
+      pan = requisite_for(operation, 'card')['card_number']
       return failure(:unprocessable_entity, 'pan_invalid') if requisite_type_for(operation, request_method) == 'card' && !pan.to_s.match?(/\A\d{13,19}\z/)
 
       success
@@ -71,7 +71,7 @@ module Provider
     end
 
     def fetch_status(operation)
-      response = client.get("#{BASE_URL}/transfers/#{operation.provider_operation_id}", headers: auth_headers)
+      response = client.get("#{BASE_URL}/transfers/#{operation.provider_operation_key}", headers: auth_headers)
       return failure(http_symbol(response.status), "provider.#{error_code_for(response)}") unless response.status == 200
 
       apply_status(operation, response.body.dig('data', 'state'), strict: true)
@@ -106,7 +106,12 @@ module Provider
     def requisite_type_for(operation, request_method)
       return request_method if REQUISITE_TYPES.include?(request_method)
 
-      (operation.payout_requisite.keys & REQUISITE_TYPES).first
+      (operation.payout_requisite.keys & REQUISITE_TYPES).first || ('card' if operation.payout_requisite.key?('card_number'))
+    end
+
+    # Реквизиты на платформе: вложенные (payout_requisite['sbp'] = {…}) или плоские (payout_requisite['card_number']).
+    def requisite_for(operation, requisite_type)
+      operation.payout_requisite.fetch(requisite_type) { operation.payout_requisite }
     end
 
     def build_payout_payload(operation, requisite_type)
@@ -133,10 +138,10 @@ module Provider
     end
 
     def build_recipient(operation, requisite_type)
-      requisite = operation.payout_requisite.fetch(requisite_type)
+      requisite = requisite_for(operation, requisite_type)
       {
         card: {
-          pan: requisite['number'],
+          pan: requisite['card_number'],
           holder: requisite['holder'],
           expiry: nil, # TODO(forge): map 'destination.card.expiry' (see overrides.yml)
         }
@@ -149,7 +154,7 @@ module Provider
                        provider_code: response.body.dig('errors', 0, 'code'), message: response.body.dig('errors', 0, 'message'))
       end
 
-      operations.update(operation.id, provider_operation_id: response.body.dig('data', 'transfer_id'))
+      operations.update(operation.id, provider_operation_key: response.body.dig('data', 'transfer_id'))
       apply_status(operation, response.body.dig('data', 'state'))
     end
 

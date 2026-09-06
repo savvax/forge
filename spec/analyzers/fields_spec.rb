@@ -34,7 +34,8 @@ RSpec.describe Forge::Analyzers::Fields do
         required_if: { field: 'type', equals: 'sbp' }, requisite_type: 'sbp', confidence: 0.6
       )
       expect(mapping(finding, 'recipient.card_number')).to have_attributes(
-        source_expr: "operation.payout_requisite.dig('card', 'number')", required_if: { field: 'type', equals: 'card' }
+        source_expr: "operation.payout_requisite.dig('card', 'card_number')", required_if: { field: 'type',
+                                                                                             equals: 'card' }
       )
       expect(mapping(finding, 'recipient.bank_name')).to have_attributes(required: false, requisite_type: 'sbp')
     end
@@ -58,7 +59,8 @@ RSpec.describe Forge::Analyzers::Fields do
         ["credentials.fetch('merchant_id')", 'operation.id.to_s', 'callback_url']
       )
       expect(exprs(finding, 'destination.card.pan', 'destination.card.holder', 'destination.card.expiry')).to eq(
-        ["operation.payout_requisite.dig('card', 'number')", "operation.payout_requisite.dig('card', 'holder')", nil]
+        ["operation.payout_requisite.dig('card', 'card_number')", "operation.payout_requisite.dig('card', 'holder')",
+         nil]
       )
       expect(finding.value[:requisite_types]).to eq(['card'])
     end

@@ -54,6 +54,8 @@
 
 HMAC-SHA256(body, callback_secret) → hex → Swift-Signature
 
+Подпись считается по сырым байтам тела. Платформа передаёт в `process_callback` уже разобранный JSON, поэтому передавайте и сырое тело: `process_callback(payload, raw_body: request.body.read, headers: request.headers)`. Без `raw_body` сервис подписывает `JSON.generate(payload)` — подпись сойдётся, только если провайдер шлёт компактный JSON с тем же порядком ключей.
+
 ## Поля запроса
 
 | Поле | Источник | Обязательность | Преобразование |

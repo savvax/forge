@@ -122,7 +122,7 @@ class E2E
     type = @operation.payout_requisite.keys.first
     check('check_conditions', @service.check_conditions(@operation, type))
     check('create_request', @service.create_request(@operation, type))
-    step "create_request ok → provider id #{@operation.provider_operation_id}, status #{@operation.status}"
+    step "create_request ok → provider id #{@operation.provider_operation_key}, status #{@operation.status}"
     check('fetch_status', @service.fetch_status(@operation))
     step "fetch_status ok → #{@operation.status} (#{@operation.provider_status})"
   end
@@ -150,7 +150,7 @@ class E2E
   end
 
   def simulate(event)
-    url = URI("http://127.0.0.1:#{@mock_port}/_simulate/#{@operation.provider_operation_id}/#{event}")
+    url = URI("http://127.0.0.1:#{@mock_port}/_simulate/#{@operation.provider_operation_key}/#{event}")
     res = Net::HTTP.post(url, '')
     fail!("simulate: HTTP #{res.code} #{res.body}") unless res.code == '200'
   end

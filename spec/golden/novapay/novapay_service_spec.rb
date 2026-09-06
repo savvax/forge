@@ -33,7 +33,8 @@ RSpec.describe Provider::NovapayService do
       result = service.create_request(operation, 'create')
       expect(result).to be_success
       expect(stub).to have_been_requested
-      expect(operations.find(operation.id).provider_operation_id).to eq(provider_id)
+      expect(operations.find(operation.id).provider_operation_key).to eq(provider_id)
+      expect(result.data.dig(:result, :id)).to eq(provider_id) # платформа: provider_operation_key = payload.dig(:result, :id)
       expect(result.data[:status]).to eq(create_fixture['expected_operation_status'])
     end
 
@@ -46,6 +47,15 @@ RSpec.describe Provider::NovapayService do
     it 'refuses an operation without a known requisite type' do
       operation.payout_requisite = { 'unknown_type' => {} }
       expect(service.create_request(operation, 'create').code).to eq('requisite_missing')
+    end
+
+    it 'accepts the flat card form of payout_requisite' do
+      operation.payout_requisite = { 'card_number' => '4111111111111111', 'phone' => '79000000000' }
+      stub = stub_request(:post, create_url).with { |req| parse_body(req).to_s.include?('4111111111111111') }
+             .to_return(status: 201, body: create_fixture['response_201'].to_json,
+                        headers: { 'Content-Type' => 'application/json' })
+      expect(service.create_request(operation, 'create')).to be_success
+      expect(stub).to have_been_requested
     end
 
     it 'maps 401 to invalid_credentials' do
@@ -66,7 +76,7 @@ RSpec.describe Provider::NovapayService do
     end
 
     it 'delegates status request_method to fetch_status' do
-      operation.provider_operation_id = provider_id
+      operation.provider_operation_key = provider_id
       stub = stub_request(:get, "#{described_class::BASE_URL}/payouts/#{provider_id}")
              .to_return(status: 200, body: fixtures.dig('fetch_status', 'response_200').to_json,
                         headers: { 'Content-Type' => 'application/json' })
@@ -77,7 +87,7 @@ RSpec.describe Provider::NovapayService do
 
   describe '#fetch_status' do
     it 'maps the provider status to approved' do
-      operation.provider_operation_id = provider_id
+      operation.provider_operation_key = provider_id
       stub_request(:get, "#{described_class::BASE_URL}/payouts/#{provider_id}")
         .to_return(status: 200, body: fixtures.dig('fetch_status', 'response_200').to_json,
                    headers: { 'Content-Type' => 'application/json' })
@@ -93,7 +103,7 @@ RSpec.describe Provider::NovapayService do
     let(:headers) { { 'X-NovaPay-Signature' => sign(body, algorithm: 'sha256', encoding: 'hex') } }
 
     before do
-      operation.provider_operation_id = dig_path(callback['payload'], ["payout_id"])
+      operation.provider_operation_key = dig_path(callback['payload'], ["payout_id"])
       operations.save(operation)
     end
 
@@ -107,7 +117,7 @@ RSpec.describe Provider::NovapayService do
       failed = fixtures['callback_failed']['payload']
       failed_body = JSON.generate(failed)
       failed_headers = { 'X-NovaPay-Signature' => sign(failed_body, algorithm: 'sha256', encoding: 'hex') }
-      operation.provider_operation_id = dig_path(failed, ["payout_id"])
+      operation.provider_operation_key = dig_path(failed, ["payout_id"])
       result = service.process_callback(failed, raw_body: failed_body, headers: failed_headers)
       expect(result.data[:status]).to eq('rejected')
       expect(result.data[:error_code]).to eq('recipient_not_found')
@@ -123,7 +133,7 @@ RSpec.describe Provider::NovapayService do
     it 'cancels a pending payout' do
       require_relative 'novapay_extras'
       extras = Provider::NovapayExtras.new(provider: build_record('novapay'), operations: operations)
-      operation.provider_operation_id = provider_id
+      operation.provider_operation_key = provider_id
       stub_request(:post, "#{described_class::BASE_URL}/payouts/#{provider_id}/cancel")
         .to_return(status: 200, body: fixtures.dig('cancel', 'response_200').to_json,
                    headers: { 'Content-Type' => 'application/json' })

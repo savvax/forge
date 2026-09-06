@@ -66,6 +66,8 @@
 
 <% if plan.webhook && plan.webhook[:signature][:header] -%>
 <%= signature_line %>
+
+Подпись считается по сырым байтам тела. Платформа передаёт в `process_callback` уже разобранный JSON, поэтому передавайте и сырое тело: `process_callback(payload, raw_body: request.body.read, headers: request.headers)`. Без `raw_body` сервис подписывает `JSON.generate(payload)` — подпись сойдётся, только если провайдер шлёт компактный JSON с тем же порядком ключей.
 <% else -%>
 Подпись webhook в спеке не описана — callbacks не проверяются (см. «Допущения»).
 <% end -%>

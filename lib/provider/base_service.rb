@@ -55,16 +55,16 @@ module Provider
 
     # --- Переходы статуса операции (по ID провайдера, как в примере ТЗ) -------
 
-    def approve_operation(provider_operation_id)
-      transition_by_provider_id(provider_operation_id, 'approved')
+    def approve_operation(provider_operation_key)
+      transition_by_provider_id(provider_operation_key, 'approved')
     end
 
-    def reject_operation(provider_operation_id, error_code = nil)
-      transition_by_provider_id(provider_operation_id, 'rejected', error_code: error_code)
+    def reject_operation(provider_operation_key, error_code = nil)
+      transition_by_provider_id(provider_operation_key, 'rejected', error_code: error_code)
     end
 
-    def mark_in_progress(provider_operation_id)
-      transition_by_provider_id(provider_operation_id, 'in_progress')
+    def mark_in_progress(provider_operation_key)
+      transition_by_provider_id(provider_operation_key, 'in_progress')
     end
 
     # --- Доступ к настройкам --------------------------------------------------
@@ -83,16 +83,17 @@ module Provider
 
     private
 
-    def transition(operation, status, provider_status: nil, error_code: nil, provider_operation_id: nil)
+    def transition(operation, status, provider_status: nil, error_code: nil, provider_operation_key: nil)
       operations.update(operation.id, status: status, provider_status: provider_status,
-                                      error_code: error_code, provider_operation_id: provider_operation_id)
+                                      error_code: error_code, provider_operation_key: provider_operation_key)
+      key = provider_operation_key || operation.provider_operation_key
       success(status: status, provider_status: provider_status, error_code: error_code,
-              provider_operation_id: provider_operation_id || operation.provider_operation_id)
+              provider_operation_key: key, result: { id: key }) # платформа читает payload.dig(:result, :id)
     end
 
-    def transition_by_provider_id(provider_operation_id, status, error_code: nil)
-      operation = operations.find_by_provider_id(provider_operation_id)
-      return failure(:not_found, 'operation_not_found', provider_operation_id: provider_operation_id) unless operation
+    def transition_by_provider_id(provider_operation_key, status, error_code: nil)
+      operation = operations.find_by_provider_id(provider_operation_key)
+      return failure(:not_found, 'operation_not_found', provider_operation_key: provider_operation_key) unless operation
 
       transition(operation, status, error_code: error_code)
     end

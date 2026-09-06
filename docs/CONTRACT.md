@@ -17,7 +17,7 @@ end
 
 | Аргумент | Что это | Источник |
 |---|---|---|
-| `operation` | Объект выплаты платформы (`Provider::Operation`) | ТЗ (`operation.amount`, `operation.id`, `operation.payout_requisite`, `operation.provider_operation_id`) |
+| `operation` | Объект выплаты платформы (`Provider::Operation`) | ТЗ (`operation.amount`, `operation.id`, `operation.payout_requisite`, `operation.provider_operation_key` — имя поля платформы по QA 2; `provider_operation_id` из примера ТЗ оставлен алиасом) |
 | `request_method` | **Логический тип действия, не HTTP-verb**: платёжный метод шлюза (`'sbp'`, `'card'`, `'bank_account'`) или служебное `'status'`/`'check'`; ТЗ показывает default `'create'` | QA 1, письменный ответ |
 | `payload` | Разобранный JSON тела webhook (Hash, строковые ключи) | ТЗ |
 | `raw_body:`, `headers:` | Сырое тело и заголовки webhook для проверки подписи (kwargs с default — вызов `process_callback(payload)` из ТЗ остаётся валидным) | решение D-03 |
@@ -33,7 +33,8 @@ end
 Provider::Result = Data.define(:status, :code, :data)
 # status: :ok | HTTP-like символ (:unprocessable_entity, :unauthorized, :too_many_requests, :bad_gateway, :not_found, …)
 # code:   nil | строка ('amount_too_low', 'provider.rate_limit', 'invalid_signature', 'unknown_event')
-# data:   Hash (status:, provider_status:, provider_operation_id:, retry_after:, message:, provider_code:)
+# data:   Hash (status:, provider_status:, provider_operation_key:, result: { id: }, retry_after:, message:, provider_code:)
+#         result[:id] — ID у провайдера: платформа делает provider_operation_key = payload.dig(:result, :id) (QA 2)
 ```
 
 `success(data = {})` → `status: :ok`; `failure(status, code, data = {})`. `success?` / `failed?`.
@@ -48,7 +49,7 @@ Provider::Operation = Struct.new(
   :amount,                # BigDecimal/Numeric в мажорных единицах (1500.00 RUB). В минорные переводит сервис
   :currency,              # 'RUB'
   :status,                # 'new' | 'in_progress' | 'approved' | 'rejected'
-  :provider_operation_id, # ID у провайдера ('np_7f3a9b2c'), появляется после create_request
+  :provider_operation_key, # ID у провайдера ('np_7f3a9b2c'), появляется после create_request
   :provider_status,       # сырой статус провайдера ('processing')
   :error_code,            # код ошибки при rejected ('recipient_not_found')
   :payout_requisite,      # Hash реквизитов по типам (см. ниже)
@@ -150,7 +151,7 @@ end
 require 'securerandom'
 
 module Provider
-  Operation = Struct.new(:id, :amount, :currency, :status, :provider_operation_id, :provider_status,
+  Operation = Struct.new(:id, :amount, :currency, :status, :provider_operation_key, :provider_status,
                          :error_code, :payout_requisite, :idempotency_key, :description, :customer,
                          keyword_init: true) do
     def initialize(**attrs)
@@ -190,16 +191,16 @@ module Provider
       @by_id[id]
     end
 
-    def find_by_provider_id(provider_operation_id)
-      @by_id.values.find { |op| op.provider_operation_id == provider_operation_id }
+    def find_by_provider_id(provider_operation_key)
+      @by_id.values.find { |op| op.provider_operation_key == provider_operation_key }
     end
 
-    def update(id, status: nil, provider_status: nil, error_code: nil, provider_operation_id: nil)
+    def update(id, status: nil, provider_status: nil, error_code: nil, provider_operation_key: nil)
       operation = @by_id.fetch(id)
       operation.status = status if status
       operation.provider_status = provider_status if provider_status
       operation.error_code = error_code if error_code
-      operation.provider_operation_id = provider_operation_id if provider_operation_id
+      operation.provider_operation_key = provider_operation_key if provider_operation_key
       operation
     end
   end
@@ -347,16 +348,16 @@ module Provider
 
     # --- Переходы статуса операции (по ID провайдера, как в примере ТЗ) -------
 
-    def approve_operation(provider_operation_id)
-      transition_by_provider_id(provider_operation_id, 'approved')
+    def approve_operation(provider_operation_key)
+      transition_by_provider_id(provider_operation_key, 'approved')
     end
 
-    def reject_operation(provider_operation_id, error_code = nil)
-      transition_by_provider_id(provider_operation_id, 'rejected', error_code: error_code)
+    def reject_operation(provider_operation_key, error_code = nil)
+      transition_by_provider_id(provider_operation_key, 'rejected', error_code: error_code)
     end
 
-    def mark_in_progress(provider_operation_id)
-      transition_by_provider_id(provider_operation_id, 'in_progress')
+    def mark_in_progress(provider_operation_key)
+      transition_by_provider_id(provider_operation_key, 'in_progress')
     end
 
     # --- Доступ к настройкам --------------------------------------------------
@@ -375,16 +376,17 @@ module Provider
 
     private
 
-    def transition(operation, status, provider_status: nil, error_code: nil, provider_operation_id: nil)
+    def transition(operation, status, provider_status: nil, error_code: nil, provider_operation_key: nil)
       operations.update(operation.id, status: status, provider_status: provider_status,
-                                      error_code: error_code, provider_operation_id: provider_operation_id)
+                                      error_code: error_code, provider_operation_key: provider_operation_key)
+      key = provider_operation_key || operation.provider_operation_key
       success(status: status, provider_status: provider_status, error_code: error_code,
-              provider_operation_id: provider_operation_id || operation.provider_operation_id)
+              provider_operation_key: key, result: { id: key }) # платформа читает payload.dig(:result, :id)
     end
 
-    def transition_by_provider_id(provider_operation_id, status, error_code: nil)
-      operation = operations.find_by_provider_id(provider_operation_id)
-      return failure(:not_found, 'operation_not_found', provider_operation_id: provider_operation_id) unless operation
+    def transition_by_provider_id(provider_operation_key, status, error_code: nil)
+      operation = operations.find_by_provider_id(provider_operation_key)
+      return failure(:not_found, 'operation_not_found', provider_operation_key: provider_operation_key) unless operation
 
       transition(operation, status, error_code: error_code)
     end
@@ -418,7 +420,7 @@ end
 |---|---|
 | Отправляет запрос | `client.post(url, json:, headers:)`, `client.get(url, headers:)` |
 | Читает секреты | `credentials.fetch('api_key')`, `credentials.fetch('callback_secret')` |
-| Сохраняет ID провайдера и статус после create | `transition(operation, 'in_progress', provider_status:, provider_operation_id:)` |
+| Сохраняет ID провайдера и статус после create | `transition(operation, 'in_progress', provider_status:, provider_operation_key:)` |
 | Применяет статус из ответа/статус-запроса | `apply_status(operation, provider_status)` (генерируется; внутри `STATUS_MAP` + `transition`) |
 | Обрабатывает webhook | `EVENT_MAP` → `approve_operation` / `reject_operation` / `mark_in_progress` по `payload[id_field]` |
 | Проверяет подпись | `verify_signature!(raw_body, headers)` (генерируется; `OpenSSL::HMAC`, `secure_compare`) |

@@ -77,7 +77,7 @@ module Forge
       def variant_lines
         inner = direct_children
         base, typed = inner.partition { |m| m.requisite_type.nil? && m.required_if.nil? }
-        lines = ['requisite = operation.payout_requisite.fetch(requisite_type)',
+        lines = ['requisite = requisite_for(operation, requisite_type)',
                  "base = { #{base.map { |m| base_entry(m) }.join(', ')} }"]
         lines += todo_notes(inner.select { |m| m.source_expr.nil? })
         lines + (typed.empty? ? ['base'] : case_lines(typed.group_by(&:requisite_type)))

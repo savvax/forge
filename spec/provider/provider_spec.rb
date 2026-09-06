@@ -26,8 +26,8 @@ RSpec.describe Provider do
 
     it 'saves, finds and updates' do
       store.save(op)
-      store.update('op_1', provider_operation_id: 'np_1', status: 'in_progress')
-      expect(store.find('op_1').provider_operation_id).to eq('np_1')
+      store.update('op_1', provider_operation_key: 'np_1', status: 'in_progress')
+      expect(store.find('op_1').provider_operation_key).to eq('np_1')
       expect(store.find_by_provider_id('np_1').status).to eq('in_progress')
       expect(store.find_by_provider_id('nope')).to be_nil
     end
