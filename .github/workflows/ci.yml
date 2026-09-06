@@ -50,7 +50,10 @@ jobs:
             bundle exec rspec -I lib -I "$(dirname "$spec")" "$spec"
           done
       - uses: actions/upload-artifact@v4
-        with: { name: output-${{ matrix.provider }}, path: tmp/out/, retention-days: 7 }
+        with:
+          name: "output-${{ matrix.provider }}"
+          path: tmp/out/
+          retention-days: 7
 
   determinism:
     runs-on: ubuntu-latest
