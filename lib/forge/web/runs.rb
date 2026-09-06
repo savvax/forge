@@ -69,7 +69,15 @@ module Forge
         [text, (error.empty? ? nil : "error: #{error}")].compact.join("\n\n")
       end
 
-      def report_json = read('report.json') || '{}'
+      # Пустой/битый report.json (обрыв записи) → '{}': страница прогона рендерится без обзора, а не 500.
+      def report_json
+        json = read('report.json').to_s
+        JSON.parse(json)
+        json
+      rescue JSON::ParserError
+        '{}'
+      end
+
       def step_output(name) = read("#{name}.log")
       def exit_code = meta['exit_code']
 
@@ -90,8 +98,9 @@ module Forge
       # bin/forge generate тем же кодом, что и CLI; stdout → report, ошибки → meta.error.
       # Один прогон: stdout в формате json → report.json; report.txt (текст того же прогона) пишет сам GenerateCommand.
       def generate
-        code, json = capture { GenerateCommand.new(generate_options).run }
-        File.write(File.join(@dir, 'report.json'), json)
+        out = StringIO.new
+        code = GenerateCommand.new(generate_options.merge(io: out)).run
+        File.write(File.join(@dir, 'report.json'), out.string)
         write_meta(meta.merge('exit_code' => code, 'provider' => provider_from_files))
       rescue Forge::Error => e
         write_meta(meta.merge('exit_code' => e.class.exit_code, 'error' => e.message,
@@ -172,16 +181,6 @@ module Forge
         raise ArgumentError, 'example must be inside examples/' unless allowed && File.file?(path)
 
         path
-      end
-
-      def capture
-        out = StringIO.new
-        old = $stdout
-        $stdout = out
-        code = yield
-        [code, out.string]
-      ensure
-        $stdout = old
       end
 
       def spec_command

@@ -101,10 +101,12 @@ module Forge
       names.map { |name| "./#{File.join(@opts[:out], name)}".sub(%r{\A\./\./}, './') }
     end
 
+    # opts[:io] — куда печатать отчёт (веб передаёт StringIO: подмена $stdout не потокобезопасна под Puma).
     def print_report(spec, findings, generation, text)
-      return puts(text) unless @opts[:format] == 'json'
+      io = @opts[:io] || $stdout
+      return io.puts(text) unless @opts[:format] == 'json'
 
-      puts Report.json(spec, findings, exit_code: generation[:exit_code], generation: generation)
+      io.puts Report.json(spec, findings, exit_code: generation[:exit_code], generation: generation)
     end
 
     def exit_code(findings)

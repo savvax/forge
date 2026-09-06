@@ -116,6 +116,15 @@ RSpec.describe Forge::Web::App do
     expect(Forge::Web::Runs.new(id).step_output('spec')).to include('no generated spec')
   end
 
+  it 'keeps report.json intact for concurrent runs (no global $stdout capture under Puma threads)' do
+    runs = Array.new(3) { Thread.new { Forge::Web::Runs.create(example: 'examples/specs/novapay.yaml', verify: '0') } }
+                .map(&:value)
+    runs.each do |run|
+      expect(JSON.parse(run.report_json)['endpoints'].size).to eq(5), run.id
+      expect(client.get("/runs/#{run.id}").status).to eq(200)
+    end
+  end
+
   it 'deletes a run' do
     id = create_run('verify' => '0')
     expect(client.post("/runs/#{id}/delete").status).to eq(303)
