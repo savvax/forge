@@ -14,7 +14,7 @@
 > `approved` на сгенерированном моке для NovaPay, CardPay, SwiftPay (подпись `t=…,v1=…`), Райффайзена и
 > OAuth2-провайдера (`spec/fixtures/oauth2_payout.yaml`). 20 реальных API (Stripe, Adyen, PayPal, Wise, Mollie…)
 > анализируются без падений, отчёты — `examples/real/reports/`; PayPal, Velo, Dwolla и Open Banking получают токен
-> OAuth2 client_credentials. Живой веб-интерфейс — http://2.56.121.34.
+> OAuth2 client_credentials. Живой веб-интерфейс — https://forge.savvax.com.
 
 ## Демо: весь CLI за три минуты
 
@@ -182,7 +182,7 @@ CLI — основной интерфейс (по условиям задачи)
 жюри: загрузить спеку и overrides, увидеть отчёт, открыть/скачать 7 файлов, запустить сгенерированный
 RSpec и e2e (мок + webhook) кнопкой. Без базы и без новых гемов (Sinatra + Puma уже в Gemfile).
 
-Развёрнутый экземпляр для жюри: **http://2.56.121.34** (те же 20 МБ на спеку, прогоны хранятся на сервере).
+Развёрнутый экземпляр для жюри: **https://forge.savvax.com** (те же 20 МБ на спеку, прогоны хранятся на сервере).
 
 ```bash
 bin/forge-web                                  # http://localhost:8080 (PORT, FORGE_WORKDIR)
@@ -325,7 +325,7 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 | Документация и тестовые материалы | `output/<p>/INTEGRATION.md` (с «Допущениями»), `fixtures.json`, генерируемый `*_service_spec.rb` |
 | Удобство и демонстрация | этот README, `bin/integrate`, коды выхода 0–4, ошибки с pointer + hint, `bin/e2e`, `bin/demo` |
 | Качество реализации | шесть стадий по каталогам, `rubocop` 0, покрытие ≥ 97 %, обработка ошибок разбора/генерации (`spec/fixtures/broken/`, `spec/cli_spec.rb`, `lib/forge/shape.rb`), фаззинг (`spec/fuzz/`), CI |
-| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved` (5 сценариев, включая OAuth2 и подпись с timestamp); отчёт с confidence; overrides как рекомендованный механизм; веб-интерфейс с кнопками rspec/e2e (http://2.56.121.34); фаззинг в CI; прогон на 20 реальных API; детерминизм |
+| Дополнительные идеи | генерируемый RSpec как доказательство; мок-сервер из той же спеки + e2e `create → webhook → approved` (5 сценариев, включая OAuth2 и подпись с timestamp); отчёт с confidence; overrides как рекомендованный механизм; веб-интерфейс с кнопками rspec/e2e (https://forge.savvax.com); фаззинг в CI; прогон на 20 реальных API; детерминизм |
 
 Подробная разбалловка — `docs/CRITERIA.md`.
 
