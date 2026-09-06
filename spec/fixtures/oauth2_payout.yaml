@@ -1,0 +1,129 @@
+openapi: 3.0.3
+info:
+  title: OAuthPay Payout API
+  version: 1.0.0
+  description: Test spec for the OAuth2 client_credentials flow (relative tokenUrl, HMAC webhook).
+servers:
+  - url: https://api.sandbox.oauthpay.example/v1
+    description: Sandbox
+security:
+  - oauth2: [payouts]
+paths:
+  /payouts:
+    post:
+      operationId: createPayout
+      summary: Create payout
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PayoutRequest' }
+            example: { amount: 150000, currency: USD, reference: ord-1, recipient: { account_number: '123456789', bank_code: '021000021' } }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payout' }
+              example: { id: po_1, status: pending, amount: 150000, currency: USD }
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+              example: { error: { code: unauthorized, message: invalid token } }
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+              example: { error: { code: validation_error, message: amount too low } }
+  /payouts/{payout_id}:
+    get:
+      operationId: getPayout
+      summary: Payout status
+      parameters:
+        - name: payout_id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Payout' }
+              example: { id: po_1, status: completed, amount: 150000, currency: USD }
+  /webhooks/payout:
+    post:
+      operationId: payoutWebhook
+      summary: Payout status webhook
+      security: []
+      parameters:
+        - name: X-Signature
+          in: header
+          required: true
+          description: HMAC-SHA256 hex of the raw request body
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/WebhookEvent' }
+            examples:
+              completed: { value: { event: payout.completed, payout_id: po_1, status: completed } }
+              failed: { value: { event: payout.failed, payout_id: po_1, status: failed, error: { code: account_closed } } }
+      responses:
+        '200': { description: OK }
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: /oauth/token
+          scopes: { payouts: Create and read payouts }
+  schemas:
+    PayoutRequest:
+      type: object
+      required: [amount, currency, reference, recipient]
+      properties:
+        amount: { type: integer, description: Amount in cents, minimum: 100 }
+        currency: { type: string, enum: [USD] }
+        reference: { type: string }
+        recipient:
+          type: object
+          required: [account_number, bank_code]
+          properties:
+            account_number: { type: string }
+            bank_code: { type: string }
+    Payout:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [pending, processing, completed, failed] }
+        amount: { type: integer }
+        currency: { type: string }
+    WebhookEvent:
+      type: object
+      properties:
+        event: { type: string, enum: [payout.completed, payout.failed] }
+        payout_id: { type: string }
+        status: { type: string, enum: [pending, processing, completed, failed] }
+        error:
+          type: object
+          properties:
+            code: { type: string }
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }

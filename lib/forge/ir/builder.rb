@@ -36,7 +36,8 @@ module Forge
         @hash.dig('components', 'securitySchemes').to_h.map do |name, scheme|
           s = scheme.to_h
           SecurityScheme.new(name: name, type: s['type'].to_s, location: s['in'], param_name: s['name'],
-                             scheme: s['scheme'], bearer_format: s['bearerFormat'], description: s['description'])
+                             scheme: s['scheme'], bearer_format: s['bearerFormat'], description: s['description'],
+                             token_url: s['flows'].to_h.dig('clientCredentials', 'tokenUrl'))
         end
       end
 

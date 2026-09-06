@@ -20,6 +20,20 @@ RSpec.describe Provider::<%= class_name %> do
 <% else -%>
   let(:auth_headers) { { 'Accept' => 'application/json' } } # auth без заголовков (apiKey в query / none)
 <% end -%>
+<% if plan.auth[:type] == 'oauth2' -%>
+  let(:token_url) { Provider::<%= class_name %>::TOKEN_URL }
+
+  before { stub_request(:post, token_url).to_return(body: '{"access_token":"test_access_token","token_type":"Bearer"}') }
+
+  describe '#access_token' do
+    it 'requests the token once with Basic(client_id:client_secret) and grant_type=client_credentials' do
+      2.times { service.send(:access_token) }
+      basic = Base64.strict_encode64('test_client_id:test_client_secret')
+      expect(a_request(:post, token_url).with(headers: { 'Authorization' => "Basic #{basic}" },
+                                              body: 'grant_type=client_credentials')).to have_been_made.once
+    end
+  end
+<% end -%>
 
   describe '#check_conditions' do
 <% if min? -%>

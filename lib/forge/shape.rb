@@ -19,7 +19,8 @@ module Forge
     CONTENT = { '*' => MEDIA }.freeze
     PARAMETER = { 'schema' => :schema, 'content' => CONTENT, 'name' => :string, 'in' => :string,
                   'description' => :string }.freeze
-    SECURITY_SCHEME = { 'type' => :string, 'scheme' => :string, 'in' => :string, 'name' => :string }.freeze
+    SECURITY_SCHEME = { 'type' => :string, 'scheme' => :string, 'in' => :string, 'name' => :string,
+                        'flows' => { '*' => { 'tokenUrl' => :string } } }.freeze
     SERVER = { 'variables' => { '*' => { 'enum' => :array } } }.freeze
     RESPONSE = { 'content' => CONTENT, 'headers' => { '*' => { 'schema' => :schema } } }.freeze
     OPERATION = { 'parameters' => [PARAMETER], 'requestBody' => { 'content' => CONTENT, 'description' => :string },

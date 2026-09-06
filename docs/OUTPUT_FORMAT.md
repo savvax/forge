@@ -22,7 +22,10 @@
   `apply_status`, `error_code_for`, `verify_signature!`, `to_minor_units`/`to_major_amount`.
 - Auth: `api_key` → `{ '<Header>' => credentials.fetch('api_key') }`; `bearer` → `{ 'Authorization' =>
   "Bearer #{credentials.fetch('token')}" }`; `basic` → `Base64.strict_encode64("#{credentials.fetch('login')}:#{credentials.fetch('password')}")`;
-  `oauth2` → как bearer + `# TODO(forge): OAuth2 token flow is not generated; obtain token manually` + UNSUPPORTED.
+  `oauth2` с `flows.clientCredentials.tokenUrl` → `TOKEN_URL = ENV.fetch('<PREFIX>_TOKEN_URL', …)` (относительный
+  `tokenUrl` — от `BASE_URL`), `auth_headers` → `Bearer #{access_token}`, `access_token` — `POST TOKEN_URL` с
+  `Basic(client_id:client_secret)` и `grant_type=client_credentials`, кэш на время жизни сервиса; мок отдаёт токен
+  по тому же пути. `oauth2` без clientCredentials → как bearer + `# TODO(forge): OAuth2 token flow…` + UNSUPPORTED.
 - Нет webhook → `process_callback` возвращает `failure(:not_implemented, 'callbacks_not_supported')` + WARN `no_webhook`.
 - Нет status-эндпоинта → `fetch_status` возвращает `failure(:not_implemented, 'status_endpoint_missing')` + WARN.
 - Неизвестное поле → `field_name: nil, # TODO(forge): map '<path>' (see overrides.yml)`.

@@ -35,6 +35,7 @@ module Forge
       return 'Auth: not found (credentials required; see warnings)' if a[:type] == 'none'
 
       where = a[:header] ? "header: #{a[:header]}" : "#{a[:location]}: #{a[:param_name]}"
+      where += ", client_credentials → POST #{a[:token_url]}" if a[:type] == 'oauth2'
       "Auth: #{a[:scheme_name]} (#{a[:type]}, #{where}) → credentials.#{a[:credential_keys].join('/')}"
     end
 

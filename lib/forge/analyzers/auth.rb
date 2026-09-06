@@ -4,7 +4,8 @@ require_relative 'base'
 
 module Forge
   module Analyzers
-    # Схема авторизации create-эндпоинта: apiKey → api_key, bearer → token, basic → login/password.
+    # Схема авторизации create-эндпоинта: apiKey → api_key, bearer → token, basic → login/password,
+    # oauth2 с clientCredentials.tokenUrl → oauth2 (client_id/client_secret, токен по tokenUrl).
     class Auth < Base
       BEARER = { type: 'bearer', header: 'Authorization', prefix: 'Bearer', credential_key: 'token',
                  credential_keys: ['token'], location: 'header' }.freeze
@@ -37,11 +38,13 @@ module Forge
       end
 
       def supported?(scheme)
-        scheme.type == 'apiKey' || (scheme.type == 'http' && %w[bearer basic].include?(scheme.scheme))
+        scheme.type == 'apiKey' || (scheme.type == 'http' && %w[bearer basic].include?(scheme.scheme)) ||
+          (scheme.type == 'oauth2' && !scheme.token_url.nil?)
       end
 
       def describe(scheme)
         return api_key(scheme) if scheme.type == 'apiKey'
+        return oauth2(scheme) if scheme.type == 'oauth2'
         return BEARER.merge(scheme_name: scheme.name) if scheme.scheme == 'bearer'
 
         { type: 'basic', scheme_name: scheme.name, header: 'Authorization', prefix: 'Basic', credential_key: 'login',
@@ -57,6 +60,13 @@ module Forge
         { type: 'api_key', scheme_name: scheme.name, header: in_header ? scheme.param_name : nil, prefix: nil,
           credential_key: 'api_key', credential_keys: ['api_key'], location: scheme.location,
           param_name: scheme.param_name }
+      end
+
+      # client_credentials: POST tokenUrl с Basic(client_id:client_secret) → Bearer access_token (структура спеки).
+      def oauth2(scheme)
+        { type: 'oauth2', scheme_name: scheme.name, header: 'Authorization', prefix: 'Bearer',
+          credential_key: 'client_id', credential_keys: %w[client_id client_secret], location: 'header',
+          token_url: scheme.token_url }
       end
 
       def unsupported_alternative(scheme)

@@ -24,6 +24,21 @@
     def auth_headers
       {} # TODO(forge): no security scheme found in the spec; add credentials here
     end
+<% when 'oauth2' -%>
+    def auth_headers
+      { 'Authorization' => "Bearer #{access_token}" }
+    end
+
+    # OAuth2 client_credentials (<%= plan.auth[:scheme_name] %>): POST TOKEN_URL with Basic(client_id:client_secret).
+    # The token is cached for the life of this service object; expires_in is not tracked (re-create on 401).
+    def access_token
+      @access_token ||= begin
+        basic = Base64.strict_encode64("#{credentials.fetch('client_id')}:#{credentials.fetch('client_secret')}")
+        response = client.post(TOKEN_URL, form: { 'grant_type' => 'client_credentials' },
+                                          headers: { 'Authorization' => "Basic #{basic}" })
+        response.body.fetch('access_token')
+      end
+    end
 <% else -%>
 <% if plan.auth[:scheme_name] && plan.warnings.any? { |w| w.code == :oauth2 } -%>
     # TODO(forge): OAuth2 token flow is not generated; obtain token manually and store it in credentials.token

@@ -13,6 +13,9 @@ module Provider
 <% if plan.base_url[:production] && plan.base_url[:production] != plan.base_url[:default] -%>
     PRODUCTION_URL = '<%= plan.base_url[:production] %>'
 <% end -%>
+<% if plan.auth[:type] == 'oauth2' -%>
+    TOKEN_URL = ENV.fetch('<%= plan.provider[:env_prefix] %>_TOKEN_URL', <%= view.token_url_literal %>)
+<% end -%>
 
 <% if plan.status_map.empty? -%>
     STATUS_MAP = {}.freeze # TODO(forge): no status enum in the spec; fill from the provider docs (statuses.<X>: … in overrides.yml)

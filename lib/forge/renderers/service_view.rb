@@ -39,7 +39,7 @@ module Forge
       def body_kw = op(:create).body_encoding == 'form' ? 'form' : 'json'
 
       def requires
-        optional = { 'base64' => plan.auth[:type] == 'basic' || signature&.dig(:encoding) == 'base64',
+        optional = { 'base64' => %w[basic oauth2].include?(plan.auth[:type]) || signature&.dig(:encoding) == 'base64',
                      'uri' => plan.auth[:type] == 'api_key' && plan.auth[:location] == 'query' }
         %w[base64 json openssl uri].select { |r| optional.fetch(r, true) }
       end
@@ -126,6 +126,12 @@ module Forge
       end
 
       def timestamped? = signature[:scheme] == 'timestamped'
+
+      # tokenUrl относительный (/oauth/token) → от BASE_URL, чтобы ENV-переопределение базы действовало и на токен.
+      def token_url_literal
+        url = plan.auth[:token_url].to_s
+        url.start_with?('/') ? "\"\#{BASE_URL}#{url}\"" : "'#{url}'"
+      end
 
       # Выражение HMAC над `data` (raw_body или "<t>.<raw body>") в кодировке из плана.
       def hmac_expr(data = 'raw_body')

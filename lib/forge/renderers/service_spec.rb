@@ -28,6 +28,7 @@ module Forge
         when 'api_key' then plan.auth[:header] && "'#{plan.auth[:header]}' => 'test_api_key'"
         when 'bearer' then "'Authorization' => 'Bearer test_token'"
         when 'basic' then "'Authorization' => \"Basic \#{Base64.strict_encode64('test_login:test_password')}\""
+        when 'oauth2' then "'Authorization' => 'Bearer test_access_token'"
         end
       end
 

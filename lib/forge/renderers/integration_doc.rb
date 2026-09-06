@@ -7,7 +7,7 @@ module Forge
     # INTEGRATION.md по templates/integration.md.erb (docs/OUTPUT_FORMAT.md § 3).
     class IntegrationDoc < Base
       AUTH_NAMES = { 'api_key' => 'API Key', 'bearer' => 'Bearer token', 'basic' => 'Basic auth',
-                     'none' => 'не найдена' }.freeze
+                     'oauth2' => 'OAuth2 client_credentials', 'none' => 'не найдена' }.freeze
       ACTIONS = { 'reject' => 'reject', 'alert_block' => 'alert ops, block provider', 'retry' => 'retry later',
                   'retry_backoff' => 'retry with backoff', 'alert' => 'alert ops',
                   'treat_as_success' => 'treat as success (idempotent replay)' }.freeze
@@ -26,6 +26,7 @@ module Forge
         when 'api_key' then api_key_header(plan.auth)
         when 'bearer' then '`Authorization: Bearer <credentials.token>`'
         when 'basic' then '`Authorization: Basic base64(<credentials.login>:<credentials.password>)`'
+        when 'oauth2' then oauth2_header
         else '—'
         end
       end
@@ -80,6 +81,12 @@ module Forge
         return line unless sig[:scheme] == 'timestamped'
 
         "#{line.sub("(#{over},", "(\"<t>.<#{over}>\",")}: `t=<unix timestamp>,v1=<hmac>`"
+      end
+
+      def oauth2_header
+        "`Authorization: Bearer <access_token>` — токен: `POST #{plan.auth[:token_url]}` с " \
+          '`Basic(client_id:client_secret)` и `grant_type=client_credentials`; кэшируется на время жизни сервиса, ' \
+          '`expires_in` не отслеживается (ENV `_TOKEN_URL` переопределяет адрес)'
       end
 
       def field_rows

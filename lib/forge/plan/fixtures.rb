@@ -67,6 +67,7 @@ module Forge
                  when 'api_key' then a[:header] && { a[:header] => '<credentials.api_key>' }
                  when 'bearer' then { 'Authorization' => 'Bearer <credentials.token>' }
                  when 'basic' then { 'Authorization' => "Basic #{Base64.strict_encode64('<login>:<password>')}" }
+                 when 'oauth2' then { 'Authorization' => "Bearer <access_token: POST #{a[:token_url]}>" }
                  end
         { 'headers' => header || {} }
       end

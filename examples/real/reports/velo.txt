@@ -54,7 +54,7 @@ Found 100 endpoints: POST /v1/authenticate, GET /v1/deltas/fundings, GET /v1/del
   status   GET /v3/payouts/{payoutId}                 getPayoutSummaryV3       confidence 0.90
   cancel   DELETE /v3/payouts/{payoutId}              withdrawPayoutV3         confidence 0.75   (outside contract → cancel_request)
   webhook  POST veloWebhookNotification               veloWebhook              confidence 0.95
-Auth: OAuth2 (bearer, header: Authorization) → credentials.token
+Auth: OAuth2 (oauth2, header: Authorization, client_credentials → POST https://api.sandbox.velopayments.com/v1/login) → credentials.client_id/client_secret
 Statuses (status): not found
 Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
         401 (create) invalid_credentials → alert_block;
@@ -88,11 +88,6 @@ Warnings (28):
   WARN         role_conflict              POST /v3/payouts/{payoutId}/quote (createQuoteForPayoutV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)
         hint: endpoints.createQuoteForPayoutV3: cancel
   … and 18 more (see --format json)
-Unsupported (2):
-  UNSUPPORTED  oauth2_alternative         alternative security scheme 'OAuth2' (oauth2) is ignored
-        hint: the first supported scheme is used
-  UNSUPPORTED  oauth2                     security scheme 'OAuth2' (oauth2) is not supported; bearer token assumed
-        hint: obtain the token out of band and put it into credentials.token
 Info (99):
   INFO         webhook_source_webhooks    webhook taken from webhooks: POST veloWebhookNotification (veloWebhook)
   INFO         outside_contract           DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) — generated as `cancel_request` helper
@@ -105,4 +100,4 @@ Info (99):
   INFO         outside_contract           GET /v1/paymentChannelRules (listPaymentChannelRulesV1) — not used
   INFO         outside_contract           GET /v1/paymentaudit/fundings (getFundingsV1) — not used
   … and 89 more (see --format json)
-Done: 28 warnings, 2 unsupported. Exit 0.
+Done: 28 warnings, 0 unsupported. Exit 0.

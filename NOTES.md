@@ -218,6 +218,18 @@ Velo, Mollie, Paystack, Dwolla, Plaid) — ложные: слово в пути 
 взята из текста → `WARN signature_timestamped` и `webhook.signature_scheme: timestamped` в overrides (закрывает WARN).
 Прочие timestamp/nonce-схемы по-прежнему UNSUPPORTED. Окно повтора по `t` не проверяется — комментарий в коде.
 
+### D-30 · OAuth2 client_credentials генерируется из структуры спеки
+Контекст: PayPal Payouts (и ещё несколько реальных API) авторизуются только через oauth2; сервис получал
+`Bearer credentials.token` с TODO и UNSUPPORTED — эксперт видел «не поддержано» на самом известном провайдере.
+Решение: `flows.clientCredentials.tokenUrl` — структурный факт, без догадок. `IR::SecurityScheme#token_url`,
+`Auth` → `type: oauth2`, `credential_keys: client_id/client_secret`. В сервисе `TOKEN_URL = ENV.fetch('<PREFIX>_TOKEN_URL', …)`
+(относительный `tokenUrl` — от `BASE_URL`), `auth_headers` → `Bearer #{access_token}`, токен — `POST TOKEN_URL` с
+`Basic(client_id:client_secret)` и `grant_type=client_credentials`, кэш на время жизни объекта (`expires_in` не
+отслеживается — комментарий в коде и в INTEGRATION.md). Мок отдаёт токен по тому же пути и принимает только его;
+сгенерированный spec проверяет, что токен запрашивается один раз с нужными заголовками; `bin/e2e
+spec/fixtures/oauth2_payout.yaml` → approved (e2e подменяет и `TOKEN_URL`). Другие flows (authorizationCode и т. п.)
+по-прежнему bearer + UNSUPPORTED. Секреты, как и раньше, в `credentials` с пометкой «заполнить вручную».
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

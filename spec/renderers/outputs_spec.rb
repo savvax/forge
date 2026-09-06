@@ -56,6 +56,15 @@ RSpec.describe Forge::Renderers do
       end
     end
 
+    it 'generates a green spec for an oauth2 client_credentials provider (token stubbed, requested once)' do
+      dir = generate(plan_for('spec/fixtures/oauth2_payout.yaml'), 'tmp/out_spec/oauthpay')
+      out = Forge::Verifier.spec!("#{dir}/oauthpay_service_spec.rb", load_paths: ['lib', dir])
+      expect(out).to include('examples, 0 failures'), out
+      service = File.read("#{dir}/oauthpay_service.rb")
+      expect(service).to include("TOKEN_URL = ENV.fetch('OAUTHPAY_TOKEN_URL', \"\#{BASE_URL}/oauth/token\")",
+                                 'def access_token', "form: { 'grant_type' => 'client_credentials' }")
+    end
+
     it 'renders callbacks_not_supported for a plan without webhook' do
       schemes = { 'b' => { 'type' => 'http', 'scheme' => 'bearer' } }
       body = body_json({ 'amount' => { 'type' => 'integer' }, 'currency' => { 'type' => 'string' } })

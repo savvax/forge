@@ -22,6 +22,10 @@ class <%= class_name %> < Sinatra::Base
   EVENTS = <%= events.inspect %>.freeze
   IDEMPOTENCY_HEADER = <%= idempotency_header.inspect %>
   ID_PREFIX = '<%= plan.provider[:name] %>'
+<% if auth[:type] == 'oauth2' -%>
+  TOKEN_PATH = <%= URI(auth[:token_url].to_s).path.inspect %>
+  MOCK_TOKEN = 'mock-access-token'
+<% end -%>
 
   set :port, ENV.fetch('PORT', 4567).to_i
   set :bind, '127.0.0.1'
@@ -54,6 +58,8 @@ class <%= class_name %> < Sinatra::Base
       Base64.decode64(header).split(':', 2).last == key
 <% when 'none' -%>
       true
+<% when 'oauth2' -%>
+      request.env['HTTP_AUTHORIZATION'] == "Bearer #{MOCK_TOKEN}"
 <% else -%>
       request.env['HTTP_AUTHORIZATION'] == "Bearer #{key}"
 <% end -%>
@@ -117,7 +123,17 @@ class <%= class_name %> < Sinatra::Base
     end
   end
 
-  before { halt(*reply(401, error_body(401, 'unauthorized'))) unless request.path_info.start_with?('/_') || authorized? }
+<% open = auth[:type] == 'oauth2' ? ' || request.path_info == TOKEN_PATH' : '' -%>
+  before { halt(*reply(401, error_body(401, 'unauthorized'))) unless request.path_info.start_with?('/_')<%= open %> || authorized? }
+<% if auth[:type] == 'oauth2' -%>
+
+  # OAuth2 client_credentials: Basic(client_id:client_secret) → access_token; client_secret must equal MOCK_API_KEY.
+  post TOKEN_PATH do
+    secret = Base64.decode64(request.env['HTTP_AUTHORIZATION'].to_s.delete_prefix('Basic ')).split(':', 2).last
+    halt(*reply(401, error_body(401, 'unauthorized'))) unless secret == ENV.fetch('MOCK_API_KEY', 'test-key')
+    reply(200, { 'access_token' => MOCK_TOKEN, 'token_type' => 'Bearer', 'expires_in' => 3600 })
+  end
+<% end -%>
 
   <%= op(:create).method %> '<%= sinatra_path(:create) %>' do
     body = json_body

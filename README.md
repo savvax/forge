@@ -261,7 +261,7 @@ paths:
 |---|---|---|---|
 | Adyen Payout v68 | create `POST /payout`, basic auth (apiKey — альтернатива), сумма `amount.value` в minor units | нет status-эндпоинта и webhook (WARN); поля с большой вложенностью | [adyen_payout.txt](examples/real/reports/adyen_payout.txt) |
 | Adyen Transfers v4 | create/status, apiKey в query (WARN), 20+ статусов из enum по словарю | 100+ редких статусов → `statuses.<X>` (отчёт сворачивает список) | [adyen_transfers.txt](examples/real/reports/adyen_transfers.txt) |
-| PayPal Payouts | create/status/cancel, bearer с TODO вместо oauth2 (UNSUPPORTED) | batch `items[]` — массивы не мапятся (WARN) | [paypal_payouts.txt](examples/real/reports/paypal_payouts.txt) |
+| PayPal Payouts | create/status/cancel, OAuth2 client_credentials: токен по `POST /v1/oauth2/token`, затем Bearer | batch `items[]` — массивы не мапятся (WARN) | [paypal_payouts.txt](examples/real/reports/paypal_payouts.txt) |
 | Paystack | `--include-paths /transfer*`: create `transfer_initiate`, status, balance; `$ref` на path-pointer с `~1` и `%7B` | конфликт status/verify и DELETE recipient как cancel → `endpoints.*` | [paystack.txt](examples/real/reports/paystack.txt) |
 | Stripe (8 МБ) | `--include-paths /v1/payouts*`: create/status/cancel, статусы из description, сумма в cents, form-urlencoded тело (WARN); загрузка 0.1 с | webhook в спеке нет | [stripe.txt](examples/real/reports/stripe.txt) |
 | Square | статус-эндпоинт; create нет → WARN `no_create_endpoint` (`generate` → exit 2 с подсказкой); битые `$ref` вне контракта → UNSUPPORTED | — | [square.txt](examples/real/reports/square.txt) |
@@ -302,7 +302,8 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
   «что дальше».
 - Внешние `$ref` (`other.yaml#/…`, `http…`) и циклы: в схеме запроса create — ошибка exit 1, иначе
   UNSUPPORTED + заглушка `{}`.
-- OAuth2-флоу не генерируется (bearer с `TODO`). Подпись `t=…,v1=…` (Stripe-стиль) проверяется как HMAC над
+- OAuth2: генерируется только `client_credentials` (`tokenUrl` из спеки, `client_id`/`client_secret` в
+  credentials, токен кэшируется без учёта `expires_in`); другие flows → bearer с `TODO`. Подпись `t=…,v1=…` (Stripe-стиль) проверяется как HMAC над
   `"<t>.<raw body>"` (WARN: схема взята из описания); прочие timestamp/nonce-схемы → `NotImplementedError`
   в `verify_signature!` с пояснением.
 - `oneOf` получателя: по умолчанию первый вариант + WARN; выбор — `fields.<path>.variant: <SchemaName>`.

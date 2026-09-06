@@ -43,7 +43,16 @@ RSpec.describe Forge::Analyzers::Auth do
     expect(finding).to have_warning(:api_key_in_query, level: :warn)
   end
 
-  it 'oauth2 only → UNSUPPORTED + bearer fallback' do
+  it 'oauth2 clientCredentials with tokenUrl → oauth2 (client_id/client_secret), no UNSUPPORTED' do
+    flows = { 'clientCredentials' => { 'tokenUrl' => '/oauth/token', 'scopes' => {} } }
+    finding = auth_for(spec_with({ 'o' => { 'type' => 'oauth2', 'flows' => flows } }, [{ 'o' => [] }]))
+    expect(finding.value).to include(type: 'oauth2', scheme_name: 'o', header: 'Authorization', prefix: 'Bearer',
+                                     credential_keys: %w[client_id client_secret], token_url: '/oauth/token')
+    expect(finding.confidence).to eq(0.95)
+    expect(finding.warnings).to eq([])
+  end
+
+  it 'oauth2 without clientCredentials → UNSUPPORTED + bearer fallback' do
     finding = auth_for(spec_with({ 'o' => { 'type' => 'oauth2', 'flows' => {} } }, [{ 'o' => [] }]))
     expect(finding.value).to include(type: 'bearer', credential_key: 'token')
     expect(finding).to have_warning(:oauth2, level: :unsupported, hint: /token/)

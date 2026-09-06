@@ -40,7 +40,7 @@ Found 82 endpoints: POST /token, GET /, GET /accounts/{id}, POST /funding-source
   status   GET /transfers/{id}                        getTransfer              confidence 0.90
   cancel   POST /transfers/{id}                       cancelTransfer           confidence 0.65   (outside contract → cancel_request)
   balance  GET /funding-sources/{id}/balance          getFundingSourceBalance  confidence 0.75   (outside contract → fetch_balance)
-Auth: clientCredentials (bearer, header: Authorization) → credentials.token
+Auth: clientCredentials (oauth2, header: Authorization, client_credentials → POST /token) → credentials.client_id/client_secret
 Statuses (status): not found
 Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
         403 forbidden → alert_block; 404 (status) not_found → reject;
@@ -70,11 +70,6 @@ Warnings (22):
   WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
         hint: endpoints.<operationId>: webhook  (overrides.yml)
   … and 12 more (see --format json)
-Unsupported (2):
-  UNSUPPORTED  oauth2_alternative         alternative security scheme 'clientCredentials' (oauth2) is ignored
-        hint: the first supported scheme is used
-  UNSUPPORTED  oauth2                     security scheme 'clientCredentials' (oauth2) is not supported; bearer token assumed
-        hint: obtain the token out of band and put it into credentials.token
 Info (80):
   INFO         outside_contract           POST /transfers/{id} (cancelTransfer) — generated as `cancel_request` helper
   INFO         outside_contract           GET /funding-sources/{id}/balance (getFundingSourceBalance) — generated as `fetch_balance` helper
@@ -87,4 +82,4 @@ Info (80):
   INFO         outside_contract           GET /accounts/{id}/mass-payments (listMassPayments) — not used
   INFO         outside_contract           GET /customers (listAndSearchCustomers) — not used
   … and 70 more (see --format json)
-Done: 22 warnings, 2 unsupported. Exit 0.
+Done: 22 warnings, 0 unsupported. Exit 0.

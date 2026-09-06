@@ -15,7 +15,7 @@ require_relative '../lib/provider'
 # Сценарий: generate → mock → check_conditions → create_request → fetch_status → simulate → process_callback.
 class E2E
   CREDENTIALS = { 'api_key' => 'test-key', 'token' => 'test-key', 'login' => 'user', 'password' => 'test-key',
-                  'callback_secret' => 'secret' }.freeze
+                  'client_id' => 'client', 'client_secret' => 'test-key', 'callback_secret' => 'secret' }.freeze
 
   # Крошечный HTTP-приёмник webhook на TCPServer: один запрос за раз, кладёт его в очередь.
   class WebhookReceiver
@@ -108,13 +108,22 @@ class E2E
   def build_service
     load File.expand_path(File.join(@out, @plan.provider[:file_name]))
     klass = Provider.const_get(@plan.provider[:class_name])
-    klass.send(:remove_const, :BASE_URL)
-    klass.const_set(:BASE_URL, "http://127.0.0.1:#{@mock_port}")
+    point_at_mock(klass)
     fixtures = JSON.parse(File.read(File.join(@out, 'fixtures.json')))
     @operations = Provider::MemoryOperations.new
     @service = klass.new(provider: record_from(fixtures), operations: @operations)
     @operation = operation_from(fixtures.dig('create_request', 'operation'))
     @operations.save(@operation)
+  end
+
+  # BASE_URL (и TOKEN_URL для oauth2) сгенерированного сервиса → мок.
+  def point_at_mock(klass)
+    klass.send(:remove_const, :BASE_URL)
+    klass.const_set(:BASE_URL, "http://127.0.0.1:#{@mock_port}")
+    return unless klass.const_defined?(:TOKEN_URL)
+
+    klass.send(:remove_const, :TOKEN_URL)
+    klass.const_set(:TOKEN_URL, "http://127.0.0.1:#{@mock_port}#{URI(@plan.auth[:token_url].to_s).path}")
   end
 
   def record_from(fixtures)

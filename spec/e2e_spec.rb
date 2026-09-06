@@ -13,6 +13,12 @@ RSpec.describe 'bin/e2e' do
     end
   end
 
+  it 'approves an oauth2 client_credentials provider: token from the mock, then Bearer on every call' do
+    out, status = e2e('spec/fixtures/oauth2_payout.yaml')
+    expect(status.exitstatus).to eq(0), out
+    expect(out).to include('create_request ok', 'operation approved ✓')
+  end
+
   it 'approves cardpay with its overrides (all WARN closed)' do
     out, status = e2e('examples/specs/cardpay.yaml', '--overrides', 'examples/overrides/cardpay.yml')
     expect(status.exitstatus).to eq(0), out

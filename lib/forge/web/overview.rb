@@ -43,6 +43,7 @@ module Forge
         when 'api_key' then "API key · #{auth['location']} `#{auth['header'] || auth['param_name']}` → api_key"
         when 'bearer' then 'Bearer token · Authorization → credentials.token'
         when 'basic' then 'Basic auth · Authorization → credentials.login / password'
+        when 'oauth2' then "OAuth2 client_credentials · POST #{auth['token_url']} → credentials.client_id/client_secret"
         else 'не найдена (см. предупреждения)'
         end
       end

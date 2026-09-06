@@ -152,7 +152,7 @@ UPDATE_GOLDEN=1 bundle exec rspec spec/golden_spec.rb && git diff --stat spec/go
 
 ## 5. Известные ограничения (README «Ограничения»)
 
-Только OpenAPI 3.x; только payout; OAuth2-флоу не генерируется (bearer + TODO); подпись `t=…,v1=…` проверяется
+Только OpenAPI 3.x; только payout; OAuth2 — только client_credentials (D-30), другие flows → bearer + TODO; подпись `t=…,v1=…` проверяется
 (D-29), прочие timestamp/nonce-схемы → `NotImplementedError` с TODO; массивы полей (PayPal `items[]`) не мапятся. Закрыто 5.09 (D-17…D-20): выбор
 варианта `oneOf` через overrides, form-urlencoded тела (`form:` + WARN), статус через POST с id в теле,
 валидация фикстур по схемам спеки (INFO). NovaPay теперь даёт 3 WARN + 4 INFO: четвёртый INFO —

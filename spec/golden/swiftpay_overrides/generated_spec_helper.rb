@@ -15,7 +15,8 @@ WebMock.disable_net_connect!
 module GeneratedSpecHelper
   TEST_CREDENTIALS = { 'api_key' => 'test_api_key', 'token' => 'test_token', 'login' => 'test_login',
                        'password' => 'test_password', 'callback_secret' => 'test_secret',
-                       'merchant_id' => 'test_merchant' }.freeze
+                       'merchant_id' => 'test_merchant', 'client_id' => 'test_client_id',
+                       'client_secret' => 'test_client_secret' }.freeze
 
   def fixtures = @fixtures ||= JSON.parse(File.read(File.join(__dir__, 'fixtures.json')))
 
