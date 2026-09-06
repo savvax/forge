@@ -1,0 +1,601 @@
+{
+  "spec": {
+    "openapi": "3.2.0",
+    "title": "Wise Platform Transfer API",
+    "version": "",
+    "source": "examples/real/wise_transfer.yml"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/v1/transfers",
+      "operation_id": "transferCreate",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v1/transfers/{transferId}",
+      "operation_id": "transferGet",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "PUT",
+      "path": "/v1/transfers/{transferId}/cancel",
+      "operation_id": "transferCancel",
+      "confidence": 0.7,
+      "outside_contract": true
+    },
+    {
+      "role": "webhook",
+      "method": "POST",
+      "path": "transfers#state-change",
+      "operation_id": "eventTransfersStateChange",
+      "confidence": 0.95,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "UserToken"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 429,
+        "role": "create",
+        "pointer": "#/paths/~1v1~1transfers/post/responses/429",
+        "headers": [
+          "Retry-After",
+          "X-Rate-Limited-By",
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1v1~1transfers~1{transferId}/get/responses/404",
+        "headers": [
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 429,
+        "role": "status",
+        "pointer": "#/paths/~1v1~1transfers~1{transferId}/get/responses/429",
+        "headers": [
+          "Retry-After",
+          "X-Rate-Limited-By",
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      },
+      {
+        "status": 404,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1transfers~1{transferId}~1cancel/put/responses/404",
+        "headers": [
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 409,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1transfers~1{transferId}~1cancel/put/responses/409",
+        "headers": [
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "conflict",
+        "action": "reject"
+      },
+      {
+        "status": 429,
+        "role": "cancel",
+        "pointer": "#/paths/~1v1~1transfers~1{transferId}~1cancel/put/responses/429",
+        "headers": [
+          "Retry-After",
+          "X-Rate-Limited-By",
+          "X-External-Correlation-Id",
+          "x-trace-id"
+        ],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      }
+    ],
+    "http": {
+      "404": "not_found",
+      "429": "rate_limit"
+    },
+    "codes": [],
+    "retry_after_header": "Retry-After"
+  },
+  "webhook": {
+    "endpoint": {
+      "method": "post",
+      "path": "transfers#state-change",
+      "operation_id": "eventTransfersStateChange"
+    },
+    "source": "webhooks",
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": "X-Signature-SHA256",
+      "algorithm": "sha256",
+      "encoding": "base64",
+      "payload": "raw_body",
+      "secret_key": "callback_secret"
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "sourceAccount",
+        "path": [
+          "sourceAccount"
+        ],
+        "source_expr": "credentials.fetch('sourceAccount')",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "targetAccount",
+        "path": [
+          "targetAccount"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "quoteUuid",
+        "path": [
+          "quoteUuid"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "customerTransactionId",
+        "path": [
+          "customerTransactionId"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "details",
+          "reference"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "transferPurpose",
+        "path": [
+          "details",
+          "transferPurpose"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "transferPurposeSubTransferPurpose",
+        "path": [
+          "details",
+          "transferPurposeSubTransferPurpose"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "transferPurposeInvoiceNumber",
+        "path": [
+          "details",
+          "transferPurposeInvoiceNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "sourceOfFunds",
+        "path": [
+          "details",
+          "sourceOfFunds"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [
+      "bank_account"
+    ],
+    "requisite_container": "details",
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/transfer-requirements (transferRequirementsValidate) also looks like create (0.75); POST /v1/transfers (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1v1~1transfer-requirements/post",
+      "hint": "endpoints.transferRequirementsValidate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v2/profiles/{profileId}/third-party-transfers (transferThirdPartyCreate) also looks like create (0.6); POST /v1/transfers (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1v2~1profiles~1{profileId}~1third-party-transfers/post",
+      "hint": "endpoints.transferThirdPartyCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/profiles/{profileId}/partner-licence-transfers (transferPartnerLicenceCreate) also looks like create (0.6); POST /v1/transfers (transferCreate) wins (0.95)",
+      "pointer": "#/paths/~1v1~1profiles~1{profileId}~1partner-licence-transfers/post",
+      "hint": "endpoints.transferPartnerLicenceCreate: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/transfers/{transferId}/receipt.pdf (transferReceiptGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1receipt.pdf/get",
+      "hint": "endpoints.transferReceiptGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/transfers/{transferId}/us-combined-receipt.pdf (transferUsCombinedReceiptGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1us-combined-receipt.pdf/get",
+      "hint": "endpoints.transferUsCombinedReceiptGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/transfers/{transferId}/documents/noc (transferNocGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1documents~1noc/get",
+      "hint": "endpoints.transferNocGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGetV1) also looks like status (0.6); GET /v1/transfers/{transferId} (transferGet) wins (0.9)",
+      "pointer": "#/paths/~1v1~1profiles~1{profileId}~1third-party-transfers~1{transferId}/get",
+      "hint": "endpoints.transferThirdPartyGetV1: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v2/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGet) also looks like status (0.6); GET /v1/transfers/{transferId} (transferGet) wins (0.9)",
+      "pointer": "#/paths/~1v2~1profiles~1{profileId}~1third-party-transfers~1{transferId}/get",
+      "hint": "endpoints.transferThirdPartyGet: status"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "cancel: PUT /v1/transfers/{transferId}/cancel (transferCancel) scored 0.7",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1cancel/put",
+      "hint": "endpoints.transferCancel: cancel"
+    },
+    {
+      "level": "info",
+      "code": "webhook_source_webhooks",
+      "message": "webhook taken from webhooks: POST transfers#state-change (eventTransfersStateChange)",
+      "pointer": "#/webhooks/transfers#state-change/post",
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.wise.com)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PUT /v1/transfers/{transferId}/cancel (transferCancel) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1cancel/put",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/transfers (transferList) — not used",
+      "pointer": "#/paths/~1v1~1transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/transfer-requirements (transferRequirementsValidate) — not used",
+      "pointer": "#/paths/~1v1~1transfer-requirements/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/profiles/{profileId}/third-party-transfers (transferThirdPartyCreate) — not used",
+      "pointer": "#/paths/~1v2~1profiles~1{profileId}~1third-party-transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGetV1) — not used",
+      "pointer": "#/paths/~1v1~1profiles~1{profileId}~1third-party-transfers~1{transferId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGet) — not used",
+      "pointer": "#/paths/~1v2~1profiles~1{profileId}~1third-party-transfers~1{transferId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/profiles/{profileId}/transfers/{transferId}/payments (transferFund) — not used",
+      "pointer": "#/paths/~1v3~1profiles~1{profileId}~1transfers~1{transferId}~1payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/transfers/{transferId}/payments (transferPaymentsList) — not used",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/transfers/{transferId}/invoices/bankingpartner (transferPayoutInfoGet) — not used",
+      "pointer": "#/paths/~1v2~1transfers~1{transferId}~1invoices~1bankingpartner/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/transfers/{transferId}/receipt.pdf (transferReceiptGet) — not used",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1receipt.pdf/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/transfers/{transferId}/us-combined-receipt.pdf (transferUsCombinedReceiptGet) — not used",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1us-combined-receipt.pdf/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/transfers/{transferId}/documents/noc (transferNocGet) — not used",
+      "pointer": "#/paths/~1v1~1transfers~1{transferId}~1documents~1noc/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/profiles/{profileId}/partner-licence-transfers (transferPartnerLicenceCreate) — not used",
+      "pointer": "#/paths/~1v1~1profiles~1{profileId}~1partner-licence-transfers/post",
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "http_alternative",
+      "message": "alternative security scheme 'PersonalToken' (http) is ignored",
+      "pointer": "#/components/securitySchemes/PersonalToken",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "signature_algorithm_assumed",
+      "message": "X-Signature-SHA256: algorithm not stated; sha256 assumed",
+      "pointer": null,
+      "hint": "webhook.signature_algorithm: sha256|sha512|sha1  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "info",
+      "code": "credential_field",
+      "message": "sourceAccount → credentials.sourceAccount",
+      "pointer": null,
+      "hint": "fill it in credentials"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "targetAccount (integer, Recipient account ID. You can create multiple transfers to same recipient acc…) has no source",
+      "pointer": null,
+      "hint": "fields.targetAccount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "quoteUuid (string, V2 quote ID. You can only create one transfer per one quote. You cannot use s…) has no source",
+      "pointer": null,
+      "hint": "fields.quoteUuid.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "customerTransactionId (string, Required to perform idempotency check to avoid duplicate transfers in case of…) has no source",
+      "pointer": null,
+      "hint": "fields.customerTransactionId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "details.reference (string, Recipient will see this reference text in their bank statement. Maximum allow…) has no source",
+      "pointer": null,
+      "hint": "fields.details.reference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "details.transferPurpose (string, Conditionally required. For example when target currency is THB. See [Transfe…) has no source",
+      "pointer": null,
+      "hint": "fields.details.transferPurpose.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "details.transferPurposeSubTransferPurpose (string, Conditionally required. For example when target currency is CNY. See [Transfe…) has no source",
+      "pointer": null,
+      "hint": "fields.details.transferPurposeSubTransferPurpose.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "details.transferPurposeInvoiceNumber (string, Conditionally required. For example when target currency is INR. See [Transfe…) has no source",
+      "pointer": null,
+      "hint": "fields.details.transferPurposeInvoiceNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "details.sourceOfFunds (string, Conditionally required. For example when target currency is USD and transfer …) has no source",
+      "pointer": null,
+      "hint": "fields.details.sourceOfFunds.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

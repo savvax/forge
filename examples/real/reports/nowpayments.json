@@ -1,0 +1,260 @@
+{
+  "spec": {
+    "openapi": "3.0.3",
+    "title": "NOWPayments API",
+    "version": "1.0.0",
+    "source": "examples/real/nowpayments.json"
+  },
+  "endpoints": [
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v1/sub-partner/transfer/{id}",
+      "operation_id": "getTransfer",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "balance",
+      "method": "GET",
+      "path": "/v1/sub-partner/balance/{id}",
+      "operation_id": "getSubPartnerBalance",
+      "confidence": 0.75,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "none",
+    "scheme_name": null,
+    "header": null,
+    "prefix": null,
+    "credential_key": null,
+    "credential_keys": [],
+    "location": null
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "result",
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.8
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/sub-partner/transfers (getAllTransfers) also looks like status (0.7); GET /v1/sub-partner/transfer/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1v1~1sub-partner~1transfers/get",
+      "hint": "endpoints.getAllTransfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/payout/{withdrawals-id}/verify (verifyPayout) also looks like status (0.6); GET /v1/sub-partner/transfer/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1v1~1payout~1{withdrawals-id}~1verify/post",
+      "hint": "endpoints.verifyPayout: status"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "balance: GET /v1/sub-partner/balance/{id} (getSubPartnerBalance) scored 0.75",
+      "pointer": "#/paths/~1v1~1sub-partner~1balance~1{id}/get",
+      "hint": "endpoints.getSubPartnerBalance: balance"
+    },
+    {
+      "level": "warn",
+      "code": "no_create_endpoint",
+      "message": "no create endpoint found",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: create  (overrides.yml) or --include-paths"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.nowpayments.io)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/sub-partner/balance/{id} (getSubPartnerBalance) — generated as `fetch_balance` helper",
+      "pointer": "#/paths/~1v1~1sub-partner~1balance~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/estimate (getEstimatedPrice) — not used",
+      "pointer": "#/paths/~1v1~1estimate/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/min-amount (getTheMinimumPaymentAmount) — not used",
+      "pointer": "#/paths/~1v1~1min-amount/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payment/ (getListOfPayments) — not used",
+      "pointer": "#/paths/~1v1~1payment~1/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payment/{id}/update-merchant-estimate (getUpdatePaymentEstimate) — not used",
+      "pointer": "#/paths/~1v1~1payment~1{id}~1update-merchant-estimate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payment/{payment_id} (getPaymentStatus) — not used",
+      "pointer": "#/paths/~1v1~1payment~1{payment_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payout/{withdrawals-id}/verify (verifyPayout) — not used",
+      "pointer": "#/paths/~1v1~1payout~1{withdrawals-id}~1verify/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/sub-partner (getSubPartners) — not used",
+      "pointer": "#/paths/~1v1~1sub-partner/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/sub-partner/transfers (getAllTransfers) — not used",
+      "pointer": "#/paths/~1v1~1sub-partner~1transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/subscriptions (getManyRecurringPayments) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/subscriptions/plans (getManyPlans) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions~1plans/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/subscriptions/plans/{plan-id} (getOnePlan) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions~1plans~1{plan-id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /v1/subscriptions/plans/{plan-id} (updatePlan) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions~1plans~1{plan-id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/subscriptions/{sub_id} (getOneRecurringPayment) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions~1{sub_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v1/subscriptions/{sub_id} (deleteRecurringPayment) — not used",
+      "pointer": "#/paths/~1v1~1subscriptions~1{sub_id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "auth_not_found",
+      "message": "no security requirement on the create endpoint or at the root",
+      "pointer": "#/security",
+      "hint": "auth.type: api_key|bearer|basic (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    }
+  ],
+  "exit_code": 0
+}

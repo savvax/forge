@@ -12,6 +12,7 @@ RSpec.describe Provider::RaiffeisenService do
   let(:create_fixture) { fixtures['create_request'] }
   let(:provider_id) { dig_path(create_fixture['response_200'], ["id"]) }
   let(:create_url) { "#{described_class::BASE_URL}/payout/v1/payouts" }
+  let(:overridden) { [["incomeTypeCode"]] } # source задан в overrides.yml — не сравнивается
   let(:auth_headers) { { 'Accept' => 'application/json' } } # auth без заголовков (apiKey в query / none)
 
   describe '#check_conditions' do
@@ -22,7 +23,8 @@ RSpec.describe Provider::RaiffeisenService do
 
   describe '#create_request' do
     it 'creates payout (200)' do
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(parse_body(req), create_fixture['request']) }
+      expected_body = without_paths(create_fixture['request'], overridden)
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(parse_body(req), overridden), expected_body) }
                                             .to_return(status: 200, body: create_fixture['response_200'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
       result = service.create_request(operation, 'create')

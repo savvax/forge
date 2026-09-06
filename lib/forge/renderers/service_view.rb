@@ -24,6 +24,14 @@ module Forge
       def signature? = !signature&.dig(:header).nil?
       def minor? = plan.amount[:unit] == :minor
       def currency = plan.amount[:currencies].first
+
+      # Валюты: из анализа суммы, иначе из enum поля currency (валидация есть, а списка нет — PAYONE).
+      def currencies
+        return plan.amount[:currencies] unless plan.amount[:currencies].empty?
+
+        plan.validations.find { |v| v[:rule] == :enum }&.dig(:value).to_a
+      end
+
       def requisites? = !plan.requisite_types.empty?
       def type_values = plan.fields[:requisite_type_values].to_h.reject { |k, v| k == v }
       def type_values? = !type_values.empty?
@@ -98,7 +106,7 @@ module Forge
       end
 
       def pattern_check(validation)
-        name = validation[:field].split('.').last
+        name = identifier(validation[:field].split('.').last)
         expr = requisite_access(validation[:expr])
         regexp = validation[:value].sub(/\A\^/, '\A').sub(/\$\z/, '\z').gsub('/', '\/')
         check = "#{name}.to_s.match?(/#{regexp}/)"
@@ -106,6 +114,15 @@ module Forge
         guard = "requisite_type_for(operation, request_method) == '#{type}'"
         condition = type ? "if #{guard} && !#{check}" : "unless #{check}"
         ["#{name} = #{expr}", "#{FAIL}'#{validation[:error_code]}') #{condition}"]
+      end
+
+      RESERVED = %w[end class def if unless while until do begin rescue return yield self nil true false and or not
+                    then case when else module alias super redo retry next break for in undef].freeze
+
+      # Имя локальной переменной из имени поля: Currency → currency; end/1st → field_end/field_1st.
+      def identifier(raw)
+        name = Rules.normalize(raw)
+        RESERVED.include?(name) || name.match?(/\A\d/) ? "field_#{name}" : name
       end
 
       def hmac_expr

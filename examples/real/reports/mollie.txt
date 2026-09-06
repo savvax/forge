@@ -1,0 +1,136 @@
+Parsing spec... ok (openapi 3.1.0, Mollie API 1.0.0)
+Found 128 endpoints: POST /oauth2/tokens, DELETE /oauth2/tokens, GET /v2/balances,
+                     GET /v2/balances/{balanceId}, GET /v2/balances/primary,
+                     GET /v2/balances/{balanceId}/report, GET /v2/balances/{balanceId}/transactions,
+                     GET /v2/settlements, GET /v2/settlements/{settlementId},
+                     GET /v2/settlements/open, GET /v2/settlements/next,
+                     GET /v2/settlements/{settlementId}/payments,
+                     GET /v2/settlements/{settlementId}/captures,
+                     GET /v2/settlements/{settlementId}/refunds,
+                     GET /v2/settlements/{settlementId}/chargebacks, GET /v2/invoices,
+                     GET /v2/invoices/{invoiceId}, GET /v2/permissions,
+                     GET /v2/permissions/{permissionId}, GET /v2/organizations/{organizationId},
+                     GET /v2/organizations/me, GET /v2/organizations/me/partner, GET /v2/profiles,
+                     POST /v2/profiles, GET /v2/profiles/{profileId}, PATCH /v2/profiles/{profileId},
+                     DELETE /v2/profiles/{profileId}, GET /v2/profiles/me, GET /v2/onboarding/me,
+                     POST /v2/onboarding/me, GET /v2/capabilities, GET /v2/clients,
+                     GET /v2/clients/{organizationId}, POST /v2/client-links, GET /v2/webhooks,
+                     POST /v2/webhooks, GET /v2/webhooks/{webhookId}, PATCH /v2/webhooks/{webhookId},
+                     DELETE /v2/webhooks/{webhookId}, POST /v2/webhooks/{webhookId}/ping,
+                     GET /v2/events/{webhookEventId}, GET /v2/connect/balance-transfers,
+                     POST /v2/connect/balance-transfers,
+                     GET /v2/connect/balance-transfers/{balanceTransferId}, GET /v2/payments,
+                     POST /v2/payments, GET /v2/payments/{paymentId}, PATCH /v2/payments/{paymentId},
+                     DELETE /v2/payments/{paymentId},
+                     POST /v2/payments/{paymentId}/release-authorization,
+                     GET /v2/unmatched-credit-transfers,
+                     GET /v2/unmatched-credit-transfers/{unmatchedCreditTransferId},
+                     POST /v2/unmatched-credit-transfers/{unmatchedCreditTransferId}/match,
+                     POST /v2/unmatched-credit-transfers/{unmatchedCreditTransferId}/return,
+                     POST /v2/sessions, GET /v2/sessions/{sessionId}, GET /v2/methods,
+                     GET /v2/methods/all, GET /v2/methods/{methodId},
+                     POST /v2/profiles/{profileId}/methods/{methodId},
+                     DELETE /v2/profiles/{profileId}/methods/{methodId},
+                     POST /v2/profiles/{profileId}/methods/{methodId}/issuers/{issuerId},
+                     DELETE /v2/profiles/{profileId}/methods/{methodId}/issuers/{issuerId},
+                     GET /v2/payments/{paymentId}/refunds, POST /v2/payments/{paymentId}/refunds,
+                     GET /v2/payments/{paymentId}/refunds/{refundId},
+                     DELETE /v2/payments/{paymentId}/refunds/{refundId}, GET /v2/refunds,
+                     GET /v2/payments/{paymentId}/chargebacks,
+                     GET /v2/payments/{paymentId}/chargebacks/{chargebackId}, GET /v2/chargebacks,
+                     GET /v2/payments/{paymentId}/captures, POST /v2/payments/{paymentId}/captures,
+                     GET /v2/payments/{paymentId}/captures/{captureId},
+                     POST /v2/wallets/applepay/sessions, GET /v2/payment-links,
+                     POST /v2/payment-links, GET /v2/payment-links/{paymentLinkId},
+                     PATCH /v2/payment-links/{paymentLinkId},
+                     DELETE /v2/payment-links/{paymentLinkId},
+                     GET /v2/payment-links/{paymentLinkId}/payments, GET /v2/terminals,
+                     GET /v2/terminals/{terminalId}, GET /v2/terminals/pairing-codes,
+                     POST /v2/terminals/pairing-codes,
+                     GET /v2/terminals/pairing-codes/{pairingCodeId},
+                     DELETE /v2/terminals/pairing-codes/{pairingCodeId},
+                     GET /v2/payments/{paymentId}/routes, POST /v2/payments/{paymentId}/routes,
+                     GET /v2/payments/{paymentId}/routes/{routeId}, GET /v2/customers,
+                     POST /v2/customers, GET /v2/customers/{customerId},
+                     PATCH /v2/customers/{customerId}, DELETE /v2/customers/{customerId},
+                     GET /v2/customers/{customerId}/payments,
+                     POST /v2/customers/{customerId}/payments,
+                     GET /v2/customers/{customerId}/mandates,
+                     POST /v2/customers/{customerId}/mandates,
+                     GET /v2/customers/{customerId}/mandates/{mandateId},
+                     DELETE /v2/customers/{customerId}/mandates/{mandateId},
+                     GET /v2/customers/{customerId}/subscriptions,
+                     POST /v2/customers/{customerId}/subscriptions,
+                     GET /v2/customers/{customerId}/subscriptions/{subscriptionId},
+                     PATCH /v2/customers/{customerId}/subscriptions/{subscriptionId},
+                     DELETE /v2/customers/{customerId}/subscriptions/{subscriptionId},
+                     GET /v2/subscriptions,
+                     GET /v2/customers/{customerId}/subscriptions/{subscriptionId}/payments,
+                     GET /v2/sales-invoices, POST /v2/sales-invoices,
+                     GET /v2/sales-invoices/{salesInvoiceId},
+                     PATCH /v2/sales-invoices/{salesInvoiceId},
+                     DELETE /v2/sales-invoices/{salesInvoiceId}, GET /v2/business-accounts/accounts,
+                     GET /v2/business-accounts/accounts/{businessAccountId},
+                     GET /v2/business-accounts/accounts/{businessAccountId}/transactions,
+                     GET /v2/business-accounts/accounts/{businessAccountId}/transactions/{transactionId},
+                     POST /v2/business-accounts/transfers,
+                     GET /v2/business-accounts/transfers/{businessAccountsTransferId},
+                     POST /v2/business-accounts/payee-verifications,
+                     GET /v2/business-accounts/draft-transfers,
+                     POST /v2/business-accounts/draft-transfers,
+                     GET /v2/business-accounts/draft-transfers/{draftTransferId},
+                     DELETE /v2/business-accounts/draft-transfers/{draftTransferId}, GET /v2/payouts,
+                     POST /v2/payouts, GET /v2/payouts/{payoutId}, DELETE /v2/payouts/{payoutId}
+  create   POST /v2/payouts                           create-payout            confidence 0.95
+  status   GET /v2/payouts/{payoutId}                 get-payout               confidence 0.90
+  cancel   DELETE /v2/payouts/{payoutId}              cancel-payout            confidence 0.85   (outside contract → cancel_request)
+  webhook  POST /v2/webhooks                          create-webhook           confidence 0.50
+  balance  GET /v2/balances                           list-balances            confidence 0.85   (outside contract → fetch_balance)
+Auth: apiKey (bearer, header: Authorization) → credentials.token
+Statuses (status): initiated → in_progress; completed → approved; failed, canceled → rejected; unmapped: requested, processing-at-bank
+Errors: 404 (status) Not Found → reject; 404 (cancel) Not Found → reject; 409 Conflict → reject;
+        422 Unprocessable Entity → reject; 429 (create) Too Many Requests → retry_backoff;
+        429 (status) Too Many Requests → retry_backoff;
+        429 (cancel) Too Many Requests → retry_backoff
+Webhook signature: not found (callbacks are not verified)
+Webhook events: name → no known event values or status field
+Amount: string, major units (×100) — source: amount.value (string) → major units: 'A string containing an exact monetary amount in the given currency.'
+Fields: 19 request fields, 15 unmapped
+Warnings (35):
+  WARN         role_conflict              POST /v2/connect/balance-transfers (create-connect-balance-transfer) also looks like create (0.95); POST /v2/payouts (create-payout) wins (0.95)
+        hint: endpoints.create-connect-balance-transfer: create
+  WARN         role_conflict              POST /v2/business-accounts/transfers (create-transfer) also looks like create (0.95); POST /v2/payouts (create-payout) wins (0.95)
+        hint: endpoints.create-transfer: create
+  WARN         role_conflict              GET /v2/balances/primary (get-primary-balance) also looks like balance (0.85); GET /v2/balances (list-balances) wins (0.85)
+        hint: endpoints.get-primary-balance: balance
+  WARN         role_conflict              GET /v2/connect/balance-transfers (list-connect-balance-transfers) also looks like balance (0.85); GET /v2/balances (list-balances) wins (0.85)
+        hint: endpoints.list-connect-balance-transfers: balance
+  WARN         role_conflict              GET /v2/balances/{balanceId} (get-balance) also looks like balance (0.75); GET /v2/balances (list-balances) wins (0.85)
+        hint: endpoints.get-balance: balance
+  WARN         role_conflict              GET /v2/balances/{balanceId}/report (get-balance-report) also looks like balance (0.75); GET /v2/balances (list-balances) wins (0.85)
+        hint: endpoints.get-balance-report: balance
+  WARN         role_conflict              GET /v2/balances/{balanceId}/transactions (list-balance-transactions) also looks like balance (0.75); GET /v2/balances (list-balances) wins (0.85)
+        hint: endpoints.list-balance-transactions: balance
+  WARN         role_conflict              GET /v2/unmatched-credit-transfers/{unmatchedCreditTransferId} (get-unmatched-credit-transfer) also looks like status (0.9); GET /v2/payouts/{payoutId} (get-payout) wins (0.9)
+        hint: endpoints.get-unmatched-credit-transfer: status
+  WARN         role_conflict              GET /v2/connect/balance-transfers/{balanceTransferId} (get-connect-balance-transfer) also looks like status (0.9); GET /v2/payouts/{payoutId} (get-payout) wins (0.9)
+        hint: endpoints.get-connect-balance-transfer: status
+  WARN         role_conflict              GET /v2/business-accounts/transfers/{businessAccountsTransferId} (get-transfer) also looks like status (0.9); GET /v2/payouts/{payoutId} (get-payout) wins (0.9)
+        hint: endpoints.get-transfer: status
+  … and 25 more (see --format json)
+Unsupported (1):
+  UNSUPPORTED  http_alternative           alternative security scheme 'advancedAccessToken' (http) is ignored
+        hint: the first supported scheme is used
+Info (125):
+  INFO         outside_contract           DELETE /v2/payouts/{payoutId} (cancel-payout) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /v2/balances (list-balances) — generated as `fetch_balance` helper
+  INFO         outside_contract           POST /oauth2/tokens (oauth-generate-tokens) — not used
+  INFO         outside_contract           DELETE /oauth2/tokens (oauth-revoke-tokens) — not used
+  INFO         outside_contract           GET /v2/balances/{balanceId} (get-balance) — not used
+  INFO         outside_contract           GET /v2/balances/primary (get-primary-balance) — not used
+  INFO         outside_contract           GET /v2/balances/{balanceId}/report (get-balance-report) — not used
+  INFO         outside_contract           GET /v2/balances/{balanceId}/transactions (list-balance-transactions) — not used
+  INFO         outside_contract           GET /v2/settlements (list-settlements) — not used
+  INFO         outside_contract           GET /v2/settlements/{settlementId} (get-settlement) — not used
+  … and 115 more (see --format json)
+Done: 35 warnings, 1 unsupported. Exit 0.

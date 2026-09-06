@@ -1,0 +1,114 @@
+Parsing spec... ok (openapi 3.0.2, Increase API 0.0.1)
+Found 115 endpoints: GET /account_numbers, POST /account_numbers,
+                     GET /account_numbers/{account_number_id},
+                     PATCH /account_numbers/{account_number_id}, GET /account_statements,
+                     GET /account_statements/{account_statement_id}, GET /account_transfers,
+                     POST /account_transfers, GET /account_transfers/{account_transfer_id},
+                     POST /account_transfers/{account_transfer_id}/approve,
+                     POST /account_transfers/{account_transfer_id}/cancel, GET /accounts,
+                     POST /accounts, GET /accounts/{account_id}, PATCH /accounts/{account_id},
+                     POST /accounts/{account_id}/close, GET /ach_prenotifications,
+                     POST /ach_prenotifications, GET /ach_prenotifications/{ach_prenotification_id},
+                     GET /ach_transfers, POST /ach_transfers, GET /ach_transfers/{ach_transfer_id},
+                     POST /ach_transfers/{ach_transfer_id}/approve,
+                     POST /ach_transfers/{ach_transfer_id}/cancel, GET /card_disputes,
+                     POST /card_disputes, GET /card_disputes/{card_dispute_id}, GET /card_profiles,
+                     POST /card_profiles, GET /card_profiles/{card_profile_id}, GET /cards,
+                     POST /cards, GET /cards/{card_id}, PATCH /cards/{card_id},
+                     GET /cards/{card_id}/details, GET /check_deposits, POST /check_deposits,
+                     GET /check_deposits/{check_deposit_id}, GET /check_transfers,
+                     POST /check_transfers, GET /check_transfers/{check_transfer_id},
+                     POST /check_transfers/{check_transfer_id}/approve,
+                     POST /check_transfers/{check_transfer_id}/cancel,
+                     POST /check_transfers/{check_transfer_id}/stop_payment,
+                     GET /declined_transactions,
+                     GET /declined_transactions/{declined_transaction_id},
+                     GET /digital_wallet_tokens,
+                     GET /digital_wallet_tokens/{digital_wallet_token_id}, GET /documents,
+                     GET /documents/{document_id}, GET /entities, POST /entities,
+                     GET /entities/{entity_id}, POST /entities/{entity_id}/supplemental_documents,
+                     GET /event_subscriptions, POST /event_subscriptions,
+                     GET /event_subscriptions/{event_subscription_id},
+                     PATCH /event_subscriptions/{event_subscription_id}, GET /events,
+                     GET /events/{event_id}, GET /external_accounts, POST /external_accounts,
+                     GET /external_accounts/{external_account_id},
+                     PATCH /external_accounts/{external_account_id}, GET /files, POST /files,
+                     GET /files/{file_id}, GET /groups/current, GET /inbound_ach_transfer_returns,
+                     POST /inbound_ach_transfer_returns,
+                     GET /inbound_ach_transfer_returns/{inbound_ach_transfer_return_id},
+                     GET /inbound_wire_drawdown_requests,
+                     GET /inbound_wire_drawdown_requests/{inbound_wire_drawdown_request_id},
+                     GET /limits, POST /limits, GET /limits/{limit_id}, PATCH /limits/{limit_id},
+                     GET /oauth_connections, GET /oauth_connections/{oauth_connection_id},
+                     GET /pending_transactions, GET /pending_transactions/{pending_transaction_id},
+                     GET /real_time_decisions/{real_time_decision_id},
+                     POST /real_time_decisions/{real_time_decision_id}/action, GET /routing_numbers,
+                     POST /simulations/account_statements,
+                     POST /simulations/account_transfers/{account_transfer_id}/complete,
+                     POST /simulations/ach_transfers/{ach_transfer_id}/return,
+                     POST /simulations/ach_transfers/{ach_transfer_id}/submit,
+                     POST /simulations/card_authorizations,
+                     POST /simulations/card_disputes/{card_dispute_id}/action,
+                     POST /simulations/card_refunds, POST /simulations/card_settlements,
+                     POST /simulations/check_deposits/{check_deposit_id}/reject,
+                     POST /simulations/check_deposits/{check_deposit_id}/return,
+                     POST /simulations/check_deposits/{check_deposit_id}/submit,
+                     POST /simulations/check_transfers/{check_transfer_id}/deposit,
+                     POST /simulations/check_transfers/{check_transfer_id}/mail,
+                     POST /simulations/digital_wallet_token_requests, POST /simulations/documents,
+                     POST /simulations/inbound_ach_transfers,
+                     POST /simulations/inbound_real_time_payments_transfers,
+                     POST /simulations/inbound_wire_drawdown_requests,
+                     POST /simulations/inbound_wire_transfers,
+                     POST /simulations/wire_transfers/{wire_transfer_id}/reverse,
+                     POST /simulations/wire_transfers/{wire_transfer_id}/submit, GET /transactions,
+                     GET /transactions/{transaction_id}, GET /wire_drawdown_requests,
+                     POST /wire_drawdown_requests,
+                     GET /wire_drawdown_requests/{wire_drawdown_request_id}, GET /wire_transfers,
+                     POST /wire_transfers, GET /wire_transfers/{wire_transfer_id},
+                     POST /wire_transfers/{wire_transfer_id}/approve,
+                     POST /wire_transfers/{wire_transfer_id}/cancel
+  create   POST /account_transfers                    create_an_account_transfer confidence 0.95
+  status   GET /account_transfers/{account_transfer_id} retrieve_an_account_transfer confidence 0.90
+  cancel   POST /account_transfers/{account_transfer_id}/cancel cancel_an_account_transfer confidence 0.95   (outside contract → cancel_request)
+Auth: bearerAuth (bearer, header: Authorization) → credentials.token
+Statuses (status): complete → approved; canceled → rejected; unmapped: pending_submission, pending_approval, requires_attention, flagged_by_operator
+Errors: none described
+Webhook signature: no webhook found
+Amount: integer, minor units (×100), min 0.01 — source: amount (integer, min 1) → minor units: 'The transfer amount in the minor unit of the account currency. For dollars, for example, this is cents.'
+Fields: 5 request fields, 2 unmapped
+Warnings (37):
+  WARN         role_conflict              POST /ach_transfers (create_an_ach_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.create_an_ach_transfer: create
+  WARN         role_conflict              POST /check_transfers (create_a_check_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.create_a_check_transfer: create
+  WARN         role_conflict              POST /inbound_ach_transfer_returns (create_an_ach_return) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.create_an_ach_return: create
+  WARN         role_conflict              POST /wire_transfers (create_a_wire_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.create_a_wire_transfer: create
+  WARN         role_conflict              POST /simulations/inbound_ach_transfers (simulate_an_ach_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.simulate_an_ach_transfer_to_your_account: create
+  WARN         role_conflict              POST /simulations/inbound_real_time_payments_transfers (simulate_a_real_time_payments_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.simulate_a_real_time_payments_transfer_to_your_account: create
+  WARN         role_conflict              POST /simulations/inbound_wire_transfers (simulate_a_wire_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)
+        hint: endpoints.simulate_a_wire_transfer_to_your_account: create
+  WARN         role_conflict              GET /ach_transfers/{ach_transfer_id} (retrieve_an_ach_transfer) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)
+        hint: endpoints.retrieve_an_ach_transfer: status
+  WARN         role_conflict              GET /check_transfers/{check_transfer_id} (retrieve_a_check_transfer) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)
+        hint: endpoints.retrieve_a_check_transfer: status
+  WARN         role_conflict              GET /inbound_ach_transfer_returns/{inbound_ach_transfer_return_id} (retrieve_an_inbound_ach_transfer_return) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)
+        hint: endpoints.retrieve_an_inbound_ach_transfer_return: status
+  … and 27 more (see --format json)
+Info (114):
+  INFO         outside_contract           POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /account_numbers (list_account_numbers) — not used
+  INFO         outside_contract           POST /account_numbers (create_an_account_number) — not used
+  INFO         outside_contract           GET /account_numbers/{account_number_id} (retrieve_an_account_number) — not used
+  INFO         outside_contract           PATCH /account_numbers/{account_number_id} (update_an_account_number) — not used
+  INFO         outside_contract           GET /account_statements (list_account_statements) — not used
+  INFO         outside_contract           GET /account_statements/{account_statement_id} (retrieve_an_account_statement) — not used
+  INFO         outside_contract           GET /account_transfers (list_account_transfers) — not used
+  INFO         outside_contract           POST /account_transfers/{account_transfer_id}/approve (approve_an_account_transfer) — not used
+  INFO         outside_contract           GET /accounts (list_accounts) — not used
+  … and 104 more (see --format json)
+Done: 37 warnings, 0 unsupported. Exit 0.

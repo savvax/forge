@@ -20,7 +20,16 @@ module Forge
           value = dig(request, m.path)
           assign(op, m, value, type) unless value.nil?
         end
-        [with_defaults(op).compact, @extras]
+        credential_defaults
+        [clamp_lengths(with_defaults(op)).compact, @extras]
+      end
+
+      # credentials.fetch('x') без значения в примере → плейсхолдер, иначе сгенерированный spec упадёт на KeyError.
+      def credential_defaults
+        @f[:fields].value[:request].each do |m|
+          key = m.source_expr.to_s[/credentials\.fetch\('(\w+)'\)/, 1]
+          (@extras['credentials'] ||= {})[key] ||= "test_#{key}" if key
+        end
       end
 
       # Чего нет в примере: реквизиты типа по умолчанию, минимальная сумма, первая валюта (BaseService требует их).
@@ -30,6 +39,21 @@ module Forge
         operation['amount'] ||= format('%.2f', @f[:amount].value[:minimum_major] || 1)
         operation['currency'] ||= @f[:amount].value[:currencies].first || 'USD'
         operation
+      end
+
+      # Реквизит по умолчанию длиннее maxLength поля (account_number 20 знаков при maxLength 9) → обрезаем.
+      def clamp_lengths(operation)
+        @f[:fields].value[:request].each do |m|
+          match = m.schema&.max_length && REQUISITE_EXPR.match(m.source_expr.to_s)
+          clamp(operation['payout_requisite'], match, m.schema.max_length) if match
+        end
+        operation
+      end
+
+      def clamp(requisites, match, max)
+        type = match[1] == 'requisite_type' ? default_type : match[1].delete("'")
+        fields = requisites[type]
+        fields[match[2]] = fields[match[2]][0, max] if fields && fields[match[2]].is_a?(String)
       end
 
       def canonical_type_of(request)

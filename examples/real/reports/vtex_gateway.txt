@@ -1,0 +1,59 @@
+Parsing spec... ok (openapi 3.0.0, Payments Gateway API 1.0)
+Found 22 endpoints: POST /api/pub/transactions/{transactionId}/payments, GET /api/pvt/affiliations,
+                    POST /api/pvt/affiliations, GET /api/pvt/affiliations/{affiliationId},
+                    PUT /api/pvt/affiliations/{affiliationId}, GET /api/pvt/installments,
+                    GET /api/pvt/merchants/payment-systems, GET /api/pvt/rules, POST /api/pvt/rules,
+                    GET /api/pvt/rules/{ruleId}, PUT /api/pvt/rules/{ruleId},
+                    DELETE /api/pvt/rules/{ruleId}, POST /api/pvt/transactions,
+                    GET /api/pvt/transactions/{transactionId},
+                    POST /api/pvt/transactions/{transactionId}/additional-data,
+                    POST /api/pvt/transactions/{transactionId}/authorization-request,
+                    POST /api/pvt/transactions/{transactionId}/cancellation-request,
+                    POST /api/pvt/transactions/{transactionId}/payments,
+                    GET /api/pvt/transactions/{transactionId}/payments/{paymentId},
+                    POST /api/pvt/transactions/{transactionId}/refunding-request,
+                    POST /api/pvt/transactions/{transactionId}/settlement-request,
+                    GET /api/pvt/transactions/{transactionId}/settlements
+  create   POST /api/pvt/transactions                 1.Createanewtransaction  confidence 0.70
+  status   GET /api/pvt/transactions/{transactionId}  TransactionDetails       confidence 0.65
+Auth: appKey (api_key, header: X-VTEX-API-AppKey) → credentials.api_key
+Statuses (status): not found
+Errors: none described
+Webhook signature: no webhook found
+Amount: integer, major units (×100) — source: value (integer) → major units
+Fields: 5 request fields, 4 unmapped
+Warnings (16):
+  WARN         role_conflict              POST /api/pub/transactions/{transactionId}/payments (2.SendPaymentsPublic) also looks like create (0.6); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)
+        hint: endpoints.2.SendPaymentsPublic: create
+  WARN         role_conflict              POST /api/pvt/transactions/{transactionId}/payments (2.SendPaymentsWithSavedCreditCard) also looks like create (0.6); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)
+        hint: endpoints.2.SendPaymentsWithSavedCreditCard: create
+  WARN         role_conflict              POST /api/pvt/affiliations (InsertAffiliation) also looks like create (0.5); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)
+        hint: endpoints.InsertAffiliation: create
+  WARN         role_conflict              POST /api/pvt/rules (InsertRule) also looks like create (0.5); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)
+        hint: endpoints.InsertRule: create
+  WARN         low_confidence             create: POST /api/pvt/transactions (1.Createanewtransaction) scored 0.7
+        hint: endpoints.1.Createanewtransaction: create
+  WARN         role_conflict              GET /api/pvt/transactions/{transactionId}/settlements (TransactionSettlementDetails) also looks like status (0.65); GET /api/pvt/transactions/{transactionId} (TransactionDetails) wins (0.65)
+        hint: endpoints.TransactionSettlementDetails: status
+  WARN         role_conflict              GET /api/pvt/transactions/{transactionId}/payments/{paymentId} (PaymentDetails) also looks like status (0.6); GET /api/pvt/transactions/{transactionId} (TransactionDetails) wins (0.65)
+        hint: endpoints.PaymentDetails: status
+  WARN         low_confidence             status: GET /api/pvt/transactions/{transactionId} (TransactionDetails) scored 0.65
+        hint: endpoints.TransactionDetails: status
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://vtex.local)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  … and 6 more (see --format json)
+Info (21):
+  INFO         outside_contract           POST /api/pub/transactions/{transactionId}/payments (2.SendPaymentsPublic) — not used
+  INFO         outside_contract           GET /api/pvt/affiliations (Affiliations) — not used
+  INFO         outside_contract           POST /api/pvt/affiliations (InsertAffiliation) — not used
+  INFO         outside_contract           GET /api/pvt/affiliations/{affiliationId} (AffiliationById) — not used
+  INFO         outside_contract           PUT /api/pvt/affiliations/{affiliationId} (UpdateAffiliation) — not used
+  INFO         outside_contract           GET /api/pvt/installments (Installmentsoptions) — not used
+  INFO         outside_contract           GET /api/pvt/merchants/payment-systems (AvailablePaymentMethods) — not used
+  INFO         outside_contract           GET /api/pvt/rules (Rules) — not used
+  INFO         outside_contract           POST /api/pvt/rules (InsertRule) — not used
+  INFO         outside_contract           GET /api/pvt/rules/{ruleId} (RuleById) — not used
+  … and 11 more (see --format json)
+Done: 16 warnings, 0 unsupported. Exit 0.

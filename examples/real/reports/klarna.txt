@@ -1,0 +1,36 @@
+Parsing spec... ok (openapi 3.0.0, Klarna Payments API V1 1.0.0)
+Found 6 endpoints: DELETE /payments/v1/authorizations/{authorizationToken},
+                   POST /payments/v1/authorizations/{authorizationToken}/customer-token,
+                   POST /payments/v1/authorizations/{authorizationToken}/order,
+                   POST /payments/v1/sessions, GET /payments/v1/sessions/{session_id},
+                   POST /payments/v1/sessions/{session_id}
+  cancel   DELETE /payments/v1/authorizations/{authorizationToken} cancelAuthorization      confidence 0.85   (outside contract → cancel_request)
+Auth: not found (credentials required; see warnings)
+Statuses (status): not found
+Errors: 403 forbidden → alert_block; 404 not_found → reject
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 0 request fields, 0 unmapped
+Warnings (7):
+  WARN         no_create_endpoint         no create endpoint found
+        hint: endpoints.<operationId>: create  (overrides.yml) or --include-paths
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.klarna.com)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         auth_not_found             no security requirement on the create endpoint or at the root
+        hint: auth.type: api_key|bearer|basic (overrides.yml)
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         response_id_not_found      no id field found in the response schema; `id` assumed
+        hint: statuses.response_id: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         amount_field_not_found     no amount field in the create request schema
+        hint: fields.<path>.source: "…"
+Info (6):
+  INFO         outside_contract           DELETE /payments/v1/authorizations/{authorizationToken} (cancelAuthorization) — generated as `cancel_request` helper
+  INFO         outside_contract           POST /payments/v1/authorizations/{authorizationToken}/customer-token (purchaseToken) — not used
+  INFO         outside_contract           POST /payments/v1/authorizations/{authorizationToken}/order (createOrder) — not used
+  INFO         outside_contract           POST /payments/v1/sessions (createCreditSession) — not used
+  INFO         outside_contract           GET /payments/v1/sessions/{session_id} (readCreditSession) — not used
+  INFO         outside_contract           POST /payments/v1/sessions/{session_id} (updateCreditSession) — not used
+Done: 7 warnings, 0 unsupported. Exit 0.

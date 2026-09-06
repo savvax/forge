@@ -1,0 +1,121 @@
+Parsing spec... ok (openapi 3.1.0, Configuration API 2)
+Found 96 endpoints: POST /accountHolders, GET /accountHolders/{id}, PATCH /accountHolders/{id},
+                    GET /accountHolders/{id}/balanceAccounts, GET /accountHolders/{id}/taxForms,
+                    GET /accountHolders/{id}/transactionRules, POST /balanceAccounts,
+                    GET /balanceAccounts/{balanceAccountId}/sweeps,
+                    POST /balanceAccounts/{balanceAccountId}/sweeps,
+                    GET /balanceAccounts/{balanceAccountId}/sweeps/{sweepId},
+                    PATCH /balanceAccounts/{balanceAccountId}/sweeps/{sweepId},
+                    DELETE /balanceAccounts/{balanceAccountId}/sweeps/{sweepId},
+                    GET /balanceAccounts/{id}, PATCH /balanceAccounts/{id},
+                    GET /balanceAccounts/{id}/paymentInstruments,
+                    GET /balanceAccounts/{id}/transactionRules, GET /balancePlatforms/{id},
+                    GET /balancePlatforms/{id}/accountHolders,
+                    GET /balancePlatforms/{id}/transactionRules, GET /cardorders,
+                    GET /cardorders/{id}/items, GET /grantAccounts/{id}, GET /grantOffers,
+                    GET /grantOffers/{grantOfferId}, GET /networkTokens/{networkTokenId},
+                    PATCH /networkTokens/{networkTokenId}, POST /paymentInstrumentGroups,
+                    GET /paymentInstrumentGroups/{id},
+                    GET /paymentInstrumentGroups/{id}/transactionRules, POST /paymentInstruments,
+                    POST /paymentInstruments/reveal, GET /paymentInstruments/{id},
+                    PATCH /paymentInstruments/{id},
+                    GET /paymentInstruments/{id}/networkTokenActivationData,
+                    POST /paymentInstruments/{id}/networkTokenActivationData,
+                    GET /paymentInstruments/{id}/networkTokens, GET /paymentInstruments/{id}/reveal,
+                    GET /paymentInstruments/{id}/transactionRules, POST /pins/change,
+                    POST /pins/reveal, GET /publicKey, GET /registeredDevices,
+                    POST /registeredDevices, POST /registeredDevices/{deviceId}/associations,
+                    PATCH /registeredDevices/{deviceId}/associations, PATCH /registeredDevices/{id},
+                    DELETE /registeredDevices/{id}, POST /transactionRules,
+                    GET /transactionRules/{transactionRuleId},
+                    PATCH /transactionRules/{transactionRuleId},
+                    DELETE /transactionRules/{transactionRuleId}, POST /transferRoutes/calculate,
+                    POST /validateBankAccountIdentification, GET /accountHolders/{id}/taxFormSummary,
+                    GET /balanceAccounts/{balanceAccountId}/payoutSchedules,
+                    POST /balanceAccounts/{balanceAccountId}/payoutSchedules,
+                    GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id},
+                    PATCH /balanceAccounts/{balanceAccountId}/payoutSchedules/{id},
+                    DELETE /balanceAccounts/{balanceAccountId}/payoutSchedules/{id},
+                    GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id}/executions,
+                    GET /balanceAccounts/{balanceAccountId}/recurringTopUps,
+                    POST /balanceAccounts/{balanceAccountId}/recurringTopUps,
+                    PATCH /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId},
+                    DELETE /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId},
+                    GET /balanceAccounts/{id}/transferLimits,
+                    POST /balanceAccounts/{id}/transferLimits,
+                    POST /balanceAccounts/{id}/transferLimits/approve,
+                    GET /balanceAccounts/{id}/transferLimits/current,
+                    GET /balanceAccounts/{id}/transferLimits/{transferLimitId},
+                    DELETE /balanceAccounts/{id}/transferLimits/{transferLimitId},
+                    GET /balancePlatforms/{balancePlatformId}/payoutSchedules,
+                    GET /balancePlatforms/{balancePlatformId}/payoutSchedules/{id},
+                    GET /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings,
+                    POST /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings,
+                    GET /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId},
+                    PATCH /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId},
+                    DELETE /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId},
+                    GET /balancePlatforms/{id}/transferLimits,
+                    POST /balancePlatforms/{id}/transferLimits,
+                    GET /balancePlatforms/{id}/transferLimits/{transferLimitId},
+                    DELETE /balancePlatforms/{id}/transferLimits/{transferLimitId}, GET /mandates,
+                    GET /mandates/{mandateId}, PATCH /mandates/{mandateId},
+                    POST /mandates/{mandateId}/cancel,
+                    GET /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers,
+                    POST /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers,
+                    PATCH /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers,
+                    DELETE /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers,
+                    GET /scaAssociations, PATCH /scaAssociations, DELETE /scaAssociations,
+                    POST /scaDevices, PATCH /scaDevices/{deviceId}, DELETE /scaDevices/{deviceId},
+                    POST /scaDevices/{deviceId}/scaAssociations
+  create   POST /balanceAccounts/{balanceAccountId}/payoutSchedules post-balanceAccounts-balanceAccountId-payoutSchedules confidence 0.60
+  status   GET /balanceAccounts/{balanceAccountId}/payoutSchedules get-balanceAccounts-balanceAccountId-payoutSchedules confidence 0.90
+  balance  GET /balanceAccounts/{id}                  get-balanceAccounts-id   confidence 0.75   (outside contract → fetch_balance)
+Auth: not found (credentials required; see warnings)
+Statuses (status): not found
+Errors: 401 (create) invalid_credentials → alert_block;
+        401 (status) invalid_credentials → alert_block; 403 (create) forbidden → alert_block;
+        403 (status) forbidden → alert_block; 404 (create) not_found → reject;
+        404 (status) not_found → reject; 422 (create) validation_error → reject;
+        422 (status) validation_error → reject; 500 (create) internal_error → retry;
+        500 (status) internal_error → retry
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 13 request fields, 10 unmapped
+Warnings (50):
+  WARN         role_conflict              POST /balanceAccounts/{id}/transferLimits (post-balanceAccounts-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)
+        hint: endpoints.post-balanceAccounts-id-transferLimits: create
+  WARN         role_conflict              POST /balancePlatforms/{id}/transferLimits (post-balancePlatforms-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)
+        hint: endpoints.post-balancePlatforms-id-transferLimits: create
+  WARN         role_conflict              POST /balanceAccounts/{id}/transferLimits/approve (post-balanceAccounts-id-transferLimits-approve) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)
+        hint: endpoints.post-balanceAccounts-id-transferLimits-approve: create
+  WARN         low_confidence             create: POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) scored 0.6
+        hint: endpoints.post-balanceAccounts-balanceAccountId-payoutSchedules: create
+  WARN         role_conflict              GET /balanceAccounts/{id}/transferLimits (get-balanceAccounts-id-transferLimits) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)
+        hint: endpoints.get-balanceAccounts-id-transferLimits: status
+  WARN         role_conflict              GET /balanceAccounts/{id}/transferLimits/current (get-balanceAccounts-id-transferLimits-current) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)
+        hint: endpoints.get-balanceAccounts-id-transferLimits-current: status
+  WARN         role_conflict              GET /balancePlatforms/{balancePlatformId}/payoutSchedules (get-balancePlatforms-balancePlatformId-payoutSchedules) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)
+        hint: endpoints.get-balancePlatforms-balancePlatformId-payoutSchedules: status
+  WARN         role_conflict              GET /balancePlatforms/{id}/transferLimits (get-balancePlatforms-id-transferLimits) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)
+        hint: endpoints.get-balancePlatforms-id-transferLimits: status
+  WARN         role_conflict              GET /balanceAccounts/{balanceAccountId}/sweeps (get-balanceAccounts-balanceAccountId-sweeps) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)
+        hint: endpoints.get-balanceAccounts-balanceAccountId-sweeps: balance
+  WARN         role_conflict              GET /balanceAccounts/{id}/paymentInstruments (get-balanceAccounts-id-paymentInstruments) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)
+        hint: endpoints.get-balanceAccounts-id-paymentInstruments: balance
+  … and 40 more (see --format json)
+Unsupported (1):
+  UNSUPPORTED  path_params_unresolved     POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules): path params balanceAccountId cannot be filled from the operation (only the payout id is known); provider_operation_key is substituted
+        hint: connection-level ids in the path are not supported yet: edit the URL in the generated service or choose another endpoint via endpoints.<operationId>: create
+Info (95):
+  INFO         outside_contract           GET /balanceAccounts/{id} (get-balanceAccounts-id) — generated as `fetch_balance` helper
+  INFO         outside_contract           POST /accountHolders (post-accountHolders) — not used
+  INFO         outside_contract           GET /accountHolders/{id} (get-accountHolders-id) — not used
+  INFO         outside_contract           PATCH /accountHolders/{id} (patch-accountHolders-id) — not used
+  INFO         outside_contract           GET /accountHolders/{id}/balanceAccounts (get-accountHolders-id-balanceAccounts) — not used
+  INFO         outside_contract           GET /accountHolders/{id}/taxForms (get-accountHolders-id-taxForms) — not used
+  INFO         outside_contract           GET /accountHolders/{id}/transactionRules (get-accountHolders-id-transactionRules) — not used
+  INFO         outside_contract           POST /balanceAccounts (post-balanceAccounts) — not used
+  INFO         outside_contract           GET /balanceAccounts/{balanceAccountId}/sweeps (get-balanceAccounts-balanceAccountId-sweeps) — not used
+  INFO         outside_contract           POST /balanceAccounts/{balanceAccountId}/sweeps (post-balanceAccounts-balanceAccountId-sweeps) — not used
+  … and 85 more (see --format json)
+Done: 50 warnings, 1 unsupported. Exit 0.

@@ -1,0 +1,1241 @@
+{
+  "spec": {
+    "openapi": "3.0.2",
+    "title": "Increase API",
+    "version": "0.0.1",
+    "source": "examples/real/increase.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/account_transfers",
+      "operation_id": "create_an_account_transfer",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/account_transfers/{account_transfer_id}",
+      "operation_id": "retrieve_an_account_transfer",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "POST",
+      "path": "/account_transfers/{account_transfer_id}/cancel",
+      "operation_id": "cancel_an_account_transfer",
+      "confidence": 0.95,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "bearerAuth"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {
+      "canceled": "rejected",
+      "complete": "approved"
+    },
+    "unmapped": [
+      "pending_submission",
+      "pending_approval",
+      "requires_attention",
+      "flagged_by_operator"
+    ],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.95
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "amount",
+    "path": [
+      "amount"
+    ],
+    "unit": "minor",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": null,
+    "type": "integer",
+    "expr": "to_minor_units(operation.amount)",
+    "minimum_major": 0.01,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "account_id",
+        "path": [
+          "account_id"
+        ],
+        "source_expr": "credentials.fetch('account_id')",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "amount",
+        "path": [
+          "amount"
+        ],
+        "source_expr": "to_minor_units(operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "description",
+        "path": [
+          "description"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "destination_account_id",
+        "path": [
+          "destination_account_id"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "require_approval",
+        "path": [
+          "require_approval"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "boolean"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /ach_transfers (create_an_ach_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1ach_transfers/post",
+      "hint": "endpoints.create_an_ach_transfer: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /check_transfers (create_a_check_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1check_transfers/post",
+      "hint": "endpoints.create_a_check_transfer: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /inbound_ach_transfer_returns (create_an_ach_return) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1inbound_ach_transfer_returns/post",
+      "hint": "endpoints.create_an_ach_return: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /wire_transfers (create_a_wire_transfer) also looks like create (0.95); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1wire_transfers/post",
+      "hint": "endpoints.create_a_wire_transfer: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/inbound_ach_transfers (simulate_an_ach_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1inbound_ach_transfers/post",
+      "hint": "endpoints.simulate_an_ach_transfer_to_your_account: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/inbound_real_time_payments_transfers (simulate_a_real_time_payments_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1inbound_real_time_payments_transfers/post",
+      "hint": "endpoints.simulate_a_real_time_payments_transfer_to_your_account: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/inbound_wire_transfers (simulate_a_wire_transfer_to_your_account) also looks like create (0.75); POST /account_transfers (create_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1inbound_wire_transfers/post",
+      "hint": "endpoints.simulate_a_wire_transfer_to_your_account: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /ach_transfers/{ach_transfer_id} (retrieve_an_ach_transfer) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}/get",
+      "hint": "endpoints.retrieve_an_ach_transfer: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /check_transfers/{check_transfer_id} (retrieve_a_check_transfer) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}/get",
+      "hint": "endpoints.retrieve_a_check_transfer: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /inbound_ach_transfer_returns/{inbound_ach_transfer_return_id} (retrieve_an_inbound_ach_transfer_return) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1inbound_ach_transfer_returns~1{inbound_ach_transfer_return_id}/get",
+      "hint": "endpoints.retrieve_an_inbound_ach_transfer_return: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /wire_transfers/{wire_transfer_id} (retrieve_a_wire_transfer) also looks like status (0.9); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}/get",
+      "hint": "endpoints.retrieve_a_wire_transfer: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /check_transfers (list_check_transfers) also looks like status (0.7); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1check_transfers/get",
+      "hint": "endpoints.list_check_transfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /check_transfers/{check_transfer_id}/approve (approve_a_check_transfer) also looks like status (0.6); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1approve/post",
+      "hint": "endpoints.approve_a_check_transfer: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/check_transfers/{check_transfer_id}/mail (mail_a_sandbox_check_transfer) also looks like status (0.6); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1simulations~1check_transfers~1{check_transfer_id}~1mail/post",
+      "hint": "endpoints.mail_a_sandbox_check_transfer: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /account_transfers (list_account_transfers) also looks like status (0.55); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1account_transfers/get",
+      "hint": "endpoints.list_account_transfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /ach_transfers (list_ach_transfers) also looks like status (0.55); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1ach_transfers/get",
+      "hint": "endpoints.list_ach_transfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /wire_transfers (list_wire_transfers) also looks like status (0.55); GET /account_transfers/{account_transfer_id} (retrieve_an_account_transfer) wins (0.9)",
+      "pointer": "#/paths/~1wire_transfers/get",
+      "hint": "endpoints.list_wire_transfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /ach_transfers/{ach_transfer_id}/cancel (cancel_a_pending_ach_transfer) also looks like cancel (0.95); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}~1cancel/post",
+      "hint": "endpoints.cancel_a_pending_ach_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /check_transfers/{check_transfer_id}/cancel (cancel_a_pending_check_transfer) also looks like cancel (0.95); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1cancel/post",
+      "hint": "endpoints.cancel_a_pending_check_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /check_transfers/{check_transfer_id}/stop_payment (request_a_stop_payment_on_a_check_transfer) also looks like cancel (0.95); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1stop_payment/post",
+      "hint": "endpoints.request_a_stop_payment_on_a_check_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /wire_transfers/{wire_transfer_id}/cancel (cancel_a_pending_wire_transfer) also looks like cancel (0.95); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}~1cancel/post",
+      "hint": "endpoints.cancel_a_pending_wire_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /account_transfers/{account_transfer_id}/approve (approve_an_account_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1account_transfers~1{account_transfer_id}~1approve/post",
+      "hint": "endpoints.approve_an_account_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /ach_transfers/{ach_transfer_id}/approve (approve_an_ach_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}~1approve/post",
+      "hint": "endpoints.approve_an_ach_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /wire_transfers/{wire_transfer_id}/approve (approve_a_wire_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}~1approve/post",
+      "hint": "endpoints.approve_a_wire_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/account_transfers/{account_transfer_id}/complete (complete_a_sandbox_account_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1account_transfers~1{account_transfer_id}~1complete/post",
+      "hint": "endpoints.complete_a_sandbox_account_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/ach_transfers/{ach_transfer_id}/return (return_a_sandbox_ach_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1ach_transfers~1{ach_transfer_id}~1return/post",
+      "hint": "endpoints.return_a_sandbox_ach_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/ach_transfers/{ach_transfer_id}/submit (submit_a_sandbox_ach_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1ach_transfers~1{ach_transfer_id}~1submit/post",
+      "hint": "endpoints.submit_a_sandbox_ach_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/wire_transfers/{wire_transfer_id}/reverse (reverse_a_sandbox_wire_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1wire_transfers~1{wire_transfer_id}~1reverse/post",
+      "hint": "endpoints.reverse_a_sandbox_wire_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /simulations/wire_transfers/{wire_transfer_id}/submit (submit_a_sandbox_wire_transfer) also looks like cancel (0.55); POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) wins (0.95)",
+      "pointer": "#/paths/~1simulations~1wire_transfers~1{wire_transfer_id}~1submit/post",
+      "hint": "endpoints.submit_a_sandbox_wire_transfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.increase.com)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /account_transfers/{account_transfer_id}/cancel (cancel_an_account_transfer) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1account_transfers~1{account_transfer_id}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /account_numbers (list_account_numbers) — not used",
+      "pointer": "#/paths/~1account_numbers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /account_numbers (create_an_account_number) — not used",
+      "pointer": "#/paths/~1account_numbers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /account_numbers/{account_number_id} (retrieve_an_account_number) — not used",
+      "pointer": "#/paths/~1account_numbers~1{account_number_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /account_numbers/{account_number_id} (update_an_account_number) — not used",
+      "pointer": "#/paths/~1account_numbers~1{account_number_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /account_statements (list_account_statements) — not used",
+      "pointer": "#/paths/~1account_statements/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /account_statements/{account_statement_id} (retrieve_an_account_statement) — not used",
+      "pointer": "#/paths/~1account_statements~1{account_statement_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /account_transfers (list_account_transfers) — not used",
+      "pointer": "#/paths/~1account_transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /account_transfers/{account_transfer_id}/approve (approve_an_account_transfer) — not used",
+      "pointer": "#/paths/~1account_transfers~1{account_transfer_id}~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts (list_accounts) — not used",
+      "pointer": "#/paths/~1accounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /accounts (create_an_account) — not used",
+      "pointer": "#/paths/~1accounts/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts/{account_id} (retrieve_an_account) — not used",
+      "pointer": "#/paths/~1accounts~1{account_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /accounts/{account_id} (update_an_account) — not used",
+      "pointer": "#/paths/~1accounts~1{account_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /accounts/{account_id}/close (close_an_account) — not used",
+      "pointer": "#/paths/~1accounts~1{account_id}~1close/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /ach_prenotifications (list_ach_prenotifications) — not used",
+      "pointer": "#/paths/~1ach_prenotifications/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /ach_prenotifications (create_an_ach_prenotification) — not used",
+      "pointer": "#/paths/~1ach_prenotifications/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /ach_prenotifications/{ach_prenotification_id} (retrieve_an_ach_prenotification) — not used",
+      "pointer": "#/paths/~1ach_prenotifications~1{ach_prenotification_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /ach_transfers (list_ach_transfers) — not used",
+      "pointer": "#/paths/~1ach_transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /ach_transfers (create_an_ach_transfer) — not used",
+      "pointer": "#/paths/~1ach_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /ach_transfers/{ach_transfer_id} (retrieve_an_ach_transfer) — not used",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /ach_transfers/{ach_transfer_id}/approve (approve_an_ach_transfer) — not used",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /ach_transfers/{ach_transfer_id}/cancel (cancel_a_pending_ach_transfer) — not used",
+      "pointer": "#/paths/~1ach_transfers~1{ach_transfer_id}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /card_disputes (list_card_disputes) — not used",
+      "pointer": "#/paths/~1card_disputes/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /card_disputes (create_a_card_dispute) — not used",
+      "pointer": "#/paths/~1card_disputes/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /card_disputes/{card_dispute_id} (retrieve_a_card_dispute) — not used",
+      "pointer": "#/paths/~1card_disputes~1{card_dispute_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /card_profiles (list_card_profiles) — not used",
+      "pointer": "#/paths/~1card_profiles/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /card_profiles (create_a_card_profile) — not used",
+      "pointer": "#/paths/~1card_profiles/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /card_profiles/{card_profile_id} (retrieve_a_card_profile) — not used",
+      "pointer": "#/paths/~1card_profiles~1{card_profile_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /cards (list_cards) — not used",
+      "pointer": "#/paths/~1cards/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /cards (create_a_card) — not used",
+      "pointer": "#/paths/~1cards/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /cards/{card_id} (retrieve_a_card) — not used",
+      "pointer": "#/paths/~1cards~1{card_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /cards/{card_id} (update_a_card) — not used",
+      "pointer": "#/paths/~1cards~1{card_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /cards/{card_id}/details (retrieve_sensitive_details_for_a_card) — not used",
+      "pointer": "#/paths/~1cards~1{card_id}~1details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /check_deposits (list_check_deposits) — not used",
+      "pointer": "#/paths/~1check_deposits/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /check_deposits (create_a_check_deposit) — not used",
+      "pointer": "#/paths/~1check_deposits/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /check_deposits/{check_deposit_id} (retrieve_a_check_deposit) — not used",
+      "pointer": "#/paths/~1check_deposits~1{check_deposit_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /check_transfers (list_check_transfers) — not used",
+      "pointer": "#/paths/~1check_transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /check_transfers (create_a_check_transfer) — not used",
+      "pointer": "#/paths/~1check_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /check_transfers/{check_transfer_id} (retrieve_a_check_transfer) — not used",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /check_transfers/{check_transfer_id}/approve (approve_a_check_transfer) — not used",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /check_transfers/{check_transfer_id}/cancel (cancel_a_pending_check_transfer) — not used",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /check_transfers/{check_transfer_id}/stop_payment (request_a_stop_payment_on_a_check_transfer) — not used",
+      "pointer": "#/paths/~1check_transfers~1{check_transfer_id}~1stop_payment/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /declined_transactions (list_declined_transactions) — not used",
+      "pointer": "#/paths/~1declined_transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /declined_transactions/{declined_transaction_id} (retrieve_a_declined_transaction) — not used",
+      "pointer": "#/paths/~1declined_transactions~1{declined_transaction_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /digital_wallet_tokens (list_digital_wallet_tokens) — not used",
+      "pointer": "#/paths/~1digital_wallet_tokens/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /digital_wallet_tokens/{digital_wallet_token_id} (retrieve_a_digital_wallet_token) — not used",
+      "pointer": "#/paths/~1digital_wallet_tokens~1{digital_wallet_token_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /documents (list_documents) — not used",
+      "pointer": "#/paths/~1documents/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /documents/{document_id} (retrieve_a_document) — not used",
+      "pointer": "#/paths/~1documents~1{document_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /entities (list_entities) — not used",
+      "pointer": "#/paths/~1entities/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /entities (create_an_entity) — not used",
+      "pointer": "#/paths/~1entities/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /entities/{entity_id} (retrieve_an_entity) — not used",
+      "pointer": "#/paths/~1entities~1{entity_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /entities/{entity_id}/supplemental_documents (create_a_supplemental_document_for_an_entity) — not used",
+      "pointer": "#/paths/~1entities~1{entity_id}~1supplemental_documents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /event_subscriptions (list_event_subscriptions) — not used",
+      "pointer": "#/paths/~1event_subscriptions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /event_subscriptions (create_an_event_subscription) — not used",
+      "pointer": "#/paths/~1event_subscriptions/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /event_subscriptions/{event_subscription_id} (retrieve_an_event_subscription) — not used",
+      "pointer": "#/paths/~1event_subscriptions~1{event_subscription_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /event_subscriptions/{event_subscription_id} (update_an_event_subscription) — not used",
+      "pointer": "#/paths/~1event_subscriptions~1{event_subscription_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /events (list_events) — not used",
+      "pointer": "#/paths/~1events/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /events/{event_id} (retrieve_an_event) — not used",
+      "pointer": "#/paths/~1events~1{event_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /external_accounts (list_external_accounts) — not used",
+      "pointer": "#/paths/~1external_accounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /external_accounts (create_an_external_account) — not used",
+      "pointer": "#/paths/~1external_accounts/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /external_accounts/{external_account_id} (retrieve_an_external_account) — not used",
+      "pointer": "#/paths/~1external_accounts~1{external_account_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /external_accounts/{external_account_id} (update_an_external_account) — not used",
+      "pointer": "#/paths/~1external_accounts~1{external_account_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /files (list_files) — not used",
+      "pointer": "#/paths/~1files/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /files (create_a_file) — not used",
+      "pointer": "#/paths/~1files/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /files/{file_id} (retrieve_a_file) — not used",
+      "pointer": "#/paths/~1files~1{file_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /groups/current (retrieve_group_details) — not used",
+      "pointer": "#/paths/~1groups~1current/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /inbound_ach_transfer_returns (list_inbound_ach_transfer_returns) — not used",
+      "pointer": "#/paths/~1inbound_ach_transfer_returns/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /inbound_ach_transfer_returns (create_an_ach_return) — not used",
+      "pointer": "#/paths/~1inbound_ach_transfer_returns/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /inbound_ach_transfer_returns/{inbound_ach_transfer_return_id} (retrieve_an_inbound_ach_transfer_return) — not used",
+      "pointer": "#/paths/~1inbound_ach_transfer_returns~1{inbound_ach_transfer_return_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /inbound_wire_drawdown_requests (list_inbound_wire_drawdown_requests) — not used",
+      "pointer": "#/paths/~1inbound_wire_drawdown_requests/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /inbound_wire_drawdown_requests/{inbound_wire_drawdown_request_id} (retrieve_an_inbound_wire_drawdown_request) — not used",
+      "pointer": "#/paths/~1inbound_wire_drawdown_requests~1{inbound_wire_drawdown_request_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /limits (list_limits) — not used",
+      "pointer": "#/paths/~1limits/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /limits (create_a_limit) — not used",
+      "pointer": "#/paths/~1limits/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /limits/{limit_id} (retrieve_a_limit) — not used",
+      "pointer": "#/paths/~1limits~1{limit_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /limits/{limit_id} (update_a_limit) — not used",
+      "pointer": "#/paths/~1limits~1{limit_id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /oauth_connections (list_oauth_connections) — not used",
+      "pointer": "#/paths/~1oauth_connections/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /oauth_connections/{oauth_connection_id} (retrieve_an_oauth_connection) — not used",
+      "pointer": "#/paths/~1oauth_connections~1{oauth_connection_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /pending_transactions (list_pending_transactions) — not used",
+      "pointer": "#/paths/~1pending_transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /pending_transactions/{pending_transaction_id} (retrieve_a_pending_transaction) — not used",
+      "pointer": "#/paths/~1pending_transactions~1{pending_transaction_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /real_time_decisions/{real_time_decision_id} (retrieve_a_real_time_decision) — not used",
+      "pointer": "#/paths/~1real_time_decisions~1{real_time_decision_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /real_time_decisions/{real_time_decision_id}/action (action_a_real_time_decision) — not used",
+      "pointer": "#/paths/~1real_time_decisions~1{real_time_decision_id}~1action/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /routing_numbers (list_routing_numbers) — not used",
+      "pointer": "#/paths/~1routing_numbers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/account_statements (simulate_an_account_statement_being_created) — not used",
+      "pointer": "#/paths/~1simulations~1account_statements/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/account_transfers/{account_transfer_id}/complete (complete_a_sandbox_account_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1account_transfers~1{account_transfer_id}~1complete/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/ach_transfers/{ach_transfer_id}/return (return_a_sandbox_ach_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1ach_transfers~1{ach_transfer_id}~1return/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/ach_transfers/{ach_transfer_id}/submit (submit_a_sandbox_ach_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1ach_transfers~1{ach_transfer_id}~1submit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/card_authorizations (simulate_an_authorization_on_a_card) — not used",
+      "pointer": "#/paths/~1simulations~1card_authorizations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/card_disputes/{card_dispute_id}/action (simulates_advancing_the_state_of_a_card_dispute) — not used",
+      "pointer": "#/paths/~1simulations~1card_disputes~1{card_dispute_id}~1action/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/card_refunds (simulate_a_refund_on_a_card) — not used",
+      "pointer": "#/paths/~1simulations~1card_refunds/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/card_settlements (simulate_settling_a_card_authorization) — not used",
+      "pointer": "#/paths/~1simulations~1card_settlements/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/check_deposits/{check_deposit_id}/reject (reject_a_sandbox_check_deposit) — not used",
+      "pointer": "#/paths/~1simulations~1check_deposits~1{check_deposit_id}~1reject/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/check_deposits/{check_deposit_id}/return (return_a_sandbox_check_deposit) — not used",
+      "pointer": "#/paths/~1simulations~1check_deposits~1{check_deposit_id}~1return/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/check_deposits/{check_deposit_id}/submit (submit_a_sandbox_check_deposit) — not used",
+      "pointer": "#/paths/~1simulations~1check_deposits~1{check_deposit_id}~1submit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/check_transfers/{check_transfer_id}/deposit (deposit_a_sandbox_check_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1check_transfers~1{check_transfer_id}~1deposit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/check_transfers/{check_transfer_id}/mail (mail_a_sandbox_check_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1check_transfers~1{check_transfer_id}~1mail/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/digital_wallet_token_requests (simulate_digital_wallet_provisioning_for_a_card) — not used",
+      "pointer": "#/paths/~1simulations~1digital_wallet_token_requests/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/documents (simulate_a_tax_document_being_created) — not used",
+      "pointer": "#/paths/~1simulations~1documents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/inbound_ach_transfers (simulate_an_ach_transfer_to_your_account) — not used",
+      "pointer": "#/paths/~1simulations~1inbound_ach_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/inbound_real_time_payments_transfers (simulate_a_real_time_payments_transfer_to_your_account) — not used",
+      "pointer": "#/paths/~1simulations~1inbound_real_time_payments_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/inbound_wire_drawdown_requests (simulate_an_inbound_wire_drawdown_request_being_created) — not used",
+      "pointer": "#/paths/~1simulations~1inbound_wire_drawdown_requests/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/inbound_wire_transfers (simulate_a_wire_transfer_to_your_account) — not used",
+      "pointer": "#/paths/~1simulations~1inbound_wire_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/wire_transfers/{wire_transfer_id}/reverse (reverse_a_sandbox_wire_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1wire_transfers~1{wire_transfer_id}~1reverse/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /simulations/wire_transfers/{wire_transfer_id}/submit (submit_a_sandbox_wire_transfer) — not used",
+      "pointer": "#/paths/~1simulations~1wire_transfers~1{wire_transfer_id}~1submit/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transactions (list_transactions) — not used",
+      "pointer": "#/paths/~1transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transactions/{transaction_id} (retrieve_a_transaction) — not used",
+      "pointer": "#/paths/~1transactions~1{transaction_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /wire_drawdown_requests (list_wire_drawdown_requests) — not used",
+      "pointer": "#/paths/~1wire_drawdown_requests/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /wire_drawdown_requests (create_a_wire_drawdown_request) — not used",
+      "pointer": "#/paths/~1wire_drawdown_requests/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /wire_drawdown_requests/{wire_drawdown_request_id} (retrieve_a_wire_drawdown_request) — not used",
+      "pointer": "#/paths/~1wire_drawdown_requests~1{wire_drawdown_request_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /wire_transfers (list_wire_transfers) — not used",
+      "pointer": "#/paths/~1wire_transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /wire_transfers (create_a_wire_transfer) — not used",
+      "pointer": "#/paths/~1wire_transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /wire_transfers/{wire_transfer_id} (retrieve_a_wire_transfer) — not used",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /wire_transfers/{wire_transfer_id}/approve (approve_a_wire_transfer) — not used",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /wire_transfers/{wire_transfer_id}/cancel (cancel_a_pending_wire_transfer) — not used",
+      "pointer": "#/paths/~1wire_transfers~1{wire_transfer_id}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'pending_submission' (pending_submission) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.pending_submission: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'pending_approval' (pending_approval) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.pending_approval: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'requires_attention' (requires_attention) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.requires_attention: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_status",
+      "message": "status 'flagged_by_operator' (flagged_by_operator) of status is unknown",
+      "pointer": null,
+      "hint": "statuses.flagged_by_operator: in_progress|approved|rejected  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "credential_field",
+      "message": "account_id → credentials.account_id",
+      "pointer": null,
+      "hint": "fill it in credentials"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "destination_account_id (string, The identifier for the account that will receive the transfer.) has no source",
+      "pointer": null,
+      "hint": "fields.destination_account_id.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "require_approval (boolean, Whether the transfer requires explicit approval via the dashboard or API.) has no source",
+      "pointer": null,
+      "hint": "fields.require_approval.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

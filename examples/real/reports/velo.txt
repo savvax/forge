@@ -1,0 +1,108 @@
+Parsing spec... ok (openapi 3.0.2, Velo Payments APIs 2.34.63)
+Found 100 endpoints: POST /v1/authenticate, GET /v1/deltas/fundings, GET /v1/deltas/payments,
+                     GET /v1/fundings/{fundingId}, POST /v1/logout, POST /v1/password/reset,
+                     GET /v1/paymentChannelRules, GET /v1/paymentaudit/fundings,
+                     GET /v1/paymentaudit/payoutStatistics, POST /v1/payments/{paymentId}/withdraw,
+                     GET /v1/payorLinks, POST /v1/payorLinks, GET /v1/payors/{payorId},
+                     POST /v1/payors/{payorId}/applications,
+                     POST /v1/payors/{payorId}/applications/{applicationId}/keys,
+                     GET /v1/payors/{payorId}/branding, POST /v1/payors/{payorId}/branding/logos,
+                     POST /v1/payors/{payorId}/reminderEmailsUpdate,
+                     POST /v1/sourceAccounts/{sourceAccountId}/notifications,
+                     GET /v1/supportedCountries, POST /v1/validate, GET /v1/webhooks,
+                     POST /v1/webhooks, GET /v1/webhooks/{webhookId}, POST /v1/webhooks/{webhookId},
+                     POST /v1/webhooks/{webhookId}/ping, GET /v2/currencies, GET /v2/fundingAccounts,
+                     POST /v2/fundingAccounts, GET /v2/fundingAccounts/{fundingAccountId},
+                     GET /v2/payors/{payorId}, GET /v2/sourceAccounts,
+                     GET /v2/sourceAccounts/{sourceAccountId},
+                     POST /v2/sourceAccounts/{sourceAccountId}/fundingRequest,
+                     POST /v2/sourceAccounts/{sourceAccountId}/transfers, GET /v2/supportedCountries,
+                     GET /v2/users, POST /v2/users/invite, POST /v2/users/registration/sms,
+                     GET /v2/users/self, POST /v2/users/self/mfa/unregister,
+                     POST /v2/users/self/password, POST /v2/users/self/password/validate,
+                     POST /v2/users/self/userDetailsUpdate, GET /v2/users/{userId},
+                     DELETE /v2/users/{userId}, POST /v2/users/{userId}/disable,
+                     POST /v2/users/{userId}/enable, POST /v2/users/{userId}/mfa/unregister,
+                     POST /v2/users/{userId}/roleUpdate, POST /v2/users/{userId}/tokens,
+                     POST /v2/users/{userId}/unlock, POST /v2/users/{userId}/userDetailsUpdate,
+                     GET /v3/payees, POST /v3/payees, GET /v3/payees/batch/{batchId},
+                     GET /v3/payees/deltas, GET /v3/payees/payors/{payorId}/invitationStatus,
+                     GET /v3/payees/{payeeId}, DELETE /v3/payees/{payeeId},
+                     POST /v3/payees/{payeeId}/invite, POST /v3/payees/{payeeId}/payeeDetailsUpdate,
+                     POST /v3/payees/{payeeId}/remoteIdUpdate, GET /v3/paymentaudit/payments,
+                     GET /v3/paymentaudit/payments/{paymentId}, GET /v3/paymentaudit/payouts,
+                     GET /v3/paymentaudit/payouts/{payoutId}, GET /v3/paymentaudit/transactions,
+                     POST /v3/payouts, GET /v3/payouts/{payoutId}, POST /v3/payouts/{payoutId},
+                     DELETE /v3/payouts/{payoutId}, GET /v3/payouts/{payoutId}/payments,
+                     POST /v3/payouts/{payoutId}/quote, POST /v3/payouts/{payoutId}/schedule,
+                     DELETE /v3/payouts/{payoutId}/schedule, GET /v3/sourceAccounts,
+                     GET /v3/sourceAccounts/{sourceAccountId},
+                     DELETE /v3/sourceAccounts/{sourceAccountId},
+                     POST /v3/sourceAccounts/{sourceAccountId}/fundingRequest,
+                     POST /v3/sourceAccounts/{sourceAccountId}/notifications,
+                     POST /v3/sourceAccounts/{sourceAccountId}/transfers, GET /v4/payees,
+                     POST /v4/payees, GET /v4/payees/batch/{batchId}, GET /v4/payees/deltas,
+                     GET /v4/payees/payors/{payorId}/invitationStatus, GET /v4/payees/{payeeId},
+                     DELETE /v4/payees/{payeeId}, POST /v4/payees/{payeeId}/invite,
+                     POST /v4/payees/{payeeId}/payeeDetailsUpdate,
+                     POST /v4/payees/{payeeId}/remoteIdUpdate, GET /v4/paymentaudit/fundings,
+                     GET /v4/paymentaudit/payments, GET /v4/paymentaudit/payments/{paymentId},
+                     GET /v4/paymentaudit/payoutStatistics, GET /v4/paymentaudit/payouts,
+                     GET /v4/paymentaudit/payouts/{payoutId}, GET /v4/paymentaudit/transactions,
+                     GET /v4/payments/deltas
+  create   POST /v3/payouts                           submitPayoutV3           confidence 0.95
+  status   GET /v3/payouts/{payoutId}                 getPayoutSummaryV3       confidence 0.90
+  cancel   DELETE /v3/payouts/{payoutId}              withdrawPayoutV3         confidence 0.75   (outside contract → cancel_request)
+  webhook  POST /v1/webhooks                          createWebhookV1          confidence 0.50
+Auth: OAuth2 (bearer, header: Authorization) → credentials.token
+Statuses (status): not found
+Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
+        401 (create) invalid_credentials → alert_block;
+        401 (status) invalid_credentials → alert_block;
+        401 (cancel) invalid_credentials → alert_block; 403 (create) forbidden → alert_block;
+        403 (status) forbidden → alert_block; 403 (cancel) forbidden → alert_block;
+        404 (status) not_found → reject; 404 (cancel) not_found → reject
+Webhook signature: not found (callbacks are not verified)
+Webhook events: no event field → no known event values or status field
+Amount: field not found
+Fields: 4 request fields, 3 unmapped
+Warnings (28):
+  WARN         role_conflict              GET /v3/payouts/{payoutId}/payments (getPaymentsForPayoutV3) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPaymentsForPayoutV3: status
+  WARN         role_conflict              GET /v3/paymentaudit/payouts/{payoutId} (getPaymentsForPayout_PA_V3) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPaymentsForPayout_PA_V3: status
+  WARN         role_conflict              GET /v4/paymentaudit/payouts/{payoutId} (getPaymentsForPayoutV4) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPaymentsForPayoutV4: status
+  WARN         role_conflict              GET /v1/paymentaudit/payoutStatistics (getPayoutStatsV1) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPayoutStatsV1: status
+  WARN         role_conflict              GET /v3/paymentaudit/payouts (getPayoutsForPayorV3) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPayoutsForPayorV3: status
+  WARN         role_conflict              GET /v4/paymentaudit/payoutStatistics (getPayoutStatsV4) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPayoutStatsV4: status
+  WARN         role_conflict              GET /v4/paymentaudit/payouts (getPayoutsForPayorV4) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)
+        hint: endpoints.getPayoutsForPayorV4: status
+  WARN         role_conflict              DELETE /v3/payouts/{payoutId}/schedule (deschedulePayout) also looks like cancel (0.75); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)
+        hint: endpoints.deschedulePayout: cancel
+  WARN         role_conflict              POST /v3/payouts/{payoutId} (instructPayoutV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)
+        hint: endpoints.instructPayoutV3: cancel
+  WARN         role_conflict              POST /v3/payouts/{payoutId}/quote (createQuoteForPayoutV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)
+        hint: endpoints.createQuoteForPayoutV3: cancel
+  … and 18 more (see --format json)
+Unsupported (2):
+  UNSUPPORTED  oauth2_alternative         alternative security scheme 'OAuth2' (oauth2) is ignored
+        hint: the first supported scheme is used
+  UNSUPPORTED  oauth2                     security scheme 'OAuth2' (oauth2) is not supported; bearer token assumed
+        hint: obtain the token out of band and put it into credentials.token
+Info (97):
+  INFO         outside_contract           DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) — generated as `cancel_request` helper
+  INFO         outside_contract           POST /v1/authenticate (veloAuth) — not used
+  INFO         outside_contract           GET /v1/deltas/fundings (listFundingAuditDeltas) — not used
+  INFO         outside_contract           GET /v1/deltas/payments (listPaymentChanges) — not used
+  INFO         outside_contract           GET /v1/fundings/{fundingId} (getFundingByIdV1) — not used
+  INFO         outside_contract           POST /v1/logout (logout) — not used
+  INFO         outside_contract           POST /v1/password/reset (resetPassword) — not used
+  INFO         outside_contract           GET /v1/paymentChannelRules (listPaymentChannelRulesV1) — not used
+  INFO         outside_contract           GET /v1/paymentaudit/fundings (getFundingsV1) — not used
+  INFO         outside_contract           GET /v1/paymentaudit/payoutStatistics (getPayoutStatsV1) — not used
+  … and 87 more (see --format json)
+Done: 28 warnings, 2 unsupported. Exit 0.

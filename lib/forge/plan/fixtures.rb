@@ -123,9 +123,11 @@ module Forge
       # Успешный ответ без примера: та же схема, что у create → его пример; иначе синтез по схеме.
       def synthesize_success(fixture, endpoint, base: nil)
         res = endpoint.responses.find { |r| r.status.start_with?('2') }
-        return if res&.schema.nil? || fixture.key?("response_#{res.status}")
+        return if res.nil? || fixture.key?("response_#{res.status}")
 
-        fixture["response_#{res.status}"] = Marshal.load(Marshal.dump(success_example(res.schema, base)))
+        # 2xx без схемы (201 + Location у Velo/Dwolla) → {}: сервис читает body['id'], nil сломал бы spec.
+        example = res.schema ? success_example(res.schema, base) : {}
+        fixture["response_#{res.status}"] = Marshal.load(Marshal.dump(example))
       end
 
       def success_example(schema, base)
@@ -150,7 +152,8 @@ module Forge
       def responses(endpoint)
         endpoint.responses.each_with_object({}) do |res, acc|
           example = res.examples.values.first
-          acc["response_#{res.status}"] = with_headers(res, example) if example
+          # Глубокая копия: пример из $ref — один объект для create и status; set_path в status_fixture менял бы оба.
+          acc["response_#{res.status}"] = with_headers(res, Marshal.load(Marshal.dump(example))) if example
         end
       end
 

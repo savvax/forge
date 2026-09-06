@@ -40,8 +40,8 @@ module Provider
 <% end -%>
 <% end -%>
     STATUS_METHODS = %w[status check].freeze
-<% unless plan.amount[:currencies].empty? -%>
-    SUPPORTED_CURRENCIES = %w[<%= plan.amount[:currencies].join(' ') %>].freeze
+<% unless view.currencies.empty? -%>
+    SUPPORTED_CURRENCIES = %w[<%= view.currencies.join(' ') %>].freeze
 <% end -%>
 <% if view.minor? -%>
     AMOUNT_MULTIPLIER = <%= plan.amount[:multiplier] %> # <%= view.minor_comment %>

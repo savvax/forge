@@ -22,7 +22,32 @@ RSpec.describe 'real provider specs', :real do
     'square' => { flags: ['--include-paths', '/v2/payouts*'], exit: 0, roles: { status: 'GetPayout' },
                   warns: %w[no_create_endpoint] },
     'plaid' => { flags: ['--include-paths', '/transfer/*'], exit: 0,
-                 roles: { create: 'transferCreate', cancel: 'transferCancel' }, auth: 'api_key', warns: %w[no_webhook] }
+                 roles: { create: 'transferCreate', cancel: 'transferCancel' }, auth: 'api_key',
+                 warns: %w[no_webhook] },
+    # Вторая волна: выплаты
+    'velo' => { flags: [], exit: 0, auth: 'bearer', warns: %w[signature_not_found],
+                roles: { create: 'submitPayoutV3', status: 'getPayoutSummaryV3', cancel: 'withdrawPayoutV3' } },
+    'increase' => { flags: [], exit: 0, auth: 'bearer', warns: %w[no_webhook unmapped_status],
+                    roles: { create: 'create_an_account_transfer', status: 'retrieve_an_account_transfer',
+                             cancel: 'cancel_an_account_transfer' } },
+    'mollie' => { flags: [], exit: 0, auth: 'bearer', warns: %w[unmapped_status],
+                  roles: { create: 'create-payout', status: 'get-payout', cancel: 'cancel-payout' } },
+    'dwolla' => { flags: [], exit: 0, auth: 'bearer', warns: %w[signature_not_found],
+                  roles: { create: 'initiateTransfer', status: 'getTransfer', cancel: 'cancelTransfer' } },
+    'wise_transfer' => { flags: [], exit: 0, auth: 'bearer', warns: %w[webhook_source_webhooks],
+                         roles: { create: 'transferCreate', status: 'transferGet',
+                                  webhook: 'eventTransfersStateChange' } },
+    'openbanking_pis' => { flags: [], exit: 0, auth: 'bearer', warns: %w[role_conflict],
+                           roles: { create: 'CreateDomesticPaymentConsents' } },
+    # Вторая волна: не выплаты — честный no_create_endpoint или WARN low_confidence
+    'nowpayments' => { flags: [], exit: 0, roles: {}, warns: %w[no_create_endpoint] },
+    'klarna' => { flags: [], exit: 0, roles: {}, warns: %w[no_create_endpoint] },
+    'payone_link' => { flags: [], exit: 0, roles: {}, warns: %w[no_create_endpoint] },
+    'vtex_gateway' => { flags: [], exit: 0, auth: 'api_key', roles: { status: 'TransactionDetails' },
+                        warns: %w[low_confidence] },
+    'adyen_balance' => { flags: [], exit: 0, roles: {}, warns: %w[role_conflict] },
+    'adyen_checkout' => { flags: [], exit: 0, auth: 'basic', roles: {}, warns: %w[role_conflict] },
+    'govuk_pay' => { flags: [], exit: 1, roles: {} }
   }.freeze
 
   def spec_file(name) = Dir["examples/real/#{name}.*"].first
@@ -38,6 +63,8 @@ RSpec.describe 'real provider specs', :real do
       it 'analyzes with the expected exit code, roles and auth' do
         res = Timeout.timeout(60) { analyze(name, expected[:flags], format: 'json') }
         expect(res.exit_code).to eq(expected[:exit]), res.stderr
+        next unless res.exit_code.zero? # Swagger 2.0 (GOV.UK Pay): stdout пуст, ошибка в stderr
+
         json = JSON.parse(res.stdout)
         roles = json['endpoints'].to_h { |e| [e['role'].to_sym, e['operation_id']] }
         expected[:roles].each { |role, op| expect(roles[role]).to eq(op) }
@@ -48,9 +75,10 @@ RSpec.describe 'real provider specs', :real do
 
       it 'matches the report snapshot' do
         res = analyze(name, expected[:flags])
+        actual = res.exit_code.zero? ? res.stdout : res.stderr # ошибка загрузки (Swagger 2.0) печатается в stderr
         snapshot = "examples/real/reports/#{name}.txt"
-        File.write(snapshot, res.stdout) if ENV['REAL_UPDATE'] || !File.exist?(snapshot)
-        expect(res.stdout).to eq(File.read(snapshot))
+        File.write(snapshot, actual) if ENV['REAL_UPDATE'] || !File.exist?(snapshot)
+        expect(actual).to eq(File.read(snapshot))
       end
     end
   end

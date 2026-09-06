@@ -1,0 +1,1142 @@
+{
+  "spec": {
+    "openapi": "3.1.0",
+    "title": "Dwolla API",
+    "version": "2.0",
+    "source": "examples/real/dwolla.yml"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/transfers",
+      "operation_id": "initiateTransfer",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/transfers/{id}",
+      "operation_id": "getTransfer",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "POST",
+      "path": "/transfers/{id}",
+      "operation_id": "cancelTransfer",
+      "confidence": 0.65,
+      "outside_contract": true
+    },
+    {
+      "role": "webhook",
+      "method": "POST",
+      "path": "/webhooks/{id}/retries",
+      "operation_id": "retryWebhook",
+      "confidence": 0.5,
+      "outside_contract": false
+    },
+    {
+      "role": "balance",
+      "method": "GET",
+      "path": "/funding-sources/{id}/balance",
+      "operation_id": "getFundingSourceBalance",
+      "confidence": 0.75,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "clientCredentials"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.95
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 400,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 429,
+        "role": "create",
+        "pointer": "#/paths/~1transfers/post/responses/429",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1transfers~1{id}/get/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 400,
+        "role": "cancel",
+        "pointer": "#/paths/~1transfers~1{id}/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 404,
+        "role": "cancel",
+        "pointer": "#/paths/~1transfers~1{id}/post/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      }
+    ],
+    "http": {
+      "400": "validation_error",
+      "403": "forbidden",
+      "404": "not_found",
+      "429": "rate_limit"
+    },
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": {
+      "method": "post",
+      "path": "/webhooks/{id}/retries",
+      "operation_id": "retryWebhook"
+    },
+    "source": "paths",
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null,
+      "algorithm": null,
+      "encoding": null,
+      "payload": null,
+      "secret_key": "callback_secret"
+    }
+  },
+  "amount": {
+    "field": "value",
+    "path": [
+      "amount",
+      "value"
+    ],
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": "amount.currency",
+    "type": "string",
+    "expr": "format('%.2f', operation.amount)",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "href",
+        "path": [
+          "_links",
+          "source",
+          "href"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "href",
+        "path": [
+          "_links",
+          "destination",
+          "href"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "value",
+        "path": [
+          "amount",
+          "value"
+        ],
+        "source_expr": "format('%.2f', operation.amount)",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "currency",
+        "path": [
+          "amount",
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "fees",
+        "path": [
+          "fees"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "source",
+        "path": [
+          "clearing",
+          "source"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "destination",
+        "path": [
+          "clearing",
+          "destination"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "values",
+        "path": [
+          "achDetails",
+          "source",
+          "addenda",
+          "values"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "addenda",
+        "path": [
+          "achDetails",
+          "destination",
+          "addenda"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "object"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "remittanceData",
+        "path": [
+          "rtpDetails",
+          "destination",
+          "remittanceData"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "remittanceData",
+        "path": [
+          "instantDetails",
+          "destination",
+          "remittanceData"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "correlationId",
+        "path": [
+          "correlationId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "destination",
+        "path": [
+          "processingChannel",
+          "destination"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "real-time-payments",
+            "instant"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [
+      "bank_account"
+    ],
+    "requisite_container": "_links.destination",
+    "requisite_type_values": {},
+    "headers": [
+      {
+        "provider_field": "Idempotency-Key",
+        "path": [
+          "Idempotency-Key"
+        ],
+        "source_expr": "operation.idempotency_key",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.9,
+        "requisite_type": null
+      }
+    ]
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transfers/{id}/failure (getTransferFailureReason) also looks like status (0.9); GET /transfers/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1transfers~1{id}~1failure/get",
+      "hint": "endpoints.getTransferFailureReason: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /transfers/{id}/fees (listTransferFees) also looks like status (0.75); GET /transfers/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1transfers~1{id}~1fees/get",
+      "hint": "endpoints.listTransferFees: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /accounts/{id}/transfers (listAndSearchTransfers) also looks like status (0.75); GET /transfers/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1accounts~1{id}~1transfers/get",
+      "hint": "endpoints.listAndSearchTransfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /customers/{id}/transfers (listCustomerTransfers) also looks like status (0.75); GET /transfers/{id} (getTransfer) wins (0.9)",
+      "pointer": "#/paths/~1customers~1{id}~1transfers/get",
+      "hint": "endpoints.listCustomerTransfers: status"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "cancel: POST /transfers/{id} (cancelTransfer) scored 0.65",
+      "pointer": "#/paths/~1transfers~1{id}/post",
+      "hint": "endpoints.cancelTransfer: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "balance: GET /funding-sources/{id}/balance (getFundingSourceBalance) scored 0.75",
+      "pointer": "#/paths/~1funding-sources~1{id}~1balance/get",
+      "hint": "endpoints.getFundingSourceBalance: balance"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "webhook: POST /webhooks/{id}/retries (retryWebhook) scored 0.5",
+      "pointer": "#/paths/~1webhooks~1{id}~1retries/post",
+      "hint": "endpoints.retryWebhook: webhook"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://api.dwolla.com)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transfers/{id} (cancelTransfer) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1transfers~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /funding-sources/{id}/balance (getFundingSourceBalance) — generated as `fetch_balance` helper",
+      "pointer": "#/paths/~1funding-sources~1{id}~1balance/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /token (createApplicationAccessToken) — not used",
+      "pointer": "#/paths/~1token/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET / (getRoot) — not used",
+      "pointer": "#/paths/~1/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts/{id} (getAccount) — not used",
+      "pointer": "#/paths/~1accounts~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /funding-sources (createFundingSource) — not used",
+      "pointer": "#/paths/~1funding-sources/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts/{id}/funding-sources (listFundingSources) — not used",
+      "pointer": "#/paths/~1accounts~1{id}~1funding-sources/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts/{id}/transfers (listAndSearchTransfers) — not used",
+      "pointer": "#/paths/~1accounts~1{id}~1transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accounts/{id}/mass-payments (listMassPayments) — not used",
+      "pointer": "#/paths/~1accounts~1{id}~1mass-payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers (listAndSearchCustomers) — not used",
+      "pointer": "#/paths/~1customers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers (createCustomer) — not used",
+      "pointer": "#/paths/~1customers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id} (getCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id} (update) — not used",
+      "pointer": "#/paths/~1customers~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /business-classifications (listBusinessClassifications) — not used",
+      "pointer": "#/paths/~1business-classifications/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /business-classifications/{id} (retrieveBusinessClassification) — not used",
+      "pointer": "#/paths/~1business-classifications~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/beneficial-owners (listBeneficialOwnersForCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1beneficial-owners/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/beneficial-owners (createBeneficialOwnerForCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1beneficial-owners/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /beneficial-owners/{id} (retrieveBeneficialOwner) — not used",
+      "pointer": "#/paths/~1beneficial-owners~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /beneficial-owners/{id} (updateBeneficialOwner) — not used",
+      "pointer": "#/paths/~1beneficial-owners~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /beneficial-owners/{id} (deleteBeneficialOwner) — not used",
+      "pointer": "#/paths/~1beneficial-owners~1{id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/beneficial-ownership (getBeneficialOwnershipStatusForCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1beneficial-ownership/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/beneficial-ownership (certifyBeneficialOwnershipForCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1beneficial-ownership/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/documents (listCustomerDocuments) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1documents/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/documents (createCustomerDocument) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1documents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /beneficial-owners/{id}/documents (listBeneficialOwnerDocuments) — not used",
+      "pointer": "#/paths/~1beneficial-owners~1{id}~1documents/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /beneficial-owners/{id}/documents (createBeneficialOwnerDocument) — not used",
+      "pointer": "#/paths/~1beneficial-owners~1{id}~1documents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /documents/{id} (retrieveDocument) — not used",
+      "pointer": "#/paths/~1documents~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/kba (initiateKbaForCustomer) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1kba/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /kba/{id} (getKbaQuestions) — not used",
+      "pointer": "#/paths/~1kba~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /kba/{id} (verifyKbaQuestions) — not used",
+      "pointer": "#/paths/~1kba~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/funding-sources (listCustomerFundingSources) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1funding-sources/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/funding-sources (createCustomerFundingSource) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1funding-sources/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /funding-sources/{id} (getFundingSource) — not used",
+      "pointer": "#/paths/~1funding-sources~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /funding-sources/{id} (updateOrRemoveFundingSource) — not used",
+      "pointer": "#/paths/~1funding-sources~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /funding-sources/{id}/micro-deposits (getMicroDeposits) — not used",
+      "pointer": "#/paths/~1funding-sources~1{id}~1micro-deposits/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /funding-sources/{id}/micro-deposits (initiateOrVerifyMicroDeposits) — not used",
+      "pointer": "#/paths/~1funding-sources~1{id}~1micro-deposits/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /funding-sources/{id}/ach-routing (getVanRouting) — not used",
+      "pointer": "#/paths/~1funding-sources~1{id}~1ach-routing/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /on-demand-authorizations (createOnDemandTransferAuthorization) — not used",
+      "pointer": "#/paths/~1on-demand-authorizations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/transfers (listCustomerTransfers) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1transfers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfers/{id}/fees (listTransferFees) — not used",
+      "pointer": "#/paths/~1transfers~1{id}~1fees/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transfers/{id}/failure (getTransferFailureReason) — not used",
+      "pointer": "#/paths/~1transfers~1{id}~1failure/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /mass-payments (initiateMassPayment) — not used",
+      "pointer": "#/paths/~1mass-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /mass-payments/{id} (getMassPayment) — not used",
+      "pointer": "#/paths/~1mass-payments~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /mass-payments/{id} (updateMassPayment) — not used",
+      "pointer": "#/paths/~1mass-payments~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /mass-payments/{id}/items (listMassPaymentItems) — not used",
+      "pointer": "#/paths/~1mass-payments~1{id}~1items/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /mass-payment-items/{itemId} (getMassPaymentItem) — not used",
+      "pointer": "#/paths/~1mass-payment-items~1{itemId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/mass-payments (listCustomerMassPayments) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1mass-payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /labels/{id} (getLabel) — not used",
+      "pointer": "#/paths/~1labels~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /labels/{id} (removeLabel) — not used",
+      "pointer": "#/paths/~1labels~1{id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/labels (listCustomerLabels) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1labels/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/labels (createCustomerLabel) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1labels/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /labels/{id}/ledger-entries (listLabelLedgerEntries) — not used",
+      "pointer": "#/paths/~1labels~1{id}~1ledger-entries/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /labels/{id}/ledger-entries (createLabelLedgerEntry) — not used",
+      "pointer": "#/paths/~1labels~1{id}~1ledger-entries/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /ledger-entries/{ledgerEntryId} (getLabelLedgerEntry) — not used",
+      "pointer": "#/paths/~1ledger-entries~1{ledgerEntryId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /label-reallocations (createLabelReallocation) — not used",
+      "pointer": "#/paths/~1label-reallocations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /label-reallocations/{reallocationId} (retrieveLabelReallocation) — not used",
+      "pointer": "#/paths/~1label-reallocations~1{reallocationId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /events (listEvents) — not used",
+      "pointer": "#/paths/~1events/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /events/{id} (getEvent) — not used",
+      "pointer": "#/paths/~1events~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /webhook-subscriptions (listWebhookSubscriptions) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /webhook-subscriptions (createWebhookSubscription) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /webhook-subscriptions/{id} (getWebhookSubscription) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /webhook-subscriptions/{id} (updateWebhookSubscription) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions~1{id}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /webhook-subscriptions/{id} (delete) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions~1{id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /webhook-subscriptions/{id}/webhooks (listWebhooks) — not used",
+      "pointer": "#/paths/~1webhook-subscriptions~1{id}~1webhooks/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /webhooks/{id} (getWebhook) — not used",
+      "pointer": "#/paths/~1webhooks~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /webhooks/{id}/retries (listWebhookRetries) — not used",
+      "pointer": "#/paths/~1webhooks~1{id}~1retries/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /sandbox-simulations (simulateBankTransferProcessing) — not used",
+      "pointer": "#/paths/~1sandbox-simulations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /exchange-partners (listExchangePartners) — not used",
+      "pointer": "#/paths/~1exchange-partners/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /exchange-partners/{id} (getExchangePartner) — not used",
+      "pointer": "#/paths/~1exchange-partners~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /exchanges (listAccountExchanges) — not used",
+      "pointer": "#/paths/~1exchanges/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /exchanges (createAccountExchange) — not used",
+      "pointer": "#/paths/~1exchanges/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /exchanges/{id} (getExchange) — not used",
+      "pointer": "#/paths/~1exchanges~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/exchanges (listCustomerExchanges) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1exchanges/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/exchanges (createCustomerExchange) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1exchanges/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /customers/{id}/exchange-sessions (createCustomerExchangeSession) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1exchange-sessions/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /exchange-sessions/{id} (retrieveCustomerExchangeSession) — not used",
+      "pointer": "#/paths/~1exchange-sessions~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /exchanges/{id}/exchange-sessions (createReAuthExchangeSession) — not used",
+      "pointer": "#/paths/~1exchanges~1{id}~1exchange-sessions/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /customers/{id}/available-exchange-connections (listAvailableExchangeConnections) — not used",
+      "pointer": "#/paths/~1customers~1{id}~1available-exchange-connections/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /client-tokens (createClientToken) — not used",
+      "pointer": "#/paths/~1client-tokens/post",
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2_alternative",
+      "message": "alternative security scheme 'clientCredentials' (oauth2) is ignored",
+      "pointer": "#/components/securitySchemes/clientCredentials",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2",
+      "message": "security scheme 'clientCredentials' (oauth2) is not supported; bearer token assumed",
+      "pointer": "#/components/securitySchemes/clientCredentials",
+      "hint": "obtain the token out of band and put it into credentials.token"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "signature_not_found",
+      "message": "webhook has no signature header parameter; callbacks will not be verified",
+      "pointer": null,
+      "hint": "webhook.signature_header: <Header-Name>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_unit_assumed",
+      "message": "amount unit not stated (string); major assumed",
+      "pointer": null,
+      "hint": "amount.unit: minor|major  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "_links.source.href (string) has no source",
+      "pointer": null,
+      "hint": "fields._links.source.href.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "_links.destination.href (string) has no source",
+      "pointer": null,
+      "hint": "fields._links.destination.href.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "fees is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.fees.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "clearing.source (string) has no source",
+      "pointer": null,
+      "hint": "fields.clearing.source.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "clearing.destination (string) has no source",
+      "pointer": null,
+      "hint": "fields.clearing.destination.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "achDetails.source.addenda.values is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.achDetails.source.addenda.values.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "achDetails.destination.addenda (object) has no source",
+      "pointer": null,
+      "hint": "fields.achDetails.destination.addenda.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "rtpDetails.destination.remittanceData (string, Remittance information for Real-Time Payments, providing context about the pa…) has no source",
+      "pointer": null,
+      "hint": "fields.rtpDetails.destination.remittanceData.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "instantDetails.destination.remittanceData (string, Remittance information for Instant Payments (RTP/FedNow), providing context a…) has no source",
+      "pointer": null,
+      "hint": "fields.instantDetails.destination.remittanceData.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "correlationId (string) has no source",
+      "pointer": null,
+      "hint": "fields.correlationId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "processingChannel.destination (string) has no source",
+      "pointer": null,
+      "hint": "fields.processingChannel.destination.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

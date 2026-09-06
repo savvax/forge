@@ -1,0 +1,2 @@
+error: Swagger 2.0 is not supported; convert to OpenAPI 3 at #/swagger in examples/real/govuk_pay.json
+  hint: use swagger2openapi or similar

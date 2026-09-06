@@ -230,7 +230,7 @@ paths:
 попадает в отчёт как `INFO override_applied`. Полная схема — `docs/RULES.md` § 9, примеры с
 комментариями — `examples/overrides/`.
 
-## Универсальность: три спеки и семь реальных API
+## Универсальность: четыре спеки и двадцать реальных API
 
 | Спека | Что отличается от NovaPay | Результат без overrides | С overrides |
 |---|---|---|---|
@@ -248,7 +248,7 @@ paths:
 
 ## Проверено на реальных спецификациях
 
-`rake real` скачивает семь открытых спек (`examples/real/`, в git не попадают), прогоняет `analyze` и
+`rake real` скачивает двадцать открытых спек (7 первой волны в таблице ниже и 13 второй) (`examples/real/`, в git не попадают), прогоняет `analyze` и
 сравнивает отчёты со снапшотами `examples/real/reports/*.txt`. Ни одна не роняет инструмент; WARN — это
 честность, а не сбой: каждый закрывается строкой в `overrides.yml`.
 
@@ -263,6 +263,13 @@ paths:
 | Plaid | `--include-paths /transfer/*`: create `/transfer/create`, status `POST /transfer/get` (id в теле), cancel; apiKey в заголовках | 40+ полей запроса без источника → overrides | [plaid.txt](examples/real/reports/plaid.txt) |
 
 Сводка: [SUMMARY.md](examples/real/reports/SUMMARY.md).
+
+Вторая волна (13 спек, `rake real` скачивает и их): Velo, Increase, Mollie, Dwolla, Wise, Open Banking UK — выплаты,
+сервисы генерируются, сгенерированные RSpec зелёные; NOWPayments, Klarna, PAYONE Link — честный `no_create_endpoint`
+(exit 2); VTEX, Adyen Balance Platform и Adyen Checkout — pay-in/конфигурация, create только с WARN `low_confidence`;
+GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и ссылки — `docs/REAL_SPECS.md` § 1a. Этот прогон вскрыл и закрыл
+9 дефектов генератора на «диких» спеках (ключи с точкой, пустое тело 201, минимум в один цент, `Currency` как имя
+переменной, общий `$ref`-пример у create и status и др. — `NOTES.md` D-27).
 
 Живые API: сервисы, сгенерированные из этих спек, проходят собственные RSpec (6 из 7 спек с create; Square —
 честный exit 2) и отправляли запросы в настоящие sandbox Stripe, Paystack, PayPal и Adyen с неверным ключом:

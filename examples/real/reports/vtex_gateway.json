@@ -1,0 +1,428 @@
+{
+  "spec": {
+    "openapi": "3.0.0",
+    "title": "Payments Gateway API",
+    "version": "1.0",
+    "source": "examples/real/vtex_gateway.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/api/pvt/transactions",
+      "operation_id": "1.Createanewtransaction",
+      "confidence": 0.7,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/api/pvt/transactions/{transactionId}",
+      "operation_id": "TransactionDetails",
+      "confidence": 0.65,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "api_key",
+    "scheme_name": "appKey",
+    "header": "X-VTEX-API-AppKey",
+    "prefix": null,
+    "credential_key": "api_key",
+    "credential_keys": [
+      "api_key"
+    ],
+    "location": "header",
+    "param_name": "X-VTEX-API-AppKey"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.95
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": "value",
+    "path": [
+      "value"
+    ],
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "currency_field": null,
+    "type": "integer",
+    "expr": "operation.amount.to_i",
+    "minimum_major": null,
+    "maximum_major": null
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "channel",
+        "path": [
+          "channel"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "referenceId",
+        "path": [
+          "referenceId"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "salesChannel",
+        "path": [
+          "salesChannel"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "urn",
+        "path": [
+          "urn"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "value",
+        "path": [
+          "value"
+        ],
+        "source_expr": "operation.amount.to_i",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /api/pub/transactions/{transactionId}/payments (2.SendPaymentsPublic) also looks like create (0.6); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)",
+      "pointer": "#/paths/~1api~1pub~1transactions~1{transactionId}~1payments/post",
+      "hint": "endpoints.2.SendPaymentsPublic: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /api/pvt/transactions/{transactionId}/payments (2.SendPaymentsWithSavedCreditCard) also looks like create (0.6); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1payments/post",
+      "hint": "endpoints.2.SendPaymentsWithSavedCreditCard: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /api/pvt/affiliations (InsertAffiliation) also looks like create (0.5); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)",
+      "pointer": "#/paths/~1api~1pvt~1affiliations/post",
+      "hint": "endpoints.InsertAffiliation: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /api/pvt/rules (InsertRule) also looks like create (0.5); POST /api/pvt/transactions (1.Createanewtransaction) wins (0.7)",
+      "pointer": "#/paths/~1api~1pvt~1rules/post",
+      "hint": "endpoints.InsertRule: create"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "create: POST /api/pvt/transactions (1.Createanewtransaction) scored 0.7",
+      "pointer": "#/paths/~1api~1pvt~1transactions/post",
+      "hint": "endpoints.1.Createanewtransaction: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /api/pvt/transactions/{transactionId}/settlements (TransactionSettlementDetails) also looks like status (0.65); GET /api/pvt/transactions/{transactionId} (TransactionDetails) wins (0.65)",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1settlements/get",
+      "hint": "endpoints.TransactionSettlementDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /api/pvt/transactions/{transactionId}/payments/{paymentId} (PaymentDetails) also looks like status (0.6); GET /api/pvt/transactions/{transactionId} (TransactionDetails) wins (0.65)",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1payments~1{paymentId}/get",
+      "hint": "endpoints.PaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "status: GET /api/pvt/transactions/{transactionId} (TransactionDetails) scored 0.65",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}/get",
+      "hint": "endpoints.TransactionDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://vtex.local)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pub/transactions/{transactionId}/payments (2.SendPaymentsPublic) — not used",
+      "pointer": "#/paths/~1api~1pub~1transactions~1{transactionId}~1payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/affiliations (Affiliations) — not used",
+      "pointer": "#/paths/~1api~1pvt~1affiliations/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/affiliations (InsertAffiliation) — not used",
+      "pointer": "#/paths/~1api~1pvt~1affiliations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/affiliations/{affiliationId} (AffiliationById) — not used",
+      "pointer": "#/paths/~1api~1pvt~1affiliations~1{affiliationId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PUT /api/pvt/affiliations/{affiliationId} (UpdateAffiliation) — not used",
+      "pointer": "#/paths/~1api~1pvt~1affiliations~1{affiliationId}/put",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/installments (Installmentsoptions) — not used",
+      "pointer": "#/paths/~1api~1pvt~1installments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/merchants/payment-systems (AvailablePaymentMethods) — not used",
+      "pointer": "#/paths/~1api~1pvt~1merchants~1payment-systems/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/rules (Rules) — not used",
+      "pointer": "#/paths/~1api~1pvt~1rules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/rules (InsertRule) — not used",
+      "pointer": "#/paths/~1api~1pvt~1rules/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/rules/{ruleId} (RuleById) — not used",
+      "pointer": "#/paths/~1api~1pvt~1rules~1{ruleId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PUT /api/pvt/rules/{ruleId} (PutRuleById) — not used",
+      "pointer": "#/paths/~1api~1pvt~1rules~1{ruleId}/put",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /api/pvt/rules/{ruleId} (Rule) — not used",
+      "pointer": "#/paths/~1api~1pvt~1rules~1{ruleId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/additional-data (3.SendAdditionalData) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1additional-data/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/authorization-request (4.Doauthorization) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1authorization-request/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/cancellation-request (Cancelthetransaction) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1cancellation-request/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/payments (2.SendPaymentsWithSavedCreditCard) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/transactions/{transactionId}/payments/{paymentId} (PaymentDetails) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1payments~1{paymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/refunding-request (Refundthetransaction) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1refunding-request/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /api/pvt/transactions/{transactionId}/settlement-request (Settlethetransaction) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1settlement-request/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /api/pvt/transactions/{transactionId}/settlements (TransactionSettlementDetails) — not used",
+      "pointer": "#/paths/~1api~1pvt~1transactions~1{transactionId}~1settlements/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_unit_assumed",
+      "message": "amount unit not stated (integer); major assumed",
+      "pointer": null,
+      "hint": "amount.unit: minor|major  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "referenceId (string) has no source",
+      "pointer": null,
+      "hint": "fields.referenceId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "salesChannel (string) has no source",
+      "pointer": null,
+      "hint": "fields.salesChannel.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "urn (string) has no source",
+      "pointer": null,
+      "hint": "fields.urn.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "channel (string) has no source",
+      "pointer": null,
+      "hint": "fields.channel.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

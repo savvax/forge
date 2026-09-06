@@ -159,6 +159,20 @@ Square — честный `no_create_endpoint`, `generate` → exit 2. Побо�
 Дополнение: status/cancel принимаются только на ресурсе выплат (слово выплаты в пути или путь под create), `health` — negative
 word. На pay-in спеке (ApiPay.kz / Kaspi, 75 эндпоинтов) отчёт: 6 осмысленных WARN вместо 13 и status из `/static-qr/{id}`.
 
+### D-27 · Вторая волна реальных спек: 9 дефектов генератора и 3 уточнения правил
+Контекст: 13 новых открытых спек (Velo, Increase, Mollie, Dwolla, Wise, Open Banking, NOWPayments, Klarna, PAYONE,
+VTEX, Adyen Balance/Checkout, GOV.UK) — 7 из них ломали `generate` (exit 3), хотя корпус из 12 был зелёным.
+Исправлено (каждое — общий случай, не привязка): ключи Hash не-идентификаторы квотируются (`'a.b': nil`); JSON `null` и
+2xx без схемы → `{}`; минимум суммы в одну минорную единицу не порождает `MIN_AMOUNT` (его покрывает `positive?`);
+имена переменных и кодов ошибок из полей — через `Rules.normalize` (`Currency` → `currency`, ключевые слова → `field_x`);
+`credentials.fetch('x')` без значения в примере → плейсхолдер в фикстурах; `SUPPORTED_CURRENCIES` из enum, если
+анализ суммы валют не нашёл; TODO-поля не входят в ожидаемое тело в сгенерированном spec; webhook без примера →
+pending; примеры ответов копируются глубоко (общий `$ref`-объект у create и status мутировал через `set_path`);
+integer в мажорных единицах → `.to_i`; реквизиты по умолчанию режутся по `maxLength`.
+Правила: tie-break status/cancel в пользу пути под create (`/v2/payouts/{id}` > `/v2/unmatched-credit-transfers/{id}`);
+negative words `calculate, estimate, validate, preview, link, links, methods`; balance только по `balance/funds` и не список.
+Корпус из 12 спек: роли и confidence не изменились.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:

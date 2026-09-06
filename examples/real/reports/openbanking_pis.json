@@ -1,0 +1,1863 @@
+{
+  "spec": {
+    "openapi": "3.0.0",
+    "title": "Payment Initiation API",
+    "version": "3.1.7",
+    "source": "examples/real/openbanking_pis.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/domestic-payment-consents",
+      "operation_id": "CreateDomesticPaymentConsents",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/domestic-payment-consents/{ConsentId}",
+      "operation_id": "GetDomesticPaymentConsentsConsentId",
+      "confidence": 0.9,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "TPPOAuth2Security"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 400,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/400",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/401",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/403",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 405,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/405",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "unknown_error",
+        "action": "reject"
+      },
+      {
+        "status": 406,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/406",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "unknown_error",
+        "action": "reject"
+      },
+      {
+        "status": 415,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/415",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "unknown_error",
+        "action": "reject"
+      },
+      {
+        "status": 429,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/429",
+        "headers": [
+          "Retry-After",
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      },
+      {
+        "status": 500,
+        "role": "create",
+        "pointer": "#/paths/~1domestic-payment-consents/post/responses/500",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      },
+      {
+        "status": 400,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/400",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/401",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/403",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 405,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/405",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "unknown_error",
+        "action": "reject"
+      },
+      {
+        "status": 406,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/406",
+        "headers": [
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "unknown_error",
+        "action": "reject"
+      },
+      {
+        "status": 429,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/429",
+        "headers": [
+          "Retry-After",
+          "x-fapi-interaction-id"
+        ],
+        "provider_code": null,
+        "internal_code": "rate_limit",
+        "action": "retry_backoff"
+      },
+      {
+        "status": 500,
+        "role": "status",
+        "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/500",
+        "headers": [
+          "x-fapi-interaction-id",
+          "x-jws-signature"
+        ],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      }
+    ],
+    "http": {
+      "400": "validation_error",
+      "401": "invalid_credentials",
+      "403": "forbidden",
+      "405": "unknown_error",
+      "406": "unknown_error",
+      "415": "unknown_error",
+      "429": "rate_limit",
+      "500": "internal_error"
+    },
+    "codes": [],
+    "retry_after_header": "Retry-After"
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "AuthorisationType",
+        "path": [
+          "Data",
+          "Authorisation",
+          "AuthorisationType"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Any",
+            "Single"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "CompletionDateTime",
+        "path": [
+          "Data",
+          "Authorisation",
+          "CompletionDateTime"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Identification",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorAccount",
+          "Identification"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Name",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorAccount",
+          "Name"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "SchemeName",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorAccount",
+          "SchemeName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "SecondaryIdentification",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorAccount",
+          "SecondaryIdentification"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "AddressLine",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "AddressLine"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "AddressType",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "AddressType"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "Business",
+            "Correspondence",
+            "DeliveryTo",
+            "MailTo",
+            "POBox",
+            "Postal",
+            "Residential",
+            "Statement"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "BuildingNumber",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "BuildingNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Country",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "Country"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "CountrySubDivision",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "CountrySubDivision"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Department",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "Department"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "PostCode",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "PostCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "StreetName",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "StreetName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "SubDepartment",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "SubDepartment"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "TownName",
+        "path": [
+          "Data",
+          "Initiation",
+          "CreditorPostalAddress",
+          "TownName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Identification",
+        "path": [
+          "Data",
+          "Initiation",
+          "DebtorAccount",
+          "Identification"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Name",
+        "path": [
+          "Data",
+          "Initiation",
+          "DebtorAccount",
+          "Name"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "SchemeName",
+        "path": [
+          "Data",
+          "Initiation",
+          "DebtorAccount",
+          "SchemeName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "SecondaryIdentification",
+        "path": [
+          "Data",
+          "Initiation",
+          "DebtorAccount",
+          "SecondaryIdentification"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "EndToEndIdentification",
+        "path": [
+          "Data",
+          "Initiation",
+          "EndToEndIdentification"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Amount",
+        "path": [
+          "Data",
+          "Initiation",
+          "InstructedAmount",
+          "Amount"
+        ],
+        "source_expr": "operation.amount",
+        "required": true,
+        "required_if": null,
+        "transform": "amount",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Currency",
+        "path": [
+          "Data",
+          "Initiation",
+          "InstructedAmount",
+          "Currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "InstructionIdentification",
+        "path": [
+          "Data",
+          "Initiation",
+          "InstructionIdentification"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "LocalInstrument",
+        "path": [
+          "Data",
+          "Initiation",
+          "LocalInstrument"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Reference",
+        "path": [
+          "Data",
+          "Initiation",
+          "RemittanceInformation",
+          "Reference"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Unstructured",
+        "path": [
+          "Data",
+          "Initiation",
+          "RemittanceInformation",
+          "Unstructured"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "ReadRefundAccount",
+        "path": [
+          "Data",
+          "ReadRefundAccount"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "No",
+            "Yes"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "AppliedAuthenticationApproach",
+        "path": [
+          "Data",
+          "SCASupportData",
+          "AppliedAuthenticationApproach"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "CA",
+            "SCA"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "ReferencePaymentOrderId",
+        "path": [
+          "Data",
+          "SCASupportData",
+          "ReferencePaymentOrderId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "RequestedSCAExemptionType",
+        "path": [
+          "Data",
+          "SCASupportData",
+          "RequestedSCAExemptionType"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "BillPayment",
+            "ContactlessTravel",
+            "EcommerceGoods",
+            "EcommerceServices",
+            "Kiosk",
+            "Parking",
+            "PartyToParty"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "AddressLine",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "AddressLine"
+        ],
+        "source_expr": "[]",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "BuildingNumber",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "BuildingNumber"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "Country",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "Country"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "CountrySubDivision",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "CountrySubDivision"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "PostCode",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "PostCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "StreetName",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "StreetName"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "TownName",
+        "path": [
+          "Risk",
+          "DeliveryAddress",
+          "TownName"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "MerchantCategoryCode",
+        "path": [
+          "Risk",
+          "MerchantCategoryCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "MerchantCustomerIdentification",
+        "path": [
+          "Risk",
+          "MerchantCustomerIdentification"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "PaymentContextCode",
+        "path": [
+          "Risk",
+          "PaymentContextCode"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "BillPayment",
+            "EcommerceGoods",
+            "EcommerceServices",
+            "Other",
+            "PartyToParty"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /domestic-payments (CreateDomesticPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1domestic-payments/post",
+      "hint": "endpoints.CreateDomesticPayments: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /domestic-scheduled-payment-consents (CreateDomesticScheduledPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1domestic-scheduled-payment-consents/post",
+      "hint": "endpoints.CreateDomesticScheduledPaymentConsents: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /domestic-scheduled-payments (CreateDomesticScheduledPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1domestic-scheduled-payments/post",
+      "hint": "endpoints.CreateDomesticScheduledPayments: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /file-payment-consents (CreateFilePaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1file-payment-consents/post",
+      "hint": "endpoints.CreateFilePaymentConsents: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /file-payments (CreateFilePayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1file-payments/post",
+      "hint": "endpoints.CreateFilePayments: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /international-payment-consents (CreateInternationalPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1international-payment-consents/post",
+      "hint": "endpoints.CreateInternationalPaymentConsents: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /international-payments (CreateInternationalPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1international-payments/post",
+      "hint": "endpoints.CreateInternationalPayments: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /international-scheduled-payment-consents (CreateInternationalScheduledPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1international-scheduled-payment-consents/post",
+      "hint": "endpoints.CreateInternationalScheduledPaymentConsents: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /international-scheduled-payments (CreateInternationalScheduledPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1international-scheduled-payments/post",
+      "hint": "endpoints.CreateInternationalScheduledPayments: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /file-payment-consents/{ConsentId}/file (CreateFilePaymentConsentsConsentIdFile) also looks like create (0.6); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}~1file/post",
+      "hint": "endpoints.CreateFilePaymentConsentsConsentIdFile: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-payment-consents/{ConsentId}/funds-confirmation (GetDomesticPaymentConsentsConsentIdFundsConfirmation) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": "endpoints.GetDomesticPaymentConsentsConsentIdFundsConfirmation: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-payments/{DomesticPaymentId} (GetDomesticPaymentsDomesticPaymentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-payments~1{DomesticPaymentId}/get",
+      "hint": "endpoints.GetDomesticPaymentsDomesticPaymentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-scheduled-payment-consents/{ConsentId} (GetDomesticScheduledPaymentConsentsConsentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-scheduled-payment-consents~1{ConsentId}/get",
+      "hint": "endpoints.GetDomesticScheduledPaymentConsentsConsentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-scheduled-payments/{DomesticScheduledPaymentId} (GetDomesticScheduledPaymentsDomesticScheduledPaymentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-scheduled-payments~1{DomesticScheduledPaymentId}/get",
+      "hint": "endpoints.GetDomesticScheduledPaymentsDomesticScheduledPaymentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /file-payment-consents/{ConsentId} (GetFilePaymentConsentsConsentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}/get",
+      "hint": "endpoints.GetFilePaymentConsentsConsentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /file-payments/{FilePaymentId} (GetFilePaymentsFilePaymentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}/get",
+      "hint": "endpoints.GetFilePaymentsFilePaymentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-payment-consents/{ConsentId} (GetInternationalPaymentConsentsConsentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-payment-consents~1{ConsentId}/get",
+      "hint": "endpoints.GetInternationalPaymentConsentsConsentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-payments/{InternationalPaymentId} (GetInternationalPaymentsInternationalPaymentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-payments~1{InternationalPaymentId}/get",
+      "hint": "endpoints.GetInternationalPaymentsInternationalPaymentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-scheduled-payment-consents/{ConsentId} (GetInternationalScheduledPaymentConsentsConsentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-scheduled-payment-consents~1{ConsentId}/get",
+      "hint": "endpoints.GetInternationalScheduledPaymentConsentsConsentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-scheduled-payments/{InternationalScheduledPaymentId} (GetInternationalScheduledPaymentsInternationalScheduledPaymentId) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-scheduled-payments~1{InternationalScheduledPaymentId}/get",
+      "hint": "endpoints.GetInternationalScheduledPaymentsInternationalScheduledPaymentId: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-payments/{DomesticPaymentId}/payment-details (GetDomesticPaymentsDomesticPaymentIdPaymentDetails) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-payments~1{DomesticPaymentId}~1payment-details/get",
+      "hint": "endpoints.GetDomesticPaymentsDomesticPaymentIdPaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /domestic-scheduled-payments/{DomesticScheduledPaymentId}/payment-details (GetDomesticScheduledPaymentsDomesticScheduledPaymentIdPaymentDetails) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1domestic-scheduled-payments~1{DomesticScheduledPaymentId}~1payment-details/get",
+      "hint": "endpoints.GetDomesticScheduledPaymentsDomesticScheduledPaymentIdPaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /file-payment-consents/{ConsentId}/file (GetFilePaymentConsentsConsentIdFile) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}~1file/get",
+      "hint": "endpoints.GetFilePaymentConsentsConsentIdFile: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /file-payments/{FilePaymentId}/payment-details (GetFilePaymentsFilePaymentIdPaymentDetails) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}~1payment-details/get",
+      "hint": "endpoints.GetFilePaymentsFilePaymentIdPaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /file-payments/{FilePaymentId}/report-file (GetFilePaymentsFilePaymentIdReportFile) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}~1report-file/get",
+      "hint": "endpoints.GetFilePaymentsFilePaymentIdReportFile: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-payment-consents/{ConsentId}/funds-confirmation (GetInternationalPaymentConsentsConsentIdFundsConfirmation) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": "endpoints.GetInternationalPaymentConsentsConsentIdFundsConfirmation: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-payments/{InternationalPaymentId}/payment-details (GetInternationalPaymentsInternationalPaymentIdPaymentDetails) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-payments~1{InternationalPaymentId}~1payment-details/get",
+      "hint": "endpoints.GetInternationalPaymentsInternationalPaymentIdPaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-scheduled-payment-consents/{ConsentId}/funds-confirmation (GetInternationalScheduledPaymentConsentsConsentIdFundsConfirmation) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-scheduled-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": "endpoints.GetInternationalScheduledPaymentConsentsConsentIdFundsConfirmation: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /international-scheduled-payments/{InternationalScheduledPaymentId}/payment-details (GetInternationalScheduledPaymentsInternationalScheduledPaymentIdPaymentDetails) also looks like status (0.9); GET /domestic-payment-consents/{ConsentId} (GetDomesticPaymentConsentsConsentId) wins (0.9)",
+      "pointer": "#/paths/~1international-scheduled-payments~1{InternationalScheduledPaymentId}~1payment-details/get",
+      "hint": "endpoints.GetInternationalScheduledPaymentsInternationalScheduledPaymentIdPaymentDetails: status"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://openbanking.org.uk)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-payment-consents/{ConsentId}/funds-confirmation (GetDomesticPaymentConsentsConsentIdFundsConfirmation) — not used",
+      "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /domestic-payments (CreateDomesticPayments) — not used",
+      "pointer": "#/paths/~1domestic-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-payments/{DomesticPaymentId} (GetDomesticPaymentsDomesticPaymentId) — not used",
+      "pointer": "#/paths/~1domestic-payments~1{DomesticPaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-payments/{DomesticPaymentId}/payment-details (GetDomesticPaymentsDomesticPaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1domestic-payments~1{DomesticPaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /domestic-scheduled-payment-consents (CreateDomesticScheduledPaymentConsents) — not used",
+      "pointer": "#/paths/~1domestic-scheduled-payment-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-scheduled-payment-consents/{ConsentId} (GetDomesticScheduledPaymentConsentsConsentId) — not used",
+      "pointer": "#/paths/~1domestic-scheduled-payment-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /domestic-scheduled-payments (CreateDomesticScheduledPayments) — not used",
+      "pointer": "#/paths/~1domestic-scheduled-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-scheduled-payments/{DomesticScheduledPaymentId} (GetDomesticScheduledPaymentsDomesticScheduledPaymentId) — not used",
+      "pointer": "#/paths/~1domestic-scheduled-payments~1{DomesticScheduledPaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-scheduled-payments/{DomesticScheduledPaymentId}/payment-details (GetDomesticScheduledPaymentsDomesticScheduledPaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1domestic-scheduled-payments~1{DomesticScheduledPaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /domestic-standing-order-consents (CreateDomesticStandingOrderConsents) — not used",
+      "pointer": "#/paths/~1domestic-standing-order-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-standing-order-consents/{ConsentId} (GetDomesticStandingOrderConsentsConsentId) — not used",
+      "pointer": "#/paths/~1domestic-standing-order-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /domestic-standing-orders (CreateDomesticStandingOrders) — not used",
+      "pointer": "#/paths/~1domestic-standing-orders/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-standing-orders/{DomesticStandingOrderId} (GetDomesticStandingOrdersDomesticStandingOrderId) — not used",
+      "pointer": "#/paths/~1domestic-standing-orders~1{DomesticStandingOrderId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /domestic-standing-orders/{DomesticStandingOrderId}/payment-details (GetDomesticStandingOrdersDomesticStandingOrderIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1domestic-standing-orders~1{DomesticStandingOrderId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /file-payment-consents (CreateFilePaymentConsents) — not used",
+      "pointer": "#/paths/~1file-payment-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /file-payment-consents/{ConsentId} (GetFilePaymentConsentsConsentId) — not used",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /file-payment-consents/{ConsentId}/file (GetFilePaymentConsentsConsentIdFile) — not used",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}~1file/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /file-payment-consents/{ConsentId}/file (CreateFilePaymentConsentsConsentIdFile) — not used",
+      "pointer": "#/paths/~1file-payment-consents~1{ConsentId}~1file/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /file-payments (CreateFilePayments) — not used",
+      "pointer": "#/paths/~1file-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /file-payments/{FilePaymentId} (GetFilePaymentsFilePaymentId) — not used",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /file-payments/{FilePaymentId}/payment-details (GetFilePaymentsFilePaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /file-payments/{FilePaymentId}/report-file (GetFilePaymentsFilePaymentIdReportFile) — not used",
+      "pointer": "#/paths/~1file-payments~1{FilePaymentId}~1report-file/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-payment-consents (CreateInternationalPaymentConsents) — not used",
+      "pointer": "#/paths/~1international-payment-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-payment-consents/{ConsentId} (GetInternationalPaymentConsentsConsentId) — not used",
+      "pointer": "#/paths/~1international-payment-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-payment-consents/{ConsentId}/funds-confirmation (GetInternationalPaymentConsentsConsentIdFundsConfirmation) — not used",
+      "pointer": "#/paths/~1international-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-payments (CreateInternationalPayments) — not used",
+      "pointer": "#/paths/~1international-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-payments/{InternationalPaymentId} (GetInternationalPaymentsInternationalPaymentId) — not used",
+      "pointer": "#/paths/~1international-payments~1{InternationalPaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-payments/{InternationalPaymentId}/payment-details (GetInternationalPaymentsInternationalPaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1international-payments~1{InternationalPaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-scheduled-payment-consents (CreateInternationalScheduledPaymentConsents) — not used",
+      "pointer": "#/paths/~1international-scheduled-payment-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-scheduled-payment-consents/{ConsentId} (GetInternationalScheduledPaymentConsentsConsentId) — not used",
+      "pointer": "#/paths/~1international-scheduled-payment-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-scheduled-payment-consents/{ConsentId}/funds-confirmation (GetInternationalScheduledPaymentConsentsConsentIdFundsConfirmation) — not used",
+      "pointer": "#/paths/~1international-scheduled-payment-consents~1{ConsentId}~1funds-confirmation/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-scheduled-payments (CreateInternationalScheduledPayments) — not used",
+      "pointer": "#/paths/~1international-scheduled-payments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-scheduled-payments/{InternationalScheduledPaymentId} (GetInternationalScheduledPaymentsInternationalScheduledPaymentId) — not used",
+      "pointer": "#/paths/~1international-scheduled-payments~1{InternationalScheduledPaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-scheduled-payments/{InternationalScheduledPaymentId}/payment-details (GetInternationalScheduledPaymentsInternationalScheduledPaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1international-scheduled-payments~1{InternationalScheduledPaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-standing-order-consents (CreateInternationalStandingOrderConsents) — not used",
+      "pointer": "#/paths/~1international-standing-order-consents/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-standing-order-consents/{ConsentId} (GetInternationalStandingOrderConsentsConsentId) — not used",
+      "pointer": "#/paths/~1international-standing-order-consents~1{ConsentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /international-standing-orders (CreateInternationalStandingOrders) — not used",
+      "pointer": "#/paths/~1international-standing-orders/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-standing-orders/{InternationalStandingOrderPaymentId} (GetInternationalStandingOrdersInternationalStandingOrderPaymentId) — not used",
+      "pointer": "#/paths/~1international-standing-orders~1{InternationalStandingOrderPaymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /international-standing-orders/{InternationalStandingOrderPaymentId}/payment-details (GetInternationalStandingOrdersInternationalStandingOrderPaymentIdPaymentDetails) — not used",
+      "pointer": "#/paths/~1international-standing-orders~1{InternationalStandingOrderPaymentId}~1payment-details/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2_alternative",
+      "message": "alternative security scheme 'TPPOAuth2Security' (oauth2) is ignored",
+      "pointer": "#/components/securitySchemes/TPPOAuth2Security",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2",
+      "message": "security scheme 'TPPOAuth2Security' (oauth2) is not supported; bearer token assumed",
+      "pointer": "#/components/securitySchemes/TPPOAuth2Security",
+      "hint": "obtain the token out of band and put it into credentials.token"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unknown_http_status",
+      "message": "HTTP 405 is not in the error dictionary; reject assumed",
+      "pointer": "#/paths/~1domestic-payment-consents/post/responses/405",
+      "hint": "errors.405: { internal_code: <code>, action: reject|retry|alert_block }"
+    },
+    {
+      "level": "warn",
+      "code": "unknown_http_status",
+      "message": "HTTP 406 is not in the error dictionary; reject assumed",
+      "pointer": "#/paths/~1domestic-payment-consents/post/responses/406",
+      "hint": "errors.406: { internal_code: <code>, action: reject|retry|alert_block }"
+    },
+    {
+      "level": "warn",
+      "code": "unknown_http_status",
+      "message": "HTTP 415 is not in the error dictionary; reject assumed",
+      "pointer": "#/paths/~1domestic-payment-consents/post/responses/415",
+      "hint": "errors.415: { internal_code: <code>, action: reject|retry|alert_block }"
+    },
+    {
+      "level": "warn",
+      "code": "unknown_http_status",
+      "message": "HTTP 405 is not in the error dictionary; reject assumed",
+      "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/405",
+      "hint": "errors.405: { internal_code: <code>, action: reject|retry|alert_block }"
+    },
+    {
+      "level": "warn",
+      "code": "unknown_http_status",
+      "message": "HTTP 406 is not in the error dictionary; reject assumed",
+      "pointer": "#/paths/~1domestic-payment-consents~1{ConsentId}/get/responses/406",
+      "hint": "errors.406: { internal_code: <code>, action: reject|retry|alert_block }"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Authorisation.AuthorisationType (string, Type of authorisation flow requested.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Authorisation.AuthorisationType.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Authorisation.CompletionDateTime (string, Date and time at which the requested authorisation flow must be completed.All…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Authorisation.CompletionDateTime.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorAccount.Identification (string, Identification assigned by an institution to identify an account. This identi…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorAccount.Identification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorAccount.Name (string, The account name is the name or names of the account owner(s) represented at …) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorAccount.Name.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorAccount.SchemeName (string, Name of the identification scheme, in a coded form as published in an externa…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorAccount.SchemeName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorAccount.SecondaryIdentification (string, This is secondary identification of the account, as assigned by the account s…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorAccount.SecondaryIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "Data.Initiation.CreditorPostalAddress.AddressLine is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.AddressLine.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.AddressType (string, Identifies the nature of the postal address.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.AddressType.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.BuildingNumber (string, Number that identifies the position of a building on a street.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.BuildingNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.Country (string, Nation with its own government.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.Country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.CountrySubDivision (string, Identifies a subdivision of a country such as state, region, county.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.CountrySubDivision.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.Department (string, Identification of a division of a large organisation or building.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.Department.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.PostCode (string, Identifier consisting of a group of letters and/or numbers that is added to a…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.PostCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.StreetName (string, Name of a street or thoroughfare.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.StreetName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.SubDepartment (string, Identification of a sub-division of a large organisation or building.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.SubDepartment.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.CreditorPostalAddress.TownName (string, Name of a built-up area, with defined boundaries, and a local government.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.CreditorPostalAddress.TownName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.DebtorAccount.Identification (string, Identification assigned by an institution to identify an account. This identi…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.DebtorAccount.Identification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.DebtorAccount.Name (string, The account name is the name or names of the account owner(s) represented at …) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.DebtorAccount.Name.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.DebtorAccount.SchemeName (string, Name of the identification scheme, in a coded form as published in an externa…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.DebtorAccount.SchemeName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.DebtorAccount.SecondaryIdentification (string, This is secondary identification of the account, as assigned by the account s…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.DebtorAccount.SecondaryIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.EndToEndIdentification (string, Unique identification assigned by the initiating party to unambiguously ident…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.EndToEndIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.InstructionIdentification (string, Unique identification as assigned by an instructing party for an instructed p…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.InstructionIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.LocalInstrument (string, User community specific instrument.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.LocalInstrument.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.RemittanceInformation.Reference (string, Unique reference, as assigned by the creditor, to unambiguously refer to the …) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.RemittanceInformation.Reference.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.Initiation.RemittanceInformation.Unstructured (string, Information supplied to enable the matching/reconciliation of an entry with t…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.Initiation.RemittanceInformation.Unstructured.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.ReadRefundAccount (string, Specifies to share the refund account details with PISP) has no source",
+      "pointer": null,
+      "hint": "fields.Data.ReadRefundAccount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.SCASupportData.AppliedAuthenticationApproach (string, Specifies a character string with a maximum length of 40 characters.) has no source",
+      "pointer": null,
+      "hint": "fields.Data.SCASupportData.AppliedAuthenticationApproach.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.SCASupportData.ReferencePaymentOrderId (string, If the payment is recurring, then this field is populated with the transactio…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.SCASupportData.ReferencePaymentOrderId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Data.SCASupportData.RequestedSCAExemptionType (string, This field allows a PISP to request specific SCA Exemption for a Payment Init…) has no source",
+      "pointer": null,
+      "hint": "fields.Data.SCASupportData.RequestedSCAExemptionType.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "Risk.DeliveryAddress.AddressLine is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.AddressLine.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.BuildingNumber (string, Number that identifies the position of a building on a street.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.BuildingNumber.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.Country (string, Nation with its own government, occupying a particular territory.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.Country.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.CountrySubDivision (string, Identifies a subdivision of a country such as state, region, county.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.CountrySubDivision.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.PostCode (string, Identifier consisting of a group of letters and/or numbers that is added to a…) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.PostCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.StreetName (string, Name of a street or thoroughfare.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.StreetName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.DeliveryAddress.TownName (string, Name of a built-up area, with defined boundaries, and a local government.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.DeliveryAddress.TownName.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.MerchantCategoryCode (string, Category code conform to ISO 18245, related to the type of services or goods …) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.MerchantCategoryCode.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.MerchantCustomerIdentification (string, The unique customer identifier of the PSU with the merchant.) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.MerchantCustomerIdentification.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "Risk.PaymentContextCode (string, Specifies the payment context) has no source",
+      "pointer": null,
+      "hint": "fields.Risk.PaymentContextCode.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

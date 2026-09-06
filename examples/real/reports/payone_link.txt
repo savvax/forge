@@ -1,0 +1,31 @@
+Parsing spec... ok (openapi 3.0.1, PAYONE Link API v1)
+Found 4 endpoints: GET /v1/payment-links, POST /v1/payment-links, GET /v1/payment-links/{linkId},
+                   PUT /v1/payment-links/{linkId}
+Auth: not found (credentials required; see warnings)
+Statuses (status): not found
+Errors: none described
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 0 request fields, 0 unmapped
+Warnings (7):
+  WARN         no_create_endpoint         no create endpoint found
+        hint: endpoints.<operationId>: create  (overrides.yml) or --include-paths
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://onelink.pay1.de/api)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         auth_not_found             no security requirement on the create endpoint or at the root
+        hint: auth.type: api_key|bearer|basic (overrides.yml)
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         response_id_not_found      no id field found in the response schema; `id` assumed
+        hint: statuses.response_id: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         amount_field_not_found     no amount field in the create request schema
+        hint: fields.<path>.source: "…"
+Info (5):
+  INFO         outside_contract           GET /v1/payment-links (getPaymentLinks) — not used
+  INFO         outside_contract           POST /v1/payment-links (createPaymentLink) — not used
+  INFO         outside_contract           GET /v1/payment-links/{linkId} (getPaymentLink) — not used
+  INFO         outside_contract           PUT /v1/payment-links/{linkId} (updatePaymentLink) — not used
+  INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
+Done: 7 warnings, 0 unsupported. Exit 0.

@@ -38,6 +38,9 @@ module Forge
 
       private
 
+      # Ключ Hash: голый символ, если это валидный идентификатор, иначе 'cupsecureplus.smscode': (реальные спеки).
+      def key_literal(key) = key.to_s.match?(/\A[A-Za-z_]\w*\z/) ? key.to_s : "'#{key}'"
+
       def type_field = @plan.fields[:request].find { |m| m.source_expr == 'requisite_type' }
       def inside_container?(mapping) = container? && mapping.path.first(@container.size) == @container
       def container_subtree?(mapping) = container? && mapping.path.first(@container.size) == @container
@@ -49,15 +52,15 @@ module Forge
           leaf = group.find { |m| m.path == prefix + [key] }
           next leaf_entry(key, leaf, requisite) if leaf
 
-          [["#{key}: {", *tree(group, prefix + [key], requisite: requisite).map { |l| "  #{l}" }, '}']]
+          [["#{key_literal(key)}: {", *tree(group, prefix + [key], requisite: requisite).map { |l| "  #{l}" }, '}']]
         end
         with_commas(entries)
       end
 
       def leaf_entry(key, mapping, requisite)
-        return ["#{key}: nil, #{format(TODO, mapping.path.join('.'))}", :todo] if mapping.source_expr.nil?
+        return ["#{key_literal(key)}: nil, #{format(TODO, mapping.path.join('.'))}", :todo] if mapping.source_expr.nil?
 
-        [["#{key}: #{leaf_expr(mapping, requisite)}"]]
+        [["#{key_literal(key)}: #{leaf_expr(mapping, requisite)}"]]
       end
 
       def leaf_expr(mapping, requisite)
@@ -98,9 +101,9 @@ module Forge
       end
 
       def base_entry(mapping)
-        return "#{mapping.provider_field}: #{type_value_expr}" if mapping.source_expr == 'requisite_type'
+        return "#{key_literal(mapping.provider_field)}: #{type_value_expr}" if mapping.source_expr == 'requisite_type'
 
-        "#{mapping.provider_field}: #{entry_expr(mapping)}"
+        "#{key_literal(mapping.provider_field)}: #{entry_expr(mapping)}"
       end
 
       # Поле без источника внутри варианта → nil с TODO в комментарии не поместится в однострочный Hash: даём nil.
@@ -112,7 +115,7 @@ module Forge
       end
 
       def variant_line(type, mappings)
-        merged = mappings.map { |m| "#{m.provider_field}: #{entry_expr(m)}" }.join(', ')
+        merged = mappings.map { |m| "#{key_literal(m.provider_field)}: #{entry_expr(m)}" }.join(', ')
         notes = mappings.select(&:required_if).map do |m|
           "#{m.provider_field} required for #{m.required_if[:field]}=#{m.required_if[:equals]} (from description)"
         end

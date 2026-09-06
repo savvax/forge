@@ -42,7 +42,8 @@ weak_payout_words: [payment, payments]   # слово выплаты, тольк
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
                  recipients, otp, export, bulk, search, resend, finalize,
-                 simulate, simulation, inward, incoming, payin, deposit, deposits, health]   # каждое совпадение: −0.5
+                 simulate, simulation, inward, incoming, payin, deposit, deposits, health,
+                 calculate, estimate, validate, preview, link, links, methods]   # каждое совпадение: −0.5
 
 roles:
   create:

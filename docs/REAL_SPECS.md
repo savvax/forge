@@ -17,9 +17,33 @@
 | 6 | **Square** | `https://raw.githubusercontent.com/square/connect-api-specification/master/api.json` | JSON 3.0.0 | большая | oauth2 + apiKey `Authorization` | `GET /v2/payouts`, `GET /v2/payouts/{payout_id}` — **нет create** → ожидаем `GenerationError` (exit 2); ловушка: `POST /v2/transfer-orders` (складские заказы) — проверка `negative_words` |
 | 7 | **Plaid** | `https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml` | YAML 3.0.0 | большая | apiKey в теле/заголовках | `POST /transfer/create`, `POST /transfer/get` (**статус через POST с id в теле**) — ожидаем WARN `no_status_endpoint` и запись в «Ограничения» |
 
-Не найдено / не используем: Dwolla (Swagger 2.0, репозиторий недоступен), Wise, Mollie (нет
-машиночитаемой спеки в открытом доступе на момент проверки). Если найдётся Swagger 2.0 — это тест на
-сообщение «convert to OpenAPI 3» (`spec/fixtures/broken/swagger2.yaml` уже покрывает).
+## 1a. Вторая волна (6.09.2026, ссылки проверены, HTTP 200)
+
+| Имя | Провайдер / API | URL (raw) | Что ожидаем |
+|---|---|---|---|
+| velo | **Velo Payments** (payouts) | `https://api.apis.guru/v2/specs/velopayments.com/2.34.63/openapi.json` | create `POST /v3/payouts`, status, cancel; 201 без тела → фикстура `{}` |
+| increase | **Increase** (account transfers) | `https://api.apis.guru/v2/specs/increase.com/0.0.1/openapi.json` | create/status/cancel по `/account_transfers`; минимум 1 цент → без `MIN_AMOUNT` |
+| mollie | **Mollie** (OpenAPI 3.1, 1.9 МБ) | `https://raw.githubusercontent.com/mollie/openapi/main/specs.yaml` | create `POST /v2/payouts`, status `GET /v2/payouts/{id}` — tie-break по ресурсу create |
+| dwolla | **Dwolla** (OpenAPI 3.1) | `https://raw.githubusercontent.com/Dwolla/dwolla-openapi/main/openapi.yml` | create `POST /transfers`, status, cancel; 201 без тела |
+| wise_transfer | **Wise** Transfer API (OpenAPI 3.2, профиль api-evangelist) | `https://raw.githubusercontent.com/api-evangelist/wise/main/openapi/wise-transfer-api-openapi.yml` | create/status/cancel, webhook из `webhooks`; callback без примера → pending в spec |
+| openbanking_pis | **Open Banking UK** Payment Initiation | `https://api.apis.guru/v2/specs/openbanking.org.uk/payment-initiation-openapi/3.1.7/openapi.json` | create — consent (WARN role_conflict → override); поле `Currency` → переменная `currency` |
+| nowpayments | **NOWPayments** (crypto) | `https://api.apis.guru/v2/specs/nowpayments.io/1.0.0/openapi.json` | в спеке нет `POST /payout` → `no_create_endpoint` |
+| klarna | **Klarna Payments** (pay-in) | `https://api.apis.guru/v2/specs/klarna.com/payments/1.0.0/openapi.json` | `no_create_endpoint` |
+| payone_link | **PAYONE Link** (платёжные ссылки, pay-in) | `https://api.apis.guru/v2/specs/pay1.de/link/v1/openapi.json` | `link/links` — negative word → `no_create_endpoint` |
+| vtex_gateway | **VTEX** Payments Gateway (pay-in) | `https://api.apis.guru/v2/specs/vtex.local/Payments-Gateway-API/1.0/openapi.json` | create с WARN low_confidence (слов выплаты нет); integer в мажорных единицах → `.to_i` |
+| adyen_balance | **Adyen Balance Platform** (конфигурация) | `https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/BalancePlatformService-v2.json` | `calculate` — negative word; реквизиты по умолчанию режутся по `maxLength` |
+| adyen_checkout | **Adyen Checkout** (pay-in, 390 WARN) | `https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json` | ключи с точкой (`cupsecureplus.smscode`) квотируются; `links`/`methods` — negative |
+| govuk_pay | **GOV.UK Pay** (Swagger 2.0) | `https://api.apis.guru/v2/specs/payments.service.gov.uk/payments/1.0.3/swagger.json` | exit 1: «Swagger 2.0 is not supported; convert to OpenAPI 3» |
+
+Все 13 регистрируются в `Rakefile` (`REAL_SPECS`) и `spec/real_specs_spec.rb`; отчёты — `examples/real/reports/*.txt`.
+`generate` на них: 8 сервисов с зелёным сгенерированным spec (Velo, Increase, Mollie, Dwolla, Wise, Open Banking,
+VTEX, Adyen Balance/Checkout — с WARN), 4 честных `no_create_endpoint` (exit 2), 1 Swagger 2.0 (exit 1).
+
+Лицензии второй волны: Velo — Apache-2.0; Open Banking — Open Licence; Dwolla — MIT; Adyen — MIT; Mollie — CC-BY-NC-SA-4.0
+(только скачиваем для тестов, не распространяем); Wise (профиль api-evangelist), Increase, NOWPayments, Klarna, PAYONE,
+VTEX, GOV.UK — через apis.guru, лицензия провайдера. Спеки в git не попадают.
+
+Ранее «не найдено»: Dwolla, Wise и Mollie теперь в корпусе (см. выше).
 
 Лицензии: Stripe — MIT; Adyen — MIT; PayPal — Apache-2.0; Square — Apache-2.0; Paystack — MIT; Plaid — MIT.
 Мы только читаем файлы в тестах, ничего не распространяем.

@@ -12,6 +12,7 @@ RSpec.describe Provider::SwiftpayService do
   let(:create_fixture) { fixtures['create_request'] }
   let(:provider_id) { dig_path(create_fixture['response_201'], ["payment_id"]) }
   let(:create_url) { "#{described_class::BASE_URL}/v1/payments/outbound" }
+  let(:overridden) { [["beneficiary", "address"]] } # source задан в overrides.yml — не сравнивается
   let(:auth_headers) { { 'Authorization' => "Basic #{Base64.strict_encode64('test_login:test_password')}" } }
 
   describe '#check_conditions' do
@@ -27,7 +28,8 @@ RSpec.describe Provider::SwiftpayService do
 
   describe '#create_request' do
     it 'creates payout (201)' do
-      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(parse_body(req), create_fixture['request']) }
+      expected_body = without_paths(create_fixture['request'], overridden)
+      stub = stub_request(:post, create_url).with(headers: auth_headers) { |req| subset_of?(without_paths(parse_body(req), overridden), expected_body) }
                                             .to_return(status: 201, body: create_fixture['response_201'].to_json,
                                                        headers: { 'Content-Type' => 'application/json' })
       result = service.create_request(operation, 'create')

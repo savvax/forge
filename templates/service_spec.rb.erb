@@ -139,6 +139,11 @@ RSpec.describe Provider::<%= class_name %> do
     it 'returns callbacks_not_supported' do
       expect(service.process_callback({}).code).to eq('callbacks_not_supported')
     end
+<% elsif fx['callback'].nil? -%>
+    it 'needs a callback example' do
+      pending 'the spec has neither an example nor a schema for the webhook payload (see fixtures.json)'
+      expect(fixtures['callback']).not_to be_nil
+    end
 <% elsif timestamp_unsupported? -%>
     it 'needs a hand-written signature check' do
       pending 'signature with timestamp is not generated (see report.txt)'

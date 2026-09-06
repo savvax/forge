@@ -1,0 +1,1413 @@
+{
+  "spec": {
+    "openapi": "3.1.0",
+    "title": "Configuration API",
+    "version": "2",
+    "source": "examples/real/adyen_balance.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/balanceAccounts/{balanceAccountId}/payoutSchedules",
+      "operation_id": "post-balanceAccounts-balanceAccountId-payoutSchedules",
+      "confidence": 0.6,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/balanceAccounts/{balanceAccountId}/payoutSchedules",
+      "operation_id": "get-balanceAccounts-balanceAccountId-payoutSchedules",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "balance",
+      "method": "GET",
+      "path": "/balanceAccounts/{id}",
+      "operation_id": "get-balanceAccounts-id",
+      "confidence": 0.75,
+      "outside_contract": true
+    }
+  ],
+  "auth": {
+    "type": "none",
+    "scheme_name": null,
+    "header": null,
+    "prefix": null,
+    "credential_key": null,
+    "credential_keys": [],
+    "location": null
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "create",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 422,
+        "role": "create",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post/responses/422",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "create",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      },
+      {
+        "status": 401,
+        "role": "status",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/get/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "status",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/get/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/get/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 422,
+        "role": "status",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/get/responses/422",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 500,
+        "role": "status",
+        "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/get/responses/500",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "internal_error",
+        "action": "retry"
+      }
+    ],
+    "http": {
+      "401": "invalid_credentials",
+      "403": "forbidden",
+      "404": "not_found",
+      "422": "validation_error",
+      "500": "internal_error"
+    },
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "balancePlatformPayoutScheduleId",
+        "path": [
+          "balancePlatformPayoutScheduleId"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "currency",
+        "path": [
+          "currency"
+        ],
+        "source_expr": "operation.currency",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "description",
+        "path": [
+          "description"
+        ],
+        "source_expr": "operation.description || \"Payout #{operation.id}\"",
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "enabled",
+        "path": [
+          "enabled"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "boolean"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "frequency",
+        "path": [
+          "frequency"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "weekly",
+            "weekdays",
+            "monthly"
+          ]
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "frequencyValue",
+        "path": [
+          "frequencyValue"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "maxPayoutAmount",
+        "path": [
+          "maxPayoutAmount"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "minPayoutAmount",
+        "path": [
+          "minPayoutAmount"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "reference",
+        "path": [
+          "reference"
+        ],
+        "source_expr": "operation.id.to_s",
+        "required": false,
+        "required_if": null,
+        "transform": "to_s",
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.95,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "referenceForBeneficiary",
+        "path": [
+          "referenceForBeneficiary"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "retainedAmount",
+        "path": [
+          "retainedAmount"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "integer"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "salesDayClosingTime",
+        "path": [
+          "salesDayClosingTime"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "transferInstrumentId",
+        "path": [
+          "transferInstrumentId"
+        ],
+        "source_expr": null,
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balanceAccounts/{id}/transferLimits (post-balanceAccounts-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits/post",
+      "hint": "endpoints.post-balanceAccounts-id-transferLimits: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balancePlatforms/{id}/transferLimits (post-balancePlatforms-id-transferLimits) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits/post",
+      "hint": "endpoints.post-balancePlatforms-id-transferLimits: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balanceAccounts/{id}/transferLimits/approve (post-balanceAccounts-id-transferLimits-approve) also looks like create (0.6); POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.6)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1approve/post",
+      "hint": "endpoints.post-balanceAccounts-id-transferLimits-approve: create"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "create: POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules) scored 0.6",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post",
+      "hint": "endpoints.post-balanceAccounts-balanceAccountId-payoutSchedules: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{id}/transferLimits (get-balanceAccounts-id-transferLimits) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits/get",
+      "hint": "endpoints.get-balanceAccounts-id-transferLimits: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{id}/transferLimits/current (get-balanceAccounts-id-transferLimits-current) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1current/get",
+      "hint": "endpoints.get-balanceAccounts-id-transferLimits-current: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{balancePlatformId}/payoutSchedules (get-balancePlatforms-balancePlatformId-payoutSchedules) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1payoutSchedules/get",
+      "hint": "endpoints.get-balancePlatforms-balancePlatformId-payoutSchedules: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{id}/transferLimits (get-balancePlatforms-id-transferLimits) also looks like status (0.9); GET /balanceAccounts/{balanceAccountId}/payoutSchedules (get-balanceAccounts-balanceAccountId-payoutSchedules) wins (0.9)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits/get",
+      "hint": "endpoints.get-balancePlatforms-id-transferLimits: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{balanceAccountId}/sweeps (get-balanceAccounts-balanceAccountId-sweeps) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps/get",
+      "hint": "endpoints.get-balanceAccounts-balanceAccountId-sweeps: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{id}/paymentInstruments (get-balanceAccounts-id-paymentInstruments) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1paymentInstruments/get",
+      "hint": "endpoints.get-balanceAccounts-id-paymentInstruments: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{id}/transactionRules (get-balanceAccounts-id-transactionRules) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transactionRules/get",
+      "hint": "endpoints.get-balanceAccounts-id-transactionRules: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{balanceAccountId}/recurringTopUps (get-balanceAccounts-balanceAccountId-recurringTopUps) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps/get",
+      "hint": "endpoints.get-balanceAccounts-balanceAccountId-recurringTopUps: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (get-balanceAccounts-balanceAccountId-sweeps-sweepId) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/get",
+      "hint": "endpoints.get-balanceAccounts-balanceAccountId-sweeps-sweepId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (get-balanceAccounts-balanceAccountId-payoutSchedules-id) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/get",
+      "hint": "endpoints.get-balanceAccounts-balanceAccountId-payoutSchedules-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{id}/transferLimits/{transferLimitId} (get-balanceAccounts-id-transferLimits-transferLimitId) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1{transferLimitId}/get",
+      "hint": "endpoints.get-balanceAccounts-id-transferLimits-transferLimitId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id}/executions (get-balanceAccounts-balanceAccountId-payoutSchedules-id-executions) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}~1executions/get",
+      "hint": "endpoints.get-balanceAccounts-balanceAccountId-payoutSchedules-id-executions: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{id} (get-balancePlatforms-id) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}/get",
+      "hint": "endpoints.get-balancePlatforms-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /accountHolders/{id}/balanceAccounts (get-accountHolders-id-balanceAccounts) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1accountHolders~1{id}~1balanceAccounts/get",
+      "hint": "endpoints.get-accountHolders-id-balanceAccounts: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{id}/accountHolders (get-balancePlatforms-id-accountHolders) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1accountHolders/get",
+      "hint": "endpoints.get-balancePlatforms-id-accountHolders: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{id}/transactionRules (get-balancePlatforms-id-transactionRules) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transactionRules/get",
+      "hint": "endpoints.get-balancePlatforms-id-transactionRules: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{balancePlatformId}/payoutSchedules/{id} (get-balancePlatforms-balancePlatformId-payoutSchedules-id) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1payoutSchedules~1{id}/get",
+      "hint": "endpoints.get-balancePlatforms-balancePlatformId-payoutSchedules-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /balancePlatforms/{id}/transferLimits/{transferLimitId} (get-balancePlatforms-id-transferLimits-transferLimitId) also looks like balance (0.75); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits~1{transferLimitId}/get",
+      "hint": "endpoints.get-balancePlatforms-id-transferLimits-transferLimitId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balanceAccounts (post-balanceAccounts) also looks like balance (0.6); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts/post",
+      "hint": "endpoints.post-balanceAccounts: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "PATCH /balanceAccounts/{id} (patch-balanceAccounts-id) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}/patch",
+      "hint": "endpoints.patch-balanceAccounts-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balanceAccounts/{balanceAccountId}/sweeps (post-balanceAccounts-balanceAccountId-sweeps) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps/post",
+      "hint": "endpoints.post-balanceAccounts-balanceAccountId-sweeps: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /balanceAccounts/{balanceAccountId}/recurringTopUps (post-balanceAccounts-balanceAccountId-recurringTopUps) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps/post",
+      "hint": "endpoints.post-balanceAccounts-balanceAccountId-recurringTopUps: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (patch-balanceAccounts-balanceAccountId-sweeps-sweepId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/patch",
+      "hint": "endpoints.patch-balanceAccounts-balanceAccountId-sweeps-sweepId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (delete-balanceAccounts-balanceAccountId-sweeps-sweepId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/delete",
+      "hint": "endpoints.delete-balanceAccounts-balanceAccountId-sweeps-sweepId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (patch-balanceAccounts-balanceAccountId-payoutSchedules-id) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/patch",
+      "hint": "endpoints.patch-balanceAccounts-balanceAccountId-payoutSchedules-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (delete-balanceAccounts-balanceAccountId-payoutSchedules-id) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/delete",
+      "hint": "endpoints.delete-balanceAccounts-balanceAccountId-payoutSchedules-id: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId} (patch-balanceAccounts-balanceAccountId-recurringTopUps-topUpId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps~1{topUpId}/patch",
+      "hint": "endpoints.patch-balanceAccounts-balanceAccountId-recurringTopUps-topUpId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId} (delete-balanceAccounts-balanceAccountId-recurringTopUps-topUpId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps~1{topUpId}/delete",
+      "hint": "endpoints.delete-balanceAccounts-balanceAccountId-recurringTopUps-topUpId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /balanceAccounts/{id}/transferLimits/{transferLimitId} (delete-balanceAccounts-id-transferLimits-transferLimitId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1{transferLimitId}/delete",
+      "hint": "endpoints.delete-balanceAccounts-id-transferLimits-transferLimitId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /balancePlatforms/{id}/transferLimits/{transferLimitId} (delete-balancePlatforms-id-transferLimits-transferLimitId) also looks like balance (0.5); GET /balanceAccounts/{id} (get-balanceAccounts-id) wins (0.75)",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits~1{transferLimitId}/delete",
+      "hint": "endpoints.delete-balancePlatforms-id-transferLimits-transferLimitId: balance"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "balance: GET /balanceAccounts/{id} (get-balanceAccounts-id) scored 0.75",
+      "pointer": "#/paths/~1balanceAccounts~1{id}/get",
+      "hint": "endpoints.get-balanceAccounts-id: balance"
+    },
+    {
+      "level": "unsupported",
+      "code": "path_params_unresolved",
+      "message": "POST /balanceAccounts/{balanceAccountId}/payoutSchedules (post-balanceAccounts-balanceAccountId-payoutSchedules): path params balanceAccountId cannot be filled from the operation (only the payout id is known); provider_operation_key is substituted",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules/post",
+      "hint": "connection-level ids in the path are not supported yet: edit the URL in the generated service or choose another endpoint via endpoints.<operationId>: create"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id} (get-balanceAccounts-id) — generated as `fetch_balance` helper",
+      "pointer": "#/paths/~1balanceAccounts~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /accountHolders (post-accountHolders) — not used",
+      "pointer": "#/paths/~1accountHolders/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accountHolders/{id} (get-accountHolders-id) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /accountHolders/{id} (patch-accountHolders-id) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accountHolders/{id}/balanceAccounts (get-accountHolders-id-balanceAccounts) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}~1balanceAccounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accountHolders/{id}/taxForms (get-accountHolders-id-taxForms) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}~1taxForms/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accountHolders/{id}/transactionRules (get-accountHolders-id-transactionRules) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}~1transactionRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balanceAccounts (post-balanceAccounts) — not used",
+      "pointer": "#/paths/~1balanceAccounts/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{balanceAccountId}/sweeps (get-balanceAccounts-balanceAccountId-sweeps) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balanceAccounts/{balanceAccountId}/sweeps (post-balanceAccounts-balanceAccountId-sweeps) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (get-balanceAccounts-balanceAccountId-sweeps-sweepId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (patch-balanceAccounts-balanceAccountId-sweeps-sweepId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/sweeps/{sweepId} (delete-balanceAccounts-balanceAccountId-sweeps-sweepId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1sweeps~1{sweepId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /balanceAccounts/{id} (patch-balanceAccounts-id) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id}/paymentInstruments (get-balanceAccounts-id-paymentInstruments) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1paymentInstruments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id}/transactionRules (get-balanceAccounts-id-transactionRules) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transactionRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{id} (get-balancePlatforms-id) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{id}/accountHolders (get-balancePlatforms-id-accountHolders) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1accountHolders/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{id}/transactionRules (get-balancePlatforms-id-transactionRules) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transactionRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /cardorders (get-cardorders) — not used",
+      "pointer": "#/paths/~1cardorders/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /cardorders/{id}/items (get-cardorders-id-items) — not used",
+      "pointer": "#/paths/~1cardorders~1{id}~1items/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /grantAccounts/{id} (get-grantAccounts-id) — not used",
+      "pointer": "#/paths/~1grantAccounts~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /grantOffers (get-grantOffers) — not used",
+      "pointer": "#/paths/~1grantOffers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /grantOffers/{grantOfferId} (get-grantOffers-grantOfferId) — not used",
+      "pointer": "#/paths/~1grantOffers~1{grantOfferId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /networkTokens/{networkTokenId} (get-networkTokens-networkTokenId) — not used",
+      "pointer": "#/paths/~1networkTokens~1{networkTokenId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /networkTokens/{networkTokenId} (patch-networkTokens-networkTokenId) — not used",
+      "pointer": "#/paths/~1networkTokens~1{networkTokenId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /paymentInstrumentGroups (post-paymentInstrumentGroups) — not used",
+      "pointer": "#/paths/~1paymentInstrumentGroups/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstrumentGroups/{id} (get-paymentInstrumentGroups-id) — not used",
+      "pointer": "#/paths/~1paymentInstrumentGroups~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstrumentGroups/{id}/transactionRules (get-paymentInstrumentGroups-id-transactionRules) — not used",
+      "pointer": "#/paths/~1paymentInstrumentGroups~1{id}~1transactionRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /paymentInstruments (post-paymentInstruments) — not used",
+      "pointer": "#/paths/~1paymentInstruments/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /paymentInstruments/reveal (post-paymentInstruments-reveal) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1reveal/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{id} (get-paymentInstruments-id) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /paymentInstruments/{id} (patch-paymentInstruments-id) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{id}/networkTokenActivationData (get-paymentInstruments-id-networkTokenActivationData) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}~1networkTokenActivationData/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /paymentInstruments/{id}/networkTokenActivationData (post-paymentInstruments-id-networkTokenActivationData) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}~1networkTokenActivationData/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{id}/networkTokens (get-paymentInstruments-id-networkTokens) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}~1networkTokens/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{id}/reveal (get-paymentInstruments-id-reveal) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}~1reveal/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{id}/transactionRules (get-paymentInstruments-id-transactionRules) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{id}~1transactionRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /pins/change (post-pins-change) — not used",
+      "pointer": "#/paths/~1pins~1change/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /pins/reveal (post-pins-reveal) — not used",
+      "pointer": "#/paths/~1pins~1reveal/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /publicKey (get-publicKey) — not used",
+      "pointer": "#/paths/~1publicKey/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /registeredDevices (get-registeredDevices) — not used",
+      "pointer": "#/paths/~1registeredDevices/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /registeredDevices (post-registeredDevices) — not used",
+      "pointer": "#/paths/~1registeredDevices/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /registeredDevices/{deviceId}/associations (post-registeredDevices-deviceId-associations) — not used",
+      "pointer": "#/paths/~1registeredDevices~1{deviceId}~1associations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /registeredDevices/{deviceId}/associations (patch-registeredDevices-deviceId-associations) — not used",
+      "pointer": "#/paths/~1registeredDevices~1{deviceId}~1associations/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /registeredDevices/{id} (patch-registeredDevices-id) — not used",
+      "pointer": "#/paths/~1registeredDevices~1{id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /registeredDevices/{id} (delete-registeredDevices-id) — not used",
+      "pointer": "#/paths/~1registeredDevices~1{id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transactionRules (post-transactionRules) — not used",
+      "pointer": "#/paths/~1transactionRules/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /transactionRules/{transactionRuleId} (get-transactionRules-transactionRuleId) — not used",
+      "pointer": "#/paths/~1transactionRules~1{transactionRuleId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /transactionRules/{transactionRuleId} (patch-transactionRules-transactionRuleId) — not used",
+      "pointer": "#/paths/~1transactionRules~1{transactionRuleId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /transactionRules/{transactionRuleId} (delete-transactionRules-transactionRuleId) — not used",
+      "pointer": "#/paths/~1transactionRules~1{transactionRuleId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /transferRoutes/calculate (post-transferRoutes-calculate) — not used",
+      "pointer": "#/paths/~1transferRoutes~1calculate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /validateBankAccountIdentification (post-validateBankAccountIdentification) — not used",
+      "pointer": "#/paths/~1validateBankAccountIdentification/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /accountHolders/{id}/taxFormSummary (get-accountHolders-id-taxFormSummary) — not used",
+      "pointer": "#/paths/~1accountHolders~1{id}~1taxFormSummary/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (get-balanceAccounts-balanceAccountId-payoutSchedules-id) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (patch-balanceAccounts-balanceAccountId-payoutSchedules-id) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/payoutSchedules/{id} (delete-balanceAccounts-balanceAccountId-payoutSchedules-id) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{balanceAccountId}/payoutSchedules/{id}/executions (get-balanceAccounts-balanceAccountId-payoutSchedules-id-executions) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1payoutSchedules~1{id}~1executions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{balanceAccountId}/recurringTopUps (get-balanceAccounts-balanceAccountId-recurringTopUps) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balanceAccounts/{balanceAccountId}/recurringTopUps (post-balanceAccounts-balanceAccountId-recurringTopUps) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId} (patch-balanceAccounts-balanceAccountId-recurringTopUps-topUpId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps~1{topUpId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balanceAccounts/{balanceAccountId}/recurringTopUps/{topUpId} (delete-balanceAccounts-balanceAccountId-recurringTopUps-topUpId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{balanceAccountId}~1recurringTopUps~1{topUpId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id}/transferLimits (get-balanceAccounts-id-transferLimits) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balanceAccounts/{id}/transferLimits (post-balanceAccounts-id-transferLimits) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balanceAccounts/{id}/transferLimits/approve (post-balanceAccounts-id-transferLimits-approve) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1approve/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id}/transferLimits/current (get-balanceAccounts-id-transferLimits-current) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1current/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balanceAccounts/{id}/transferLimits/{transferLimitId} (get-balanceAccounts-id-transferLimits-transferLimitId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1{transferLimitId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balanceAccounts/{id}/transferLimits/{transferLimitId} (delete-balanceAccounts-id-transferLimits-transferLimitId) — not used",
+      "pointer": "#/paths/~1balanceAccounts~1{id}~1transferLimits~1{transferLimitId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{balancePlatformId}/payoutSchedules (get-balancePlatforms-balancePlatformId-payoutSchedules) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1payoutSchedules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{balancePlatformId}/payoutSchedules/{id} (get-balancePlatforms-balancePlatformId-payoutSchedules-id) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1payoutSchedules~1{id}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings (get-balancePlatforms-balancePlatformId-webhooks-webhookId-settings) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1webhooks~1{webhookId}~1settings/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings (post-balancePlatforms-balancePlatformId-webhooks-webhookId-settings) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1webhooks~1{webhookId}~1settings/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId} (get-balancePlatforms-balancePlatformId-webhooks-webhookId-settings-settingId) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1webhooks~1{webhookId}~1settings~1{settingId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId} (patch-balancePlatforms-balancePlatformId-webhooks-webhookId-settings-settingId) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1webhooks~1{webhookId}~1settings~1{settingId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balancePlatforms/{balancePlatformId}/webhooks/{webhookId}/settings/{settingId} (delete-balancePlatforms-balancePlatformId-webhooks-webhookId-settings-settingId) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{balancePlatformId}~1webhooks~1{webhookId}~1settings~1{settingId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{id}/transferLimits (get-balancePlatforms-id-transferLimits) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /balancePlatforms/{id}/transferLimits (post-balancePlatforms-id-transferLimits) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /balancePlatforms/{id}/transferLimits/{transferLimitId} (get-balancePlatforms-id-transferLimits-transferLimitId) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits~1{transferLimitId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /balancePlatforms/{id}/transferLimits/{transferLimitId} (delete-balancePlatforms-id-transferLimits-transferLimitId) — not used",
+      "pointer": "#/paths/~1balancePlatforms~1{id}~1transferLimits~1{transferLimitId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /mandates (get-mandates) — not used",
+      "pointer": "#/paths/~1mandates/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /mandates/{mandateId} (get-mandates-mandateId) — not used",
+      "pointer": "#/paths/~1mandates~1{mandateId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /mandates/{mandateId} (patch-mandates-mandateId) — not used",
+      "pointer": "#/paths/~1mandates~1{mandateId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /mandates/{mandateId}/cancel (post-mandates-mandateId-cancel) — not used",
+      "pointer": "#/paths/~1mandates~1{mandateId}~1cancel/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers (get-paymentInstruments-paymentInstrumentId-authorisedCardUsers) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{paymentInstrumentId}~1authorisedCardUsers/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers (post-paymentInstruments-paymentInstrumentId-authorisedCardUsers) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{paymentInstrumentId}~1authorisedCardUsers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers (patch-paymentInstruments-paymentInstrumentId-authorisedCardUsers) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{paymentInstrumentId}~1authorisedCardUsers/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /paymentInstruments/{paymentInstrumentId}/authorisedCardUsers (delete-paymentInstruments-paymentInstrumentId-authorisedCardUsers) — not used",
+      "pointer": "#/paths/~1paymentInstruments~1{paymentInstrumentId}~1authorisedCardUsers/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /scaAssociations (get-scaAssociations) — not used",
+      "pointer": "#/paths/~1scaAssociations/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /scaAssociations (patch-scaAssociations) — not used",
+      "pointer": "#/paths/~1scaAssociations/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /scaAssociations (delete-scaAssociations) — not used",
+      "pointer": "#/paths/~1scaAssociations/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /scaDevices (post-scaDevices) — not used",
+      "pointer": "#/paths/~1scaDevices/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PATCH /scaDevices/{deviceId} (patch-scaDevices-deviceId) — not used",
+      "pointer": "#/paths/~1scaDevices~1{deviceId}/patch",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /scaDevices/{deviceId} (delete-scaDevices-deviceId) — not used",
+      "pointer": "#/paths/~1scaDevices~1{deviceId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /scaDevices/{deviceId}/scaAssociations (post-scaDevices-deviceId-scaAssociations) — not used",
+      "pointer": "#/paths/~1scaDevices~1{deviceId}~1scaAssociations/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "auth_not_found",
+      "message": "no security requirement on the create endpoint or at the root",
+      "pointer": "#/security",
+      "hint": "auth.type: api_key|bearer|basic (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "balancePlatformPayoutScheduleId (string, The unique identifier of the payout schedule that is applied to the balance a…) has no source",
+      "pointer": null,
+      "hint": "fields.balancePlatformPayoutScheduleId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "enabled (boolean, Specifies whether the payout schedule is enabled immediately after it is crea…) has no source",
+      "pointer": null,
+      "hint": "fields.enabled.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "frequency (string, The frequency of payouts initiated by this payout schedule.) has no source",
+      "pointer": null,
+      "hint": "fields.frequency.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "frequencyValue (integer, The date of the month or day of the week when payouts are initiated. Allowed …) has no source",
+      "pointer": null,
+      "hint": "fields.frequencyValue.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "maxPayoutAmount (integer, The maximum amount that can be paid out from balance accounts that use this p…) has no source",
+      "pointer": null,
+      "hint": "fields.maxPayoutAmount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "minPayoutAmount (integer, The minimum amount that can be paid out from balance accounts that use this p…) has no source",
+      "pointer": null,
+      "hint": "fields.minPayoutAmount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "referenceForBeneficiary (string, The reference for beneficiary used for all payouts initiated by this payout s…) has no source",
+      "pointer": null,
+      "hint": "fields.referenceForBeneficiary.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "retainedAmount (integer, The amount of funds that must remain available in the balance account after a…) has no source",
+      "pointer": null,
+      "hint": "fields.retainedAmount.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "salesDayClosingTime (string, The time of day when the sales day is closed in balance account time zone. Th…) has no source",
+      "pointer": null,
+      "hint": "fields.salesDayClosingTime.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "transferInstrumentId (string, The unique identifier of the transfer instrument to which the funds are paid …) has no source",
+      "pointer": null,
+      "hint": "fields.transferInstrumentId.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

@@ -69,7 +69,7 @@ module Provider
     def parse_body(body)
       return {} if body.nil? || body.empty?
 
-      JSON.parse(body)
+      JSON.parse(body) || {} # "null" → {}: сервис читает body['id']
     rescue JSON::ParserError
       { 'raw' => body }
     end

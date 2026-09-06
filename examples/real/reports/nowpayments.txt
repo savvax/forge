@@ -1,0 +1,49 @@
+Parsing spec... ok (openapi 3.0.3, NOWPayments API 1.0.0)
+Found 16 endpoints: GET /v1/estimate, GET /v1/min-amount, GET /v1/payment/,
+                    POST /v1/payment/{id}/update-merchant-estimate, GET /v1/payment/{payment_id},
+                    POST /v1/payout/{withdrawals-id}/verify, GET /v1/sub-partner,
+                    GET /v1/sub-partner/balance/{id}, GET /v1/sub-partner/transfer/{id},
+                    GET /v1/sub-partner/transfers, GET /v1/subscriptions,
+                    GET /v1/subscriptions/plans, GET /v1/subscriptions/plans/{plan-id},
+                    PATCH /v1/subscriptions/plans/{plan-id}, GET /v1/subscriptions/{sub_id},
+                    DELETE /v1/subscriptions/{sub_id}
+  status   GET /v1/sub-partner/transfer/{id}          getTransfer              confidence 0.90
+  balance  GET /v1/sub-partner/balance/{id}           getSubPartnerBalance     confidence 0.75   (outside contract → fetch_balance)
+Auth: not found (credentials required; see warnings)
+Statuses (status): not found
+Errors: none described
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 0 request fields, 0 unmapped
+Warnings (9):
+  WARN         role_conflict              GET /v1/sub-partner/transfers (getAllTransfers) also looks like status (0.7); GET /v1/sub-partner/transfer/{id} (getTransfer) wins (0.9)
+        hint: endpoints.getAllTransfers: status
+  WARN         role_conflict              POST /v1/payout/{withdrawals-id}/verify (verifyPayout) also looks like status (0.6); GET /v1/sub-partner/transfer/{id} (getTransfer) wins (0.9)
+        hint: endpoints.verifyPayout: status
+  WARN         low_confidence             balance: GET /v1/sub-partner/balance/{id} (getSubPartnerBalance) scored 0.75
+        hint: endpoints.getSubPartnerBalance: balance
+  WARN         no_create_endpoint         no create endpoint found
+        hint: endpoints.<operationId>: create  (overrides.yml) or --include-paths
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.nowpayments.io)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  WARN         auth_not_found             no security requirement on the create endpoint or at the root
+        hint: auth.type: api_key|bearer|basic (overrides.yml)
+  WARN         status_field_not_found     no status field (enum or described) found in the response schema
+        hint: statuses.field: <path>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
+  WARN         amount_field_not_found     no amount field in the create request schema
+        hint: fields.<path>.source: "…"
+Info (16):
+  INFO         outside_contract           GET /v1/sub-partner/balance/{id} (getSubPartnerBalance) — generated as `fetch_balance` helper
+  INFO         outside_contract           GET /v1/estimate (getEstimatedPrice) — not used
+  INFO         outside_contract           GET /v1/min-amount (getTheMinimumPaymentAmount) — not used
+  INFO         outside_contract           GET /v1/payment/ (getListOfPayments) — not used
+  INFO         outside_contract           POST /v1/payment/{id}/update-merchant-estimate (getUpdatePaymentEstimate) — not used
+  INFO         outside_contract           GET /v1/payment/{payment_id} (getPaymentStatus) — not used
+  INFO         outside_contract           POST /v1/payout/{withdrawals-id}/verify (verifyPayout) — not used
+  INFO         outside_contract           GET /v1/sub-partner (getSubPartners) — not used
+  INFO         outside_contract           GET /v1/sub-partner/transfers (getAllTransfers) — not used
+  INFO         outside_contract           GET /v1/subscriptions (getManyRecurringPayments) — not used
+  … and 6 more (see --format json)
+Done: 9 warnings, 0 unsupported. Exit 0.

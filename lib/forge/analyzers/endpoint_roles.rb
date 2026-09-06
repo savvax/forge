@@ -33,10 +33,13 @@ module Forge
         create = groups.key?(:create) ? pick_winner(:create, groups.delete(:create)) : nil
         winners = groups.filter_map do |role, group|
           related = group.select { |(endpoint, _role, _score)| related?(endpoint, role, create) }
-          [role, pick_winner(role, related)] unless related.empty?
+          [role, pick_winner(role, related, base: resource_of(create))] unless related.empty?
         end
         create ? { create: create }.merge(winners.to_h) : winners.to_h
       end
+
+      # Путь create-эндпоинта без {параметров}: /v2/payouts — ресурс выплат для tie-break и related?.
+      def resource_of(create) = create && create[0].path.sub(/\{.*\z/, '')
 
       # [endpoint, лучшая роль, очки] для кандидатов, прошедших порог warn.
       def best_roles(candidates)
@@ -52,12 +55,15 @@ module Forge
         return true unless %i[status cancel].include?(role)
 
         facts = Facts.new(endpoint, rules.fetch(:endpoint_roles), weak_ok: weak_ok?)
-        facts.payout_path? || (create && endpoint.path.start_with?(create[0].path.sub(/\{.*\z/, '')))
+        facts.payout_path? || (create && endpoint.path.start_with?(resource_of(create)))
       end
 
-      def pick_winner(role, group)
-        # Равные очки: короче путь (каноничнее ресурс: /transfer/create < /transfer/x/y/create), затем порядок в спеке.
-        winner, *losers = group.sort_by.with_index { |(ep, _role, score), index| [-score, ep.path.count('/'), index] }
+      def pick_winner(role, group, base: nil)
+        # Равные очки: путь под create-эндпоинтом (/v2/payouts/{id} > /v2/unmatched-credit-transfers/{id}), затем короче
+        # путь (каноничнее ресурс: /transfer/create < /transfer/x/y/create), затем порядок в спеке.
+        winner, *losers = group.sort_by.with_index do |(ep, _role, score), index|
+          [-score, base && ep.path.start_with?(base) ? 0 : 1, ep.path.count('/'), index]
+        end
         losers.each { |(endpoint, _role, score)| conflict(endpoint, role, winner, score) }
         low_confidence(winner[0], role, winner[2])
         [winner[0], winner[2]]

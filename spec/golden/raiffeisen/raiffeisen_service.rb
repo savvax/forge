@@ -33,12 +33,12 @@ module Provider
       return base_result if base_result.failed?
       return failure(:unprocessable_entity, 'currency_not_supported') unless SUPPORTED_CURRENCIES.include?(operation.currency)
       return failure(:unprocessable_entity, 'currency_too_long') if operation.currency.to_s.length > 3
-      return failure(:unprocessable_entity, 'paymentDetails_too_long') if (operation.description || "Payout #{operation.id}").to_s.length > 140
+      return failure(:unprocessable_entity, 'payment_details_too_long') if (operation.description || "Payout #{operation.id}").to_s.length > 140
       return failure(:unprocessable_entity, 'phone_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['phone']).to_s.length > 15
-      return failure(:unprocessable_entity, 'bankAlias_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['bank_code']).to_s.length > 255
-      return failure(:unprocessable_entity, 'firstName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['first_name']).to_s.length > 140
-      return failure(:unprocessable_entity, 'middleName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['middle_name']).to_s.length > 140
-      return failure(:unprocessable_entity, 'lastName_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['last_name']).to_s.length > 140
+      return failure(:unprocessable_entity, 'bank_alias_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['bank_code']).to_s.length > 255
+      return failure(:unprocessable_entity, 'first_name_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['first_name']).to_s.length > 140
+      return failure(:unprocessable_entity, 'middle_name_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['middle_name']).to_s.length > 140
+      return failure(:unprocessable_entity, 'last_name_too_long') if (requisite_for(operation, requisite_type_for(operation, request_method))['last_name']).to_s.length > 140
       return failure(:unprocessable_entity, 'requisite_missing') unless requisite_type_for(operation, request_method)
 
       success

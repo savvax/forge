@@ -1,0 +1,151 @@
+{
+  "spec": {
+    "openapi": "3.0.1",
+    "title": "PAYONE Link API",
+    "version": "v1",
+    "source": "examples/real/payone_link.json"
+  },
+  "endpoints": [],
+  "auth": {
+    "type": "none",
+    "scheme_name": null,
+    "header": null,
+    "prefix": null,
+    "credential_key": null,
+    "credential_keys": [],
+    "location": null
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [],
+    "http": {},
+    "codes": [],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "no_create_endpoint",
+      "message": "no create endpoint found",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: create  (overrides.yml) or --include-paths"
+    },
+    {
+      "level": "warn",
+      "code": "production_default",
+      "message": "no sandbox server; default BASE_URL is production (https://onelink.pay1.de/api)",
+      "pointer": "#/servers/0",
+      "hint": "base_url.default: <sandbox url>  (overrides.yml)"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payment-links (getPaymentLinks) — not used",
+      "pointer": "#/paths/~1v1~1payment-links/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payment-links (createPaymentLink) — not used",
+      "pointer": "#/paths/~1v1~1payment-links/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payment-links/{linkId} (getPaymentLink) — not used",
+      "pointer": "#/paths/~1v1~1payment-links~1{linkId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "PUT /v1/payment-links/{linkId} (updatePaymentLink) — not used",
+      "pointer": "#/paths/~1v1~1payment-links~1{linkId}/put",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "no_cancel_endpoint",
+      "message": "no cancel endpoint; cancel_request not generated",
+      "pointer": null,
+      "hint": null
+    },
+    {
+      "level": "warn",
+      "code": "auth_not_found",
+      "message": "no security requirement on the create endpoint or at the root",
+      "pointer": "#/security",
+      "hint": "auth.type: api_key|bearer|basic (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
+      "pointer": null,
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    }
+  ],
+  "exit_code": 0
+}

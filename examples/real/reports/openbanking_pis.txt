@@ -1,0 +1,94 @@
+Parsing spec... ok (openapi 3.0.0, Payment Initiation API 3.1.7)
+Found 41 endpoints: POST /domestic-payment-consents, GET /domestic-payment-consents/{ConsentId},
+                    GET /domestic-payment-consents/{ConsentId}/funds-confirmation,
+                    POST /domestic-payments, GET /domestic-payments/{DomesticPaymentId},
+                    GET /domestic-payments/{DomesticPaymentId}/payment-details,
+                    POST /domestic-scheduled-payment-consents,
+                    GET /domestic-scheduled-payment-consents/{ConsentId},
+                    POST /domestic-scheduled-payments,
+                    GET /domestic-scheduled-payments/{DomesticScheduledPaymentId},
+                    GET /domestic-scheduled-payments/{DomesticScheduledPaymentId}/payment-details,
+                    POST /domestic-standing-order-consents,
+                    GET /domestic-standing-order-consents/{ConsentId},
+                    POST /domestic-standing-orders,
+                    GET /domestic-standing-orders/{DomesticStandingOrderId},
+                    GET /domestic-standing-orders/{DomesticStandingOrderId}/payment-details,
+                    POST /file-payment-consents, GET /file-payment-consents/{ConsentId},
+                    GET /file-payment-consents/{ConsentId}/file,
+                    POST /file-payment-consents/{ConsentId}/file, POST /file-payments,
+                    GET /file-payments/{FilePaymentId},
+                    GET /file-payments/{FilePaymentId}/payment-details,
+                    GET /file-payments/{FilePaymentId}/report-file,
+                    POST /international-payment-consents,
+                    GET /international-payment-consents/{ConsentId},
+                    GET /international-payment-consents/{ConsentId}/funds-confirmation,
+                    POST /international-payments,
+                    GET /international-payments/{InternationalPaymentId},
+                    GET /international-payments/{InternationalPaymentId}/payment-details,
+                    POST /international-scheduled-payment-consents,
+                    GET /international-scheduled-payment-consents/{ConsentId},
+                    GET /international-scheduled-payment-consents/{ConsentId}/funds-confirmation,
+                    POST /international-scheduled-payments,
+                    GET /international-scheduled-payments/{InternationalScheduledPaymentId},
+                    GET /international-scheduled-payments/{InternationalScheduledPaymentId}/payment-details,
+                    POST /international-standing-order-consents,
+                    GET /international-standing-order-consents/{ConsentId},
+                    POST /international-standing-orders,
+                    GET /international-standing-orders/{InternationalStandingOrderPaymentId},
+                    GET /international-standing-orders/{InternationalStandingOrderPaymentId}/payment-details
+  create   POST /domestic-payment-consents            CreateDomesticPaymentConsents confidence 0.95
+  status   GET /domestic-payment-consents/{ConsentId} GetDomesticPaymentConsentsConsentId confidence 0.90
+Auth: TPPOAuth2Security (bearer, header: Authorization) → credentials.token
+Statuses (status): not found
+Errors: 400 (create) validation_error → reject; 400 (status) validation_error → reject;
+        401 (create) invalid_credentials → alert_block;
+        401 (status) invalid_credentials → alert_block; 403 (create) forbidden → alert_block;
+        403 (status) forbidden → alert_block; 405 (create) unknown_error → reject;
+        405 (status) unknown_error → reject; 406 (create) unknown_error → reject;
+        406 (status) unknown_error → reject; 415 unknown_error → reject;
+        429 (create) rate_limit → retry_backoff (Retry-After);
+        429 (status) rate_limit → retry_backoff (Retry-After); 500 (create) internal_error → retry;
+        500 (status) internal_error → retry
+Webhook signature: no webhook found
+Amount: field not found
+Fields: 41 request fields, 37 unmapped
+Warnings (78):
+  WARN         role_conflict              POST /domestic-payments (CreateDomesticPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateDomesticPayments: create
+  WARN         role_conflict              POST /domestic-scheduled-payment-consents (CreateDomesticScheduledPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateDomesticScheduledPaymentConsents: create
+  WARN         role_conflict              POST /domestic-scheduled-payments (CreateDomesticScheduledPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateDomesticScheduledPayments: create
+  WARN         role_conflict              POST /file-payment-consents (CreateFilePaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateFilePaymentConsents: create
+  WARN         role_conflict              POST /file-payments (CreateFilePayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateFilePayments: create
+  WARN         role_conflict              POST /international-payment-consents (CreateInternationalPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateInternationalPaymentConsents: create
+  WARN         role_conflict              POST /international-payments (CreateInternationalPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateInternationalPayments: create
+  WARN         role_conflict              POST /international-scheduled-payment-consents (CreateInternationalScheduledPaymentConsents) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateInternationalScheduledPaymentConsents: create
+  WARN         role_conflict              POST /international-scheduled-payments (CreateInternationalScheduledPayments) also looks like create (0.95); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateInternationalScheduledPayments: create
+  WARN         role_conflict              POST /file-payment-consents/{ConsentId}/file (CreateFilePaymentConsentsConsentIdFile) also looks like create (0.6); POST /domestic-payment-consents (CreateDomesticPaymentConsents) wins (0.95)
+        hint: endpoints.CreateFilePaymentConsentsConsentIdFile: create
+  … and 68 more (see --format json)
+Unsupported (2):
+  UNSUPPORTED  oauth2_alternative         alternative security scheme 'TPPOAuth2Security' (oauth2) is ignored
+        hint: the first supported scheme is used
+  UNSUPPORTED  oauth2                     security scheme 'TPPOAuth2Security' (oauth2) is not supported; bearer token assumed
+        hint: obtain the token out of band and put it into credentials.token
+Info (40):
+  INFO         outside_contract           GET /domestic-payment-consents/{ConsentId}/funds-confirmation (GetDomesticPaymentConsentsConsentIdFundsConfirmation) — not used
+  INFO         outside_contract           POST /domestic-payments (CreateDomesticPayments) — not used
+  INFO         outside_contract           GET /domestic-payments/{DomesticPaymentId} (GetDomesticPaymentsDomesticPaymentId) — not used
+  INFO         outside_contract           GET /domestic-payments/{DomesticPaymentId}/payment-details (GetDomesticPaymentsDomesticPaymentIdPaymentDetails) — not used
+  INFO         outside_contract           POST /domestic-scheduled-payment-consents (CreateDomesticScheduledPaymentConsents) — not used
+  INFO         outside_contract           GET /domestic-scheduled-payment-consents/{ConsentId} (GetDomesticScheduledPaymentConsentsConsentId) — not used
+  INFO         outside_contract           POST /domestic-scheduled-payments (CreateDomesticScheduledPayments) — not used
+  INFO         outside_contract           GET /domestic-scheduled-payments/{DomesticScheduledPaymentId} (GetDomesticScheduledPaymentsDomesticScheduledPaymentId) — not used
+  INFO         outside_contract           GET /domestic-scheduled-payments/{DomesticScheduledPaymentId}/payment-details (GetDomesticScheduledPaymentsDomesticScheduledPaymentIdPaymentDetails) — not used
+  INFO         outside_contract           POST /domestic-standing-order-consents (CreateDomesticStandingOrderConsents) — not used
+  … and 30 more (see --format json)
+Done: 78 warnings, 2 unsupported. Exit 0.

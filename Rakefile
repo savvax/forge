@@ -31,10 +31,29 @@ REAL_SPECS = {
   'stripe' => 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json',
   'adyen_payout' => 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/PayoutService-v68.json',
   'adyen_transfers' => 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/TransferService-v4.json',
-  'paypal_payouts' => 'https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/main/openapi/payments_payouts_batch_v1.json',
+  'paypal_payouts' =>
+    'https://raw.githubusercontent.com/paypal/paypal-rest-api-specifications/main/openapi/payments_payouts_batch_v1.json',
   'paystack' => 'https://raw.githubusercontent.com/PaystackHQ/openapi/master/dist/paystack.yaml',
   'square' => 'https://raw.githubusercontent.com/square/connect-api-specification/master/api.json',
-  'plaid' => 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml'
+  'plaid' => 'https://raw.githubusercontent.com/plaid/plaid-openapi/master/2020-09-14.yml',
+  # Вторая волна (6.09): выплаты — Velo, Increase, Mollie, Dwolla, Wise, Open Banking PIS;
+  # pay-in/конфиг как негативные — Klarna, PAYONE Link, VTEX, Adyen Balance Platform / Checkout,
+  # NOWPayments (без POST /payout); GOV.UK Pay — Swagger 2.0 (ошибка загрузки).
+  'velo' => 'https://api.apis.guru/v2/specs/velopayments.com/2.34.63/openapi.json',
+  'increase' => 'https://api.apis.guru/v2/specs/increase.com/0.0.1/openapi.json',
+  'mollie' => 'https://raw.githubusercontent.com/mollie/openapi/main/specs.yaml',
+  'dwolla' => 'https://raw.githubusercontent.com/Dwolla/dwolla-openapi/main/openapi.yml',
+  'wise_transfer' =>
+    'https://raw.githubusercontent.com/api-evangelist/wise/main/openapi/wise-transfer-api-openapi.yml',
+  'openbanking_pis' =>
+    'https://api.apis.guru/v2/specs/openbanking.org.uk/payment-initiation-openapi/3.1.7/openapi.json',
+  'nowpayments' => 'https://api.apis.guru/v2/specs/nowpayments.io/1.0.0/openapi.json',
+  'klarna' => 'https://api.apis.guru/v2/specs/klarna.com/payments/1.0.0/openapi.json',
+  'payone_link' => 'https://api.apis.guru/v2/specs/pay1.de/link/v1/openapi.json',
+  'vtex_gateway' => 'https://api.apis.guru/v2/specs/vtex.local/Payments-Gateway-API/1.0/openapi.json',
+  'adyen_balance' => 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/BalancePlatformService-v2.json',
+  'adyen_checkout' => 'https://raw.githubusercontent.com/Adyen/adyen-openapi/main/json/CheckoutService-v71.json',
+  'govuk_pay' => 'https://api.apis.guru/v2/specs/payments.service.gov.uk/payments/1.0.3/swagger.json'
 }.freeze
 
 # Флаги из docs/REAL_SPECS.md § 2 (большие спеки анализируем только по нужным путям).

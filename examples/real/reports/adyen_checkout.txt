@@ -1,0 +1,60 @@
+Parsing spec... ok (openapi 3.1.0, Adyen Checkout API 71)
+Found 28 endpoints: POST /applePay/sessions, POST /cancels, POST /cardDetails,
+                    POST /donationCampaigns, POST /donations, POST /forward, POST /orders,
+                    POST /orders/cancel, POST /originKeys, POST /paymentLinks,
+                    GET /paymentLinks/{linkId}, PATCH /paymentLinks/{linkId}, POST /paymentMethods,
+                    POST /paymentMethods/balance, POST /payments, POST /payments/details,
+                    POST /payments/{paymentPspReference}/amountUpdates,
+                    POST /payments/{paymentPspReference}/cancels,
+                    POST /payments/{paymentPspReference}/captures,
+                    POST /payments/{paymentPspReference}/refunds,
+                    POST /payments/{paymentPspReference}/reversals, POST /paypal/updateOrder,
+                    POST /sessions, GET /sessions/{sessionId}, GET /storedPaymentMethods,
+                    POST /storedPaymentMethods, DELETE /storedPaymentMethods/{storedPaymentMethodId},
+                    POST /validateShopperId
+  create   POST /payments                             post-payments            confidence 0.95
+Auth: BasicAuth (basic, header: Authorization) → credentials.login/password
+Statuses (status): not found
+Errors: 400 validation_error → reject; 401 invalid_credentials → alert_block;
+        403 forbidden → alert_block; 422 validation_error → reject; 500 internal_error → retry
+Webhook signature: no webhook found
+Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
+Fields: 403 request fields, 367 unmapped (bankAccount: bank_account)
+Warnings (390):
+  WARN         role_conflict              POST /payments/details (post-payments-details) also looks like create (0.95); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-payments-details: create
+  WARN         role_conflict              POST /cancels (post-cancels) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-cancels: create
+  WARN         role_conflict              POST /cardDetails (post-cardDetails) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-cardDetails: create
+  WARN         role_conflict              POST /donationCampaigns (post-donationCampaigns) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-donationCampaigns: create
+  WARN         role_conflict              POST /donations (post-donations) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-donations: create
+  WARN         role_conflict              POST /forward (post-forward) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-forward: create
+  WARN         role_conflict              POST /originKeys (post-originKeys) also looks like create (0.7); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-originKeys: create
+  WARN         role_conflict              POST /payments/{paymentPspReference}/amountUpdates (post-payments-paymentPspReference-amountUpdates) also looks like create (0.6); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-payments-paymentPspReference-amountUpdates: create
+  WARN         role_conflict              POST /payments/{paymentPspReference}/cancels (post-payments-paymentPspReference-cancels) also looks like create (0.6); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-payments-paymentPspReference-cancels: create
+  WARN         role_conflict              POST /payments/{paymentPspReference}/captures (post-payments-paymentPspReference-captures) also looks like create (0.6); POST /payments (post-payments) wins (0.95)
+        hint: endpoints.post-payments-paymentPspReference-captures: create
+  … and 380 more (see --format json)
+Unsupported (1):
+  UNSUPPORTED  apiKey_alternative         alternative security scheme 'ApiKeyAuth' (apiKey) is ignored
+        hint: the first supported scheme is used
+Info (29):
+  INFO         outside_contract           POST /applePay/sessions (post-applePay-sessions) — not used
+  INFO         outside_contract           POST /cancels (post-cancels) — not used
+  INFO         outside_contract           POST /cardDetails (post-cardDetails) — not used
+  INFO         outside_contract           POST /donationCampaigns (post-donationCampaigns) — not used
+  INFO         outside_contract           POST /donations (post-donations) — not used
+  INFO         outside_contract           POST /forward (post-forward) — not used
+  INFO         outside_contract           POST /orders (post-orders) — not used
+  INFO         outside_contract           POST /orders/cancel (post-orders-cancel) — not used
+  INFO         outside_contract           POST /originKeys (post-originKeys) — not used
+  INFO         outside_contract           POST /paymentLinks (post-paymentLinks) — not used
+  … and 19 more (see --format json)
+Done: 390 warnings, 1 unsupported. Exit 0.

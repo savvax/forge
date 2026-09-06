@@ -1,0 +1,1162 @@
+{
+  "spec": {
+    "openapi": "3.0.2",
+    "title": "Velo Payments APIs",
+    "version": "2.34.63",
+    "source": "examples/real/velo.json"
+  },
+  "endpoints": [
+    {
+      "role": "create",
+      "method": "POST",
+      "path": "/v3/payouts",
+      "operation_id": "submitPayoutV3",
+      "confidence": 0.95,
+      "outside_contract": false
+    },
+    {
+      "role": "status",
+      "method": "GET",
+      "path": "/v3/payouts/{payoutId}",
+      "operation_id": "getPayoutSummaryV3",
+      "confidence": 0.9,
+      "outside_contract": false
+    },
+    {
+      "role": "cancel",
+      "method": "DELETE",
+      "path": "/v3/payouts/{payoutId}",
+      "operation_id": "withdrawPayoutV3",
+      "confidence": 0.75,
+      "outside_contract": true
+    },
+    {
+      "role": "webhook",
+      "method": "POST",
+      "path": "/v1/webhooks",
+      "operation_id": "createWebhookV1",
+      "confidence": 0.5,
+      "outside_contract": false
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "header": "Authorization",
+    "prefix": "Bearer",
+    "credential_key": "token",
+    "credential_keys": [
+      "token"
+    ],
+    "location": "header",
+    "scheme_name": "OAuth2"
+  },
+  "statuses": {
+    "field_path": [
+      "status"
+    ],
+    "map": {},
+    "unmapped": [],
+    "response_id_path": [
+      "id"
+    ],
+    "response_status_path": [
+      "status"
+    ],
+    "response_id_confidence": 0.0
+  },
+  "errors": {
+    "rows": [
+      {
+        "status": 400,
+        "role": "create",
+        "pointer": "#/paths/~1v3~1payouts/post/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "create",
+        "pointer": "#/paths/~1v3~1payouts/post/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "create",
+        "pointer": "#/paths/~1v3~1payouts/post/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 401,
+        "role": "status",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/get/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "status",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/get/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "status",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/get/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      },
+      {
+        "status": 400,
+        "role": "cancel",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete/responses/400",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "validation_error",
+        "action": "reject"
+      },
+      {
+        "status": 401,
+        "role": "cancel",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete/responses/401",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "invalid_credentials",
+        "action": "alert_block"
+      },
+      {
+        "status": 403,
+        "role": "cancel",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete/responses/403",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "forbidden",
+        "action": "alert_block"
+      },
+      {
+        "status": 404,
+        "role": "cancel",
+        "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete/responses/404",
+        "headers": [],
+        "provider_code": null,
+        "internal_code": "not_found",
+        "action": "reject"
+      }
+    ],
+    "http": {
+      "400": "validation_error",
+      "401": "invalid_credentials",
+      "403": "forbidden",
+      "404": "not_found"
+    },
+    "codes": [
+      "requestBody",
+      "queryParam",
+      "requestParam",
+      "header",
+      "pathParam"
+    ],
+    "retry_after_header": null
+  },
+  "webhook": {
+    "endpoint": {
+      "method": "post",
+      "path": "/v1/webhooks",
+      "operation_id": "createWebhookV1"
+    },
+    "source": "paths",
+    "event_field": null,
+    "event_map": {},
+    "id_field": null,
+    "status_field": null,
+    "signature": {
+      "header": null,
+      "algorithm": null,
+      "encoding": null,
+      "payload": null,
+      "secret_key": "callback_secret"
+    }
+  },
+  "amount": {
+    "field": null,
+    "path": null,
+    "unit": "major",
+    "multiplier": 100,
+    "currencies": [],
+    "expr": "operation.amount"
+  },
+  "fields": {
+    "request": [
+      {
+        "provider_field": "payments",
+        "path": [
+          "payments"
+        ],
+        "source_expr": "[]",
+        "required": true,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "array"
+        },
+        "confidence": 0.3,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "payoutFromPayorId",
+        "path": [
+          "payoutFromPayorId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "payoutMemo",
+        "path": [
+          "payoutMemo"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      },
+      {
+        "provider_field": "payoutToPayorId",
+        "path": [
+          "payoutToPayorId"
+        ],
+        "source_expr": null,
+        "required": false,
+        "required_if": null,
+        "transform": null,
+        "schema": {
+          "type": "string"
+        },
+        "confidence": 0.0,
+        "requisite_type": null
+      }
+    ],
+    "requisite_types": [],
+    "requisite_container": null,
+    "requisite_type_values": {},
+    "headers": []
+  },
+  "warnings": [
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v3/payouts/{payoutId}/payments (getPaymentsForPayoutV3) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1payments/get",
+      "hint": "endpoints.getPaymentsForPayoutV3: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v3/paymentaudit/payouts/{payoutId} (getPaymentsForPayout_PA_V3) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payouts~1{payoutId}/get",
+      "hint": "endpoints.getPaymentsForPayout_PA_V3: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v4/paymentaudit/payouts/{payoutId} (getPaymentsForPayoutV4) also looks like status (0.9); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payouts~1{payoutId}/get",
+      "hint": "endpoints.getPaymentsForPayoutV4: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v1/paymentaudit/payoutStatistics (getPayoutStatsV1) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v1~1paymentaudit~1payoutStatistics/get",
+      "hint": "endpoints.getPayoutStatsV1: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v3/paymentaudit/payouts (getPayoutsForPayorV3) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payouts/get",
+      "hint": "endpoints.getPayoutsForPayorV3: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v4/paymentaudit/payoutStatistics (getPayoutStatsV4) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payoutStatistics/get",
+      "hint": "endpoints.getPayoutStatsV4: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "GET /v4/paymentaudit/payouts (getPayoutsForPayorV4) also looks like status (0.7); GET /v3/payouts/{payoutId} (getPayoutSummaryV3) wins (0.9)",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payouts/get",
+      "hint": "endpoints.getPayoutsForPayorV4: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "DELETE /v3/payouts/{payoutId}/schedule (deschedulePayout) also looks like cancel (0.75); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1schedule/delete",
+      "hint": "endpoints.deschedulePayout: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v3/payouts/{payoutId} (instructPayoutV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}/post",
+      "hint": "endpoints.instructPayoutV3: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v3/payouts/{payoutId}/quote (createQuoteForPayoutV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1quote/post",
+      "hint": "endpoints.createQuoteForPayoutV3: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v3/payouts/{payoutId}/schedule (scheduleForPayout) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1schedule/post",
+      "hint": "endpoints.scheduleForPayout: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/payments/{paymentId}/withdraw (withdrawPayment) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v1~1payments~1{paymentId}~1withdraw/post",
+      "hint": "endpoints.withdrawPayment: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v2/sourceAccounts/{sourceAccountId}/transfers (transferFundsV2) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v2~1sourceAccounts~1{sourceAccountId}~1transfers/post",
+      "hint": "endpoints.transferFundsV2: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v3/sourceAccounts/{sourceAccountId}/transfers (transferFundsV3) also looks like cancel (0.55); DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) wins (0.75)",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}~1transfers/post",
+      "hint": "endpoints.transferFundsV3: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "cancel: DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) scored 0.75",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete",
+      "hint": "endpoints.withdrawPayoutV3: cancel"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/webhooks/{webhookId} (updateWebhookV1) also looks like webhook (0.5); POST /v1/webhooks (createWebhookV1) wins (0.5)",
+      "pointer": "#/paths/~1v1~1webhooks~1{webhookId}/post",
+      "hint": "endpoints.updateWebhookV1: webhook"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/sourceAccounts/{sourceAccountId}/notifications (setNotificationsRequest) also looks like webhook (0.5); POST /v1/webhooks (createWebhookV1) wins (0.5)",
+      "pointer": "#/paths/~1v1~1sourceAccounts~1{sourceAccountId}~1notifications/post",
+      "hint": "endpoints.setNotificationsRequest: webhook"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v1/webhooks/{webhookId}/ping (pingWebhookV1) also looks like webhook (0.5); POST /v1/webhooks (createWebhookV1) wins (0.5)",
+      "pointer": "#/paths/~1v1~1webhooks~1{webhookId}~1ping/post",
+      "hint": "endpoints.pingWebhookV1: webhook"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /v3/sourceAccounts/{sourceAccountId}/notifications (setNotificationsRequestV3) also looks like webhook (0.5); POST /v1/webhooks (createWebhookV1) wins (0.5)",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}~1notifications/post",
+      "hint": "endpoints.setNotificationsRequestV3: webhook"
+    },
+    {
+      "level": "warn",
+      "code": "low_confidence",
+      "message": "webhook: POST /v1/webhooks (createWebhookV1) scored 0.5",
+      "pointer": "#/paths/~1v1~1webhooks/post",
+      "hint": "endpoints.createWebhookV1: webhook"
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) — generated as `cancel_request` helper",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/authenticate (veloAuth) — not used",
+      "pointer": "#/paths/~1v1~1authenticate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/deltas/fundings (listFundingAuditDeltas) — not used",
+      "pointer": "#/paths/~1v1~1deltas~1fundings/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/deltas/payments (listPaymentChanges) — not used",
+      "pointer": "#/paths/~1v1~1deltas~1payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/fundings/{fundingId} (getFundingByIdV1) — not used",
+      "pointer": "#/paths/~1v1~1fundings~1{fundingId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/logout (logout) — not used",
+      "pointer": "#/paths/~1v1~1logout/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/password/reset (resetPassword) — not used",
+      "pointer": "#/paths/~1v1~1password~1reset/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/paymentChannelRules (listPaymentChannelRulesV1) — not used",
+      "pointer": "#/paths/~1v1~1paymentChannelRules/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/paymentaudit/fundings (getFundingsV1) — not used",
+      "pointer": "#/paths/~1v1~1paymentaudit~1fundings/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/paymentaudit/payoutStatistics (getPayoutStatsV1) — not used",
+      "pointer": "#/paths/~1v1~1paymentaudit~1payoutStatistics/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payments/{paymentId}/withdraw (withdrawPayment) — not used",
+      "pointer": "#/paths/~1v1~1payments~1{paymentId}~1withdraw/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payorLinks (payorLinksV1) — not used",
+      "pointer": "#/paths/~1v1~1payorLinks/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payorLinks (createPayorLinks) — not used",
+      "pointer": "#/paths/~1v1~1payorLinks/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payors/{payorId} (getPayorByIdV1) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payors/{payorId}/applications (payorCreateApplicationV1) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}~1applications/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payors/{payorId}/applications/{applicationId}/keys (payorCreateApiKeyV1) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}~1applications~1{applicationId}~1keys/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/payors/{payorId}/branding (payorGetBranding) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}~1branding/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payors/{payorId}/branding/logos (payorAddPayorLogoV1) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}~1branding~1logos/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/payors/{payorId}/reminderEmailsUpdate (payorEmailOptOut) — not used",
+      "pointer": "#/paths/~1v1~1payors~1{payorId}~1reminderEmailsUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/sourceAccounts/{sourceAccountId}/notifications (setNotificationsRequest) — not used",
+      "pointer": "#/paths/~1v1~1sourceAccounts~1{sourceAccountId}~1notifications/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/supportedCountries (listSupportedCountriesV1) — not used",
+      "pointer": "#/paths/~1v1~1supportedCountries/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/validate (validateAccessToken) — not used",
+      "pointer": "#/paths/~1v1~1validate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/webhooks (listWebhooksV1) — not used",
+      "pointer": "#/paths/~1v1~1webhooks/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v1/webhooks/{webhookId} (getWebhookV1) — not used",
+      "pointer": "#/paths/~1v1~1webhooks~1{webhookId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/webhooks/{webhookId} (updateWebhookV1) — not used",
+      "pointer": "#/paths/~1v1~1webhooks~1{webhookId}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/webhooks/{webhookId}/ping (pingWebhookV1) — not used",
+      "pointer": "#/paths/~1v1~1webhooks~1{webhookId}~1ping/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/currencies (listSupportedCurrenciesV2) — not used",
+      "pointer": "#/paths/~1v2~1currencies/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/fundingAccounts (getFundingAccountsV2) — not used",
+      "pointer": "#/paths/~1v2~1fundingAccounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/fundingAccounts (createFundingAccountV2) — not used",
+      "pointer": "#/paths/~1v2~1fundingAccounts/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/fundingAccounts/{fundingAccountId} (getFundingAccountV2) — not used",
+      "pointer": "#/paths/~1v2~1fundingAccounts~1{fundingAccountId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/payors/{payorId} (getPayorByIdV2) — not used",
+      "pointer": "#/paths/~1v2~1payors~1{payorId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/sourceAccounts (getSourceAccountsV2) — not used",
+      "pointer": "#/paths/~1v2~1sourceAccounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/sourceAccounts/{sourceAccountId} (getSourceAccountV2) — not used",
+      "pointer": "#/paths/~1v2~1sourceAccounts~1{sourceAccountId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/sourceAccounts/{sourceAccountId}/fundingRequest (createFundingRequestV2) — not used",
+      "pointer": "#/paths/~1v2~1sourceAccounts~1{sourceAccountId}~1fundingRequest/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/sourceAccounts/{sourceAccountId}/transfers (transferFundsV2) — not used",
+      "pointer": "#/paths/~1v2~1sourceAccounts~1{sourceAccountId}~1transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/supportedCountries (listSupportedCountriesV2) — not used",
+      "pointer": "#/paths/~1v2~1supportedCountries/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/users (listUsers) — not used",
+      "pointer": "#/paths/~1v2~1users/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/invite (inviteUser) — not used",
+      "pointer": "#/paths/~1v2~1users~1invite/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/registration/sms (registerSms) — not used",
+      "pointer": "#/paths/~1v2~1users~1registration~1sms/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/users/self (getSelf) — not used",
+      "pointer": "#/paths/~1v2~1users~1self/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/self/mfa/unregister (unregisterMFAForSelf) — not used",
+      "pointer": "#/paths/~1v2~1users~1self~1mfa~1unregister/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/self/password (updatePasswordSelf) — not used",
+      "pointer": "#/paths/~1v2~1users~1self~1password/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/self/password/validate (validatePasswordSelf) — not used",
+      "pointer": "#/paths/~1v2~1users~1self~1password~1validate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/self/userDetailsUpdate (userDetailsUpdateForSelf) — not used",
+      "pointer": "#/paths/~1v2~1users~1self~1userDetailsUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v2/users/{userId} (getUserByIdV2) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v2/users/{userId} (deleteUserByIdV2) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/disable (disableUserV2) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1disable/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/enable (enableUserV2) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1enable/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/mfa/unregister (unregisterMFA) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1mfa~1unregister/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/roleUpdate (roleUpdate) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1roleUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/tokens (resendToken) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1tokens/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/unlock (unlockUserV2) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1unlock/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/users/{userId}/userDetailsUpdate (userDetailsUpdate) — not used",
+      "pointer": "#/paths/~1v2~1users~1{userId}~1userDetailsUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payees (listPayeesV3) — not used",
+      "pointer": "#/paths/~1v3~1payees/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payees (createPayeeV3) — not used",
+      "pointer": "#/paths/~1v3~1payees/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payees/batch/{batchId} (queryBatchStatusV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1batch~1{batchId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payees/deltas (listPayeeChangesV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1deltas/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payees/payors/{payorId}/invitationStatus (getPayeesInvitationStatusV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1payors~1{payorId}~1invitationStatus/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payees/{payeeId} (getPayeeByIdV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1{payeeId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v3/payees/{payeeId} (deletePayeeByIdV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1{payeeId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payees/{payeeId}/invite (resendPayeeInviteV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1{payeeId}~1invite/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payees/{payeeId}/payeeDetailsUpdate (payeeDetailsUpdateV3) — not used",
+      "pointer": "#/paths/~1v3~1payees~1{payeeId}~1payeeDetailsUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payees/{payeeId}/remoteIdUpdate () — not used",
+      "pointer": "#/paths/~1v3~1payees~1{payeeId}~1remoteIdUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/paymentaudit/payments (listPaymentsAuditV3) — not used",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/paymentaudit/payments/{paymentId} (getPaymentDetailsV3) — not used",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payments~1{paymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/paymentaudit/payouts (getPayoutsForPayorV3) — not used",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payouts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/paymentaudit/payouts/{payoutId} (getPaymentsForPayout_PA_V3) — not used",
+      "pointer": "#/paths/~1v3~1paymentaudit~1payouts~1{payoutId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/paymentaudit/transactions (exportTransactionsCSVV3) — not used",
+      "pointer": "#/paths/~1v3~1paymentaudit~1transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payouts/{payoutId} (instructPayoutV3) — not used",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/payouts/{payoutId}/payments (getPaymentsForPayoutV3) — not used",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payouts/{payoutId}/quote (createQuoteForPayoutV3) — not used",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1quote/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/payouts/{payoutId}/schedule (scheduleForPayout) — not used",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1schedule/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v3/payouts/{payoutId}/schedule (deschedulePayout) — not used",
+      "pointer": "#/paths/~1v3~1payouts~1{payoutId}~1schedule/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/sourceAccounts (getSourceAccountsV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v3/sourceAccounts/{sourceAccountId} (getSourceAccountV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v3/sourceAccounts/{sourceAccountId} (deleteSourceAccountV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/sourceAccounts/{sourceAccountId}/fundingRequest (createFundingRequestV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}~1fundingRequest/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/sourceAccounts/{sourceAccountId}/notifications (setNotificationsRequestV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}~1notifications/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v3/sourceAccounts/{sourceAccountId}/transfers (transferFundsV3) — not used",
+      "pointer": "#/paths/~1v3~1sourceAccounts~1{sourceAccountId}~1transfers/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payees (listPayeesV4) — not used",
+      "pointer": "#/paths/~1v4~1payees/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v4/payees (v4CreatePayee) — not used",
+      "pointer": "#/paths/~1v4~1payees/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payees/batch/{batchId} (queryBatchStatusV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1batch~1{batchId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payees/deltas (listPayeeChangesV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1deltas/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payees/payors/{payorId}/invitationStatus (getPayeesInvitationStatusV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1payors~1{payorId}~1invitationStatus/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payees/{payeeId} (getPayeeByIdV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1{payeeId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "DELETE /v4/payees/{payeeId} (deletePayeeByIdV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1{payeeId}/delete",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v4/payees/{payeeId}/invite (resendPayeeInviteV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1{payeeId}~1invite/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v4/payees/{payeeId}/payeeDetailsUpdate (payeeDetailsUpdateV4) — not used",
+      "pointer": "#/paths/~1v4~1payees~1{payeeId}~1payeeDetailsUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v4/payees/{payeeId}/remoteIdUpdate () — not used",
+      "pointer": "#/paths/~1v4~1payees~1{payeeId}~1remoteIdUpdate/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/fundings (getFundingsV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1fundings/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/payments (listPaymentsAuditV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payments/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/payments/{paymentId} (getPaymentDetailsV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payments~1{paymentId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/payoutStatistics (getPayoutStatsV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payoutStatistics/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/payouts (getPayoutsForPayorV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payouts/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/payouts/{payoutId} (getPaymentsForPayoutV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1payouts~1{payoutId}/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/paymentaudit/transactions (exportTransactionsCSVV4) — not used",
+      "pointer": "#/paths/~1v4~1paymentaudit~1transactions/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "GET /v4/payments/deltas (listPaymentChangesV4) — not used",
+      "pointer": "#/paths/~1v4~1payments~1deltas/get",
+      "hint": null
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2_alternative",
+      "message": "alternative security scheme 'OAuth2' (oauth2) is ignored",
+      "pointer": "#/components/securitySchemes/OAuth2",
+      "hint": "the first supported scheme is used"
+    },
+    {
+      "level": "unsupported",
+      "code": "oauth2",
+      "message": "security scheme 'OAuth2' (oauth2) is not supported; bearer token assumed",
+      "pointer": "#/components/securitySchemes/OAuth2",
+      "hint": "obtain the token out of band and put it into credentials.token"
+    },
+    {
+      "level": "warn",
+      "code": "status_field_not_found",
+      "message": "no status field (enum or described) found in the response schema",
+      "pointer": null,
+      "hint": "statuses.field: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "response_id_not_found",
+      "message": "no id field found in the response schema; `id` assumed",
+      "pointer": null,
+      "hint": "statuses.response_id: <path>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "signature_not_found",
+      "message": "webhook has no signature header parameter; callbacks will not be verified",
+      "pointer": null,
+      "hint": "webhook.signature_header: <Header-Name>  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "amount_field_not_found",
+      "message": "no amount field in the create request schema",
+      "pointer": null,
+      "hint": "fields.<path>.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "array_field_unsupported",
+      "message": "payments is an array; [] is generated",
+      "pointer": null,
+      "hint": "fields.payments.source: \"…\""
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "payoutFromPayorId (string, <p>The id of the payor whose source account(s) will be debited</p>) has no source",
+      "pointer": null,
+      "hint": "fields.payoutFromPayorId.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "payoutMemo (string, <p>Text applied to all payment memos unless specified explicitly on a payment…) has no source",
+      "pointer": null,
+      "hint": "fields.payoutMemo.source: \"…\"  (overrides.yml)"
+    },
+    {
+      "level": "warn",
+      "code": "unmapped_field",
+      "message": "payoutToPayorId (string, <p>The id of the payor whose payees will be paid</p>) has no source",
+      "pointer": null,
+      "hint": "fields.payoutToPayorId.source: \"…\"  (overrides.yml)"
+    }
+  ],
+  "exit_code": 0
+}

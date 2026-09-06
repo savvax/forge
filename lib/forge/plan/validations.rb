@@ -17,9 +17,14 @@ module Forge
         return [] unless mapping
 
         rules = []
-        rules << rule(mapping, :min, amount[:minimum_major], 'amount_too_low') if amount[:minimum_major]
+        rules << rule(mapping, :min, amount[:minimum_major], 'amount_too_low') if meaningful_min?(amount)
         rules << rule(mapping, :max, amount[:maximum_major], 'amount_too_high') if amount[:maximum_major]
         rules
+      end
+
+      # Минимум в одну минорную единицу (0.01) уже покрыт проверкой amount.positive? в BaseService.
+      def meaningful_min?(amount)
+        amount[:minimum_major] && (amount[:minimum_major].to_r * (amount[:multiplier] || 100)).round > 1
       end
 
       def field_rules(mapping)
@@ -27,9 +32,11 @@ module Forge
         rules = []
         if schema.max_length
           rules << rule(mapping, :max_length, schema.max_length,
-                        "#{mapping.provider_field}_too_long")
+                        "#{Rules.normalize(mapping.provider_field)}_too_long")
         end
-        rules << rule(mapping, :pattern, schema.pattern, "#{mapping.provider_field}_invalid") if schema.pattern
+        if schema.pattern
+          rules << rule(mapping, :pattern, schema.pattern, "#{Rules.normalize(mapping.provider_field)}_invalid")
+        end
         if currency?(mapping) && schema.enum
           rules << rule(mapping, :enum, schema.enum.map(&:to_s),
                         'currency_not_supported')

@@ -1,0 +1,65 @@
+Parsing spec... ok (openapi 3.2.0, Wise Platform Transfer API )
+Found 15 endpoints: GET /v1/transfers, POST /v1/transfers, GET /v1/transfers/{transferId},
+                    PUT /v1/transfers/{transferId}/cancel, POST /v1/transfer-requirements,
+                    POST /v2/profiles/{profileId}/third-party-transfers,
+                    GET /v1/profiles/{profileId}/third-party-transfers/{transferId},
+                    GET /v2/profiles/{profileId}/third-party-transfers/{transferId},
+                    POST /v3/profiles/{profileId}/transfers/{transferId}/payments,
+                    GET /v1/transfers/{transferId}/payments,
+                    GET /v2/transfers/{transferId}/invoices/bankingpartner,
+                    GET /v1/transfers/{transferId}/receipt.pdf,
+                    GET /v1/transfers/{transferId}/us-combined-receipt.pdf,
+                    GET /v1/transfers/{transferId}/documents/noc,
+                    POST /v1/profiles/{profileId}/partner-licence-transfers
+  create   POST /v1/transfers                         transferCreate           confidence 0.95
+  status   GET /v1/transfers/{transferId}             transferGet              confidence 0.90
+  cancel   PUT /v1/transfers/{transferId}/cancel      transferCancel           confidence 0.70   (outside contract → cancel_request)
+  webhook  POST transfers#state-change                eventTransfersStateChange confidence 0.95
+Auth: UserToken (bearer, header: Authorization) → credentials.token
+Statuses (status): not found
+Errors: 404 (status) not_found → reject; 404 (cancel) not_found → reject; 409 conflict → reject;
+        429 (create) rate_limit → retry_backoff (Retry-After);
+        429 (status) rate_limit → retry_backoff (Retry-After);
+        429 (cancel) rate_limit → retry_backoff (Retry-After)
+Webhook signature: X-Signature-SHA256 (HMAC-SHA256, raw body, base64) → credentials.callback_secret
+Webhook events: no event field → no known event values or status field
+Amount: field not found
+Fields: 9 request fields, 8 unmapped (details: bank_account)
+Warnings (22):
+  WARN         role_conflict              POST /v1/transfer-requirements (transferRequirementsValidate) also looks like create (0.75); POST /v1/transfers (transferCreate) wins (0.95)
+        hint: endpoints.transferRequirementsValidate: create
+  WARN         role_conflict              POST /v2/profiles/{profileId}/third-party-transfers (transferThirdPartyCreate) also looks like create (0.6); POST /v1/transfers (transferCreate) wins (0.95)
+        hint: endpoints.transferThirdPartyCreate: create
+  WARN         role_conflict              POST /v1/profiles/{profileId}/partner-licence-transfers (transferPartnerLicenceCreate) also looks like create (0.6); POST /v1/transfers (transferCreate) wins (0.95)
+        hint: endpoints.transferPartnerLicenceCreate: create
+  WARN         role_conflict              GET /v1/transfers/{transferId}/receipt.pdf (transferReceiptGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)
+        hint: endpoints.transferReceiptGet: status
+  WARN         role_conflict              GET /v1/transfers/{transferId}/us-combined-receipt.pdf (transferUsCombinedReceiptGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)
+        hint: endpoints.transferUsCombinedReceiptGet: status
+  WARN         role_conflict              GET /v1/transfers/{transferId}/documents/noc (transferNocGet) also looks like status (0.9); GET /v1/transfers/{transferId} (transferGet) wins (0.9)
+        hint: endpoints.transferNocGet: status
+  WARN         role_conflict              GET /v1/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGetV1) also looks like status (0.6); GET /v1/transfers/{transferId} (transferGet) wins (0.9)
+        hint: endpoints.transferThirdPartyGetV1: status
+  WARN         role_conflict              GET /v2/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGet) also looks like status (0.6); GET /v1/transfers/{transferId} (transferGet) wins (0.9)
+        hint: endpoints.transferThirdPartyGet: status
+  WARN         low_confidence             cancel: PUT /v1/transfers/{transferId}/cancel (transferCancel) scored 0.7
+        hint: endpoints.transferCancel: cancel
+  WARN         production_default         no sandbox server; default BASE_URL is production (https://api.wise.com)
+        hint: base_url.default: <sandbox url>  (overrides.yml)
+  … and 12 more (see --format json)
+Unsupported (1):
+  UNSUPPORTED  http_alternative           alternative security scheme 'PersonalToken' (http) is ignored
+        hint: the first supported scheme is used
+Info (15):
+  INFO         webhook_source_webhooks    webhook taken from webhooks: POST transfers#state-change (eventTransfersStateChange)
+  INFO         outside_contract           PUT /v1/transfers/{transferId}/cancel (transferCancel) — generated as `cancel_request` helper
+  INFO         outside_contract           GET /v1/transfers (transferList) — not used
+  INFO         outside_contract           POST /v1/transfer-requirements (transferRequirementsValidate) — not used
+  INFO         outside_contract           POST /v2/profiles/{profileId}/third-party-transfers (transferThirdPartyCreate) — not used
+  INFO         outside_contract           GET /v1/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGetV1) — not used
+  INFO         outside_contract           GET /v2/profiles/{profileId}/third-party-transfers/{transferId} (transferThirdPartyGet) — not used
+  INFO         outside_contract           POST /v3/profiles/{profileId}/transfers/{transferId}/payments (transferFund) — not used
+  INFO         outside_contract           GET /v1/transfers/{transferId}/payments (transferPaymentsList) — not used
+  INFO         outside_contract           GET /v2/transfers/{transferId}/invoices/bankingpartner (transferPayoutInfoGet) — not used
+  … and 5 more (see --format json)
+Done: 22 warnings, 1 unsupported. Exit 0.

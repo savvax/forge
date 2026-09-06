@@ -66,7 +66,9 @@ module Forge
       def major(limit, unit, multiplier)
         return nil unless limit
 
-        unit == :minor ? limit / multiplier : limit
+        return limit unless unit == :minor
+
+        (limit % multiplier).zero? ? limit / multiplier : (limit.to_f / multiplier).round(2)
       end
 
       def expression(unit, field)
@@ -74,7 +76,7 @@ module Forge
         return "format('%.2f', operation.amount)" if field.type == 'string'
         return 'operation.amount.to_f.round(2)' if field.type == 'number'
 
-        'operation.amount'
+        'operation.amount.to_i' # integer в мажорных единицах: BigDecimal ушёл бы в JSON как "0.1e3"
       end
 
       def not_found

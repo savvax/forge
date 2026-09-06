@@ -60,7 +60,9 @@ module Forge
         overridden = plan.warnings.filter_map do |w|
           w.code == :override_applied && w.message[/\Afields\.(\S+) → .*source/, 1]
         end
-        volatile = plan.fields[:request].select { |m| m.source_expr.to_s.include?('idempotency_key') }
+        volatile = plan.fields[:request].select do |m|
+          m.source_expr.nil? || m.source_expr.to_s.include?('idempotency_key')
+        end
         (overridden + volatile.map { |m| m.path.join('.') }).map { |path| path.split('.') }
       end
 
