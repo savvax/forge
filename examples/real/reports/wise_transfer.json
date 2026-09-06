@@ -168,6 +168,7 @@
       "algorithm": "sha256",
       "encoding": "base64",
       "payload": "raw_body",
+      "scheme": "plain",
       "secret_key": "callback_secret"
     }
   },

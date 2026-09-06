@@ -31,14 +31,6 @@
       "outside_contract": true
     },
     {
-      "role": "webhook",
-      "method": "POST",
-      "path": "/v2/webhooks",
-      "operation_id": "create-webhook",
-      "confidence": 0.5,
-      "outside_contract": false
-    },
-    {
       "role": "balance",
       "method": "GET",
       "path": "/v2/balances",
@@ -155,22 +147,14 @@
     "retry_after_header": null
   },
   "webhook": {
-    "endpoint": {
-      "method": "post",
-      "path": "/v2/webhooks",
-      "operation_id": "create-webhook"
-    },
-    "source": "paths",
-    "event_field": "name",
+    "endpoint": null,
+    "source": null,
+    "event_field": null,
     "event_map": {},
     "id_field": null,
     "status_field": null,
     "signature": {
-      "header": null,
-      "algorithm": null,
-      "encoding": null,
-      "payload": null,
-      "secret_key": "callback_secret"
+      "header": null
     }
   },
   "amount": {
@@ -638,10 +622,10 @@
     },
     {
       "level": "warn",
-      "code": "low_confidence",
-      "message": "webhook: POST /v2/webhooks (create-webhook) scored 0.5",
+      "code": "webhook_rejected",
+      "message": "webhook: POST /v2/webhooks (create-webhook) scored 0.5 (below 0.6); not used",
       "pointer": "#/paths/~1v2~1webhooks/post",
-      "hint": "endpoints.create-webhook: webhook"
+      "hint": "endpoints.create-webhook: webhook  (overrides.yml) to force it"
     },
     {
       "level": "warn",
@@ -900,6 +884,13 @@
       "code": "outside_contract",
       "message": "GET /v2/webhooks (list-webhooks) — not used",
       "pointer": "#/paths/~1v2~1webhooks/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v2/webhooks (create-webhook) — not used",
+      "pointer": "#/paths/~1v2~1webhooks/post",
       "hint": null
     },
     {
@@ -1548,10 +1539,10 @@
     },
     {
       "level": "warn",
-      "code": "signature_not_found",
-      "message": "webhook has no signature header parameter; callbacks will not be verified",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
       "pointer": null,
-      "hint": "webhook.signature_header: <Header-Name>  (overrides.yml)"
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
     },
     {
       "level": "warn",

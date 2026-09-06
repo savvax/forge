@@ -32,15 +32,17 @@
     }
   ],
   "auth": {
-    "type": "bearer",
+    "type": "oauth2",
+    "scheme_name": "Oauth2",
     "header": "Authorization",
     "prefix": "Bearer",
-    "credential_key": "token",
+    "credential_key": "client_id",
     "credential_keys": [
-      "token"
+      "client_id",
+      "client_secret"
     ],
     "location": "header",
-    "scheme_name": "Oauth2"
+    "token_url": "/v1/oauth2/token"
   },
   "statuses": {
     "field_path": [
@@ -292,20 +294,6 @@
       "message": "GET /v1/payments/payouts-item/{payout_item_id} (payouts-item.get) — not used",
       "pointer": "#/paths/~1v1~1payments~1payouts-item~1{payout_item_id}/get",
       "hint": null
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2_alternative",
-      "message": "alternative security scheme 'Oauth2' (oauth2) is ignored",
-      "pointer": "#/components/securitySchemes/Oauth2",
-      "hint": "the first supported scheme is used"
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2",
-      "message": "security scheme 'Oauth2' (oauth2) is not supported; bearer token assumed",
-      "pointer": "#/components/securitySchemes/Oauth2",
-      "hint": "obtain the token out of band and put it into credentials.token"
     },
     {
       "level": "warn",

@@ -31,14 +31,6 @@
       "outside_contract": true
     },
     {
-      "role": "webhook",
-      "method": "POST",
-      "path": "/webhooks/{id}/retries",
-      "operation_id": "retryWebhook",
-      "confidence": 0.5,
-      "outside_contract": false
-    },
-    {
       "role": "balance",
       "method": "GET",
       "path": "/funding-sources/{id}/balance",
@@ -48,15 +40,17 @@
     }
   ],
   "auth": {
-    "type": "bearer",
+    "type": "oauth2",
+    "scheme_name": "clientCredentials",
     "header": "Authorization",
     "prefix": "Bearer",
-    "credential_key": "token",
+    "credential_key": "client_id",
     "credential_keys": [
-      "token"
+      "client_id",
+      "client_secret"
     ],
     "location": "header",
-    "scheme_name": "clientCredentials"
+    "token_url": "/token"
   },
   "statuses": {
     "field_path": [
@@ -139,22 +133,14 @@
     "retry_after_header": null
   },
   "webhook": {
-    "endpoint": {
-      "method": "post",
-      "path": "/webhooks/{id}/retries",
-      "operation_id": "retryWebhook"
-    },
-    "source": "paths",
+    "endpoint": null,
+    "source": null,
     "event_field": null,
     "event_map": {},
     "id_field": null,
     "status_field": null,
     "signature": {
-      "header": null,
-      "algorithm": null,
-      "encoding": null,
-      "payload": null,
-      "secret_key": "callback_secret"
+      "header": null
     }
   },
   "amount": {
@@ -460,10 +446,10 @@
     },
     {
       "level": "warn",
-      "code": "low_confidence",
-      "message": "webhook: POST /webhooks/{id}/retries (retryWebhook) scored 0.5",
+      "code": "webhook_rejected",
+      "message": "webhook: POST /webhooks/{id}/retries (retryWebhook) scored 0.5 (below 0.6); not used",
       "pointer": "#/paths/~1webhooks~1{id}~1retries/post",
-      "hint": "endpoints.retryWebhook: webhook"
+      "hint": "endpoints.retryWebhook: webhook  (overrides.yml) to force it"
     },
     {
       "level": "warn",
@@ -937,6 +923,13 @@
     {
       "level": "info",
       "code": "outside_contract",
+      "message": "POST /webhooks/{id}/retries (retryWebhook) — not used",
+      "pointer": "#/paths/~1webhooks~1{id}~1retries/post",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
       "message": "POST /sandbox-simulations (simulateBankTransferProcessing) — not used",
       "pointer": "#/paths/~1sandbox-simulations/post",
       "hint": null
@@ -1026,20 +1019,6 @@
       "hint": null
     },
     {
-      "level": "unsupported",
-      "code": "oauth2_alternative",
-      "message": "alternative security scheme 'clientCredentials' (oauth2) is ignored",
-      "pointer": "#/components/securitySchemes/clientCredentials",
-      "hint": "the first supported scheme is used"
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2",
-      "message": "security scheme 'clientCredentials' (oauth2) is not supported; bearer token assumed",
-      "pointer": "#/components/securitySchemes/clientCredentials",
-      "hint": "obtain the token out of band and put it into credentials.token"
-    },
-    {
       "level": "warn",
       "code": "status_field_not_found",
       "message": "no status field (enum or described) found in the response schema",
@@ -1048,10 +1027,10 @@
     },
     {
       "level": "warn",
-      "code": "signature_not_found",
-      "message": "webhook has no signature header parameter; callbacks will not be verified",
+      "code": "no_webhook",
+      "message": "no webhook endpoint, callbacks or webhooks found; process_callback will be a stub",
       "pointer": null,
-      "hint": "webhook.signature_header: <Header-Name>  (overrides.yml)"
+      "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
     },
     {
       "level": "warn",

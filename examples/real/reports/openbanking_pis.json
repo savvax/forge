@@ -24,15 +24,17 @@
     }
   ],
   "auth": {
-    "type": "bearer",
+    "type": "oauth2",
+    "scheme_name": "TPPOAuth2Security",
     "header": "Authorization",
     "prefix": "Bearer",
-    "credential_key": "token",
+    "credential_key": "client_id",
     "credential_keys": [
-      "token"
+      "client_id",
+      "client_secret"
     ],
     "location": "header",
-    "scheme_name": "TPPOAuth2Security"
+    "token_url": "https://authserver.example/token"
   },
   "statuses": {
     "field_path": [
@@ -1507,20 +1509,6 @@
       "message": "no cancel endpoint; cancel_request not generated",
       "pointer": null,
       "hint": null
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2_alternative",
-      "message": "alternative security scheme 'TPPOAuth2Security' (oauth2) is ignored",
-      "pointer": "#/components/securitySchemes/TPPOAuth2Security",
-      "hint": "the first supported scheme is used"
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2",
-      "message": "security scheme 'TPPOAuth2Security' (oauth2) is not supported; bearer token assumed",
-      "pointer": "#/components/securitySchemes/TPPOAuth2Security",
-      "hint": "obtain the token out of band and put it into credentials.token"
     },
     {
       "level": "warn",

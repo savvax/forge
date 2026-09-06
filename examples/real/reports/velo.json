@@ -33,22 +33,24 @@
     {
       "role": "webhook",
       "method": "POST",
-      "path": "/v1/webhooks",
-      "operation_id": "createWebhookV1",
-      "confidence": 0.5,
+      "path": "veloWebhookNotification",
+      "operation_id": "veloWebhook",
+      "confidence": 0.95,
       "outside_contract": false
     }
   ],
   "auth": {
-    "type": "bearer",
+    "type": "oauth2",
+    "scheme_name": "OAuth2",
     "header": "Authorization",
     "prefix": "Bearer",
-    "credential_key": "token",
+    "credential_key": "client_id",
     "credential_keys": [
-      "token"
+      "client_id",
+      "client_secret"
     ],
     "location": "header",
-    "scheme_name": "OAuth2"
+    "token_url": "https://api.sandbox.velopayments.com/v1/login"
   },
   "statuses": {
     "field_path": [
@@ -175,10 +177,10 @@
   "webhook": {
     "endpoint": {
       "method": "post",
-      "path": "/v1/webhooks",
-      "operation_id": "createWebhookV1"
+      "path": "veloWebhookNotification",
+      "operation_id": "veloWebhook"
     },
-    "source": "paths",
+    "source": "webhooks",
     "event_field": null,
     "event_map": {},
     "id_field": null,
@@ -188,6 +190,7 @@
       "algorithm": null,
       "encoding": null,
       "payload": null,
+      "scheme": null,
       "secret_key": "callback_secret"
     }
   },
@@ -403,10 +406,17 @@
     },
     {
       "level": "warn",
-      "code": "low_confidence",
-      "message": "webhook: POST /v1/webhooks (createWebhookV1) scored 0.5",
+      "code": "webhook_rejected",
+      "message": "webhook: POST /v1/webhooks (createWebhookV1) scored 0.5 (below 0.6); not used",
       "pointer": "#/paths/~1v1~1webhooks/post",
-      "hint": "endpoints.createWebhookV1: webhook"
+      "hint": "endpoints.createWebhookV1: webhook  (overrides.yml) to force it"
+    },
+    {
+      "level": "info",
+      "code": "webhook_source_webhooks",
+      "message": "webhook taken from webhooks: POST veloWebhookNotification (veloWebhook)",
+      "pointer": "#/x-webhooks/veloWebhookNotification/post",
+      "hint": null
     },
     {
       "level": "info",
@@ -567,6 +577,13 @@
       "code": "outside_contract",
       "message": "GET /v1/webhooks (listWebhooksV1) — not used",
       "pointer": "#/paths/~1v1~1webhooks/get",
+      "hint": null
+    },
+    {
+      "level": "info",
+      "code": "outside_contract",
+      "message": "POST /v1/webhooks (createWebhookV1) — not used",
+      "pointer": "#/paths/~1v1~1webhooks/post",
       "hint": null
     },
     {
@@ -1086,20 +1103,6 @@
       "message": "GET /v4/payments/deltas (listPaymentChangesV4) — not used",
       "pointer": "#/paths/~1v4~1payments~1deltas/get",
       "hint": null
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2_alternative",
-      "message": "alternative security scheme 'OAuth2' (oauth2) is ignored",
-      "pointer": "#/components/securitySchemes/OAuth2",
-      "hint": "the first supported scheme is used"
-    },
-    {
-      "level": "unsupported",
-      "code": "oauth2",
-      "message": "security scheme 'OAuth2' (oauth2) is not supported; bearer token assumed",
-      "pointer": "#/components/securitySchemes/OAuth2",
-      "hint": "obtain the token out of band and put it into credentials.token"
     },
     {
       "level": "warn",
