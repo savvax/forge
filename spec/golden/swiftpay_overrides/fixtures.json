@@ -163,8 +163,7 @@
     "endpoint": "GET /v1/accounts/balance",
     "response_200": {
       "available": "available_example",
-      "reserved": "reserved_example",
-      "status": "CREATED"
+      "reserved": "reserved_example"
     }
   }
 }

@@ -136,18 +136,23 @@ module Forge
       def success_example(schema, base)
         same = base && schema.ref_name && base[:ref] == schema.ref_name
         example = same ? base[:example] : Synth.example(schema, 'response')
-        with_known_status(example)
+        with_known_status(example, schema)
       end
 
       # Синтез даёт 'status_example'; подставляем первый статус провайдера из карты, чтобы сервис его распознал.
-      def with_known_status(example)
+      # Только если путь статуса есть в схеме этого ответа: cancel может возвращать {message, invoice: {…status}},
+      # и ложный status на верхнем уровне заставил бы сгенерированный spec ждать статус, которого хелпер не отдаёт.
+      def with_known_status(example, schema)
         path = @f[:statuses].value[:response_status_path]
         raw = @p[:status_map].keys.first
-        return example unless raw && path && !path.empty? && example.is_a?(Hash)
-
+        return example unless raw && path && !path.empty? && example.is_a?(Hash) && schema_path?(schema, path)
         return example unless placeholder?(dig(example, path))
 
         set_path(Marshal.load(Marshal.dump(example)), path, raw)
+      end
+
+      def schema_path?(schema, path)
+        !path.reduce(schema) { |node, key| node && (key.is_a?(Integer) ? node.items : node.properties&.[](key)) }.nil?
       end
 
       def placeholder?(value) = value.nil? || (value.is_a?(String) && value.end_with?('_example'))

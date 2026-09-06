@@ -37,6 +37,33 @@ RSpec.describe Forge::Renderers do
       expect(ours['fetch_status']).to include('response_200' => hash_including('status' => 'completed'),
                                               'expected_operation_status' => 'approved')
     end
+
+    it 'injects the known status only where the response schema has the status path (balance, wrapped cancel)' do
+      ours = JSON.parse(described_class.new(plan).render)
+      expect(ours.dig('balance', 'response_200')).not_to have_key('status')
+      wrapped = JSON.parse(described_class.new(plan_for_hash(wrapped_cancel_spec)).render)
+      expect(wrapped.dig('cancel', 'response_200')).to include('invoice' => hash_including('status' => 'pending'))
+      expect(wrapped.dig('cancel', 'response_200')).not_to have_key('status')
+    end
+
+    # Статус живёт в Invoice; cancel отвечает обёрткой {message, invoice} — статуса на верхнем уровне нет.
+    def wrapped_cancel_spec
+      id = { 'name' => 'id', 'in' => 'path', 'required' => true, 'schema' => { 'type' => 'string' } }
+      invoice = { '$ref' => '#/components/schemas/Invoice' }
+      json = ->(schema) { { 'description' => 'ok', 'content' => { 'application/json' => { 'schema' => schema } } } }
+      create = { 'operationId' => 'createPayout', 'requestBody' => body_json({ 'amount' => { 'type' => 'integer' } }),
+                 'responses' => { '201' => json.call(invoice) } }
+      status = { 'operationId' => 'getPayout', 'parameters' => [id], 'responses' => { '200' => json.call(invoice) } }
+      cancel = { 'operationId' => 'cancelPayout', 'parameters' => [id],
+                 'responses' => { '200' => json.call({ 'type' => 'object', 'properties' => {
+                                                       'message' => { 'type' => 'string' }, 'invoice' => invoice
+                                                     } }) } }
+      schema = { 'type' => 'object', 'properties' => { 'id' => { 'type' => 'string' },
+                                                       'status' => { 'type' => 'string',
+                                                                     'enum' => %w[pending paid] } } }
+      build_spec(paths: { '/payouts' => { 'post' => create }, '/payouts/{id}' => { 'get' => status },
+                          '/payouts/{id}/cancel' => { 'post' => cancel } }, schemas: { 'Invoice' => schema })
+    end
   end
 
   describe Forge::Renderers::ServiceSpec do
