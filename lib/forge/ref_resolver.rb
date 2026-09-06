@@ -36,7 +36,7 @@ module Forge
     end
 
     def deref(ref, pointer)
-      return { 'x-forge-unresolved' => ref } unless ref.start_with?('#/')
+      return { 'x-forge-unresolved' => ref.to_s } unless ref.is_a?(String) && ref.start_with?('#/')
       return circular(ref) if @stack.include?(ref)
 
       annotate(resolved(ref, pointer), ref)

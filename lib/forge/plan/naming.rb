@@ -11,8 +11,11 @@ module Forge
 
       module_function
 
+      # Имя файла/класса: ≤ 60 символов, не начинается с цифры, мусор («!!!») → provider.
       def from_provider(provider)
-        name = provider.strip.downcase.gsub(/[^a-z0-9]+/, '_').delete_prefix('_').delete_suffix('_')
+        name = provider.to_s.strip.downcase.gsub(/[^a-z0-9]+/, '_')[0, 60].delete_prefix('_').delete_suffix('_')
+        name = "p#{name}" if name.match?(/\A\d/)
+        name = 'provider' if name.empty?
         { name: name, class_name: "#{camelize(name)}Service", env_prefix: name.upcase, file_name: "#{name}_service.rb",
           title: provider }
       end

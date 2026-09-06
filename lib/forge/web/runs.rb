@@ -46,7 +46,13 @@ module Forge
       def spec_path = meta['spec']
       def spec_name = meta['spec_name'] || File.basename(spec_path.to_s)
       def files = Dir[File.join(out_dir, '*')].map { |f| File.basename(f) }
-      def file(name) = (path = File.join(out_dir, File.basename(name))) && File.file?(path) ? path : nil
+
+      def file(name)
+        path = File.join(out_dir, File.basename(name.to_s))
+        File.file?(path) ? path : nil
+      rescue ArgumentError # null byte in the name
+        nil
+      end
 
       def report
         text = read('out/report.txt')
@@ -91,6 +97,11 @@ module Forge
 
       def exec_step(name)
         cmd = name == :spec ? spec_command : e2e_command
+        unless cmd
+          return File.write(File.join(@dir, "#{name}.log"),
+                            "no generated spec: generation failed, nothing to run\n")
+        end
+
         out, status = Open3.capture2e(*cmd, chdir: project_root)
         File.write(File.join(@dir, "#{name}.log"), "$ #{cmd.join(' ')}\n#{out}\n[exit #{status.exitstatus}]\n")
       end
@@ -129,16 +140,18 @@ module Forge
                 "#{kind}: file too large (max #{MAX_SPEC_BYTES / 1024 / 1024} MB)"
         end
 
-        ext = File.extname(name)
+        ext = name[/\.(ya?ml|json)\z/i].to_s.downcase # только известные расширения; иначе Loader пробует оба формата
         path = File.join(@dir, 'input', "#{kind}#{ext.empty? ? '.yaml' : ext}")
         File.write(path, data)
         path
       end
 
+      # Параметры формы могут прийти любого типа (curl, чужой клиент): не-файл, массив, hash — как пустые.
       def upload_source(upload, text, example, kind)
-        return [upload[:tempfile].read, upload[:filename]] if upload.respond_to?(:[]) && upload[:tempfile]
-        return [text, "#{kind}.yaml"] unless text.to_s.strip.empty?
-        return [File.read(example_path(example)), File.basename(example)] unless example.to_s.empty?
+        file = upload.is_a?(Hash) ? upload[:tempfile] : nil
+        return [file.read, upload[:filename].to_s] if file.respond_to?(:read)
+        return [text, "#{kind}.yaml"] if text.is_a?(String) && !text.strip.empty?
+        return [File.read(example_path(example)), File.basename(example)] if example.is_a?(String) && !example.empty?
 
         nil
       end
@@ -164,7 +177,7 @@ module Forge
 
       def spec_command
         spec = Dir[File.join(out_dir, '*_service_spec.rb')].first
-        ['bundle', 'exec', 'rspec', '--options', '/dev/null', '-I', 'lib', '-I', out_dir, spec.to_s]
+        spec && ['bundle', 'exec', 'rspec', '--options', '/dev/null', '-I', 'lib', '-I', out_dir, spec]
       end
 
       def e2e_command

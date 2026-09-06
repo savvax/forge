@@ -9,18 +9,32 @@ module Forge
     STRICT_EXIT = 4
 
     def self.analyze(opts)
-      spec = IR::Builder.build(Loader.load(opts[:spec]), source_path: opts[:spec])
-      overrides = opts[:overrides] && Plan::Overrides.load(opts[:overrides])
-      findings = Analyzers::Runner.run(spec, rules: Rules.load, include_paths: Array(opts[:include_paths]).flatten,
-                                             overrides: overrides)
-      [spec, findings, overrides]
+      guard do
+        spec = IR::Builder.build(Loader.load(opts[:spec]), source_path: opts[:spec])
+        overrides = opts[:overrides] && Plan::Overrides.load(opts[:overrides])
+        findings = Analyzers::Runner.run(spec, rules: Rules.load, include_paths: Array(opts[:include_paths]).flatten,
+                                               overrides: overrides)
+        [spec, findings, overrides]
+      end
+    end
+
+    # Единственная сетка для CLI и веба: всё, что не Forge::Error, становится InternalError (exit 2) с подсказкой.
+    def self.guard
+      yield
+    rescue Forge::Error
+      raise
+    rescue StandardError, SystemStackError => e
+      raise InternalError.new("internal error: #{e.class}: #{e.message.lines.first.to_s.strip[0, 200]}",
+                              hint: 'unexpected document structure; rerun with --debug and report the spec')
     end
 
     def initialize(opts)
       @opts = opts
     end
 
-    def run
+    def run = self.class.guard { run! }
+
+    def run!
       spec, findings, overrides = self.class.analyze(@opts)
       plan = Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
       files = Renderers::Runner.render(plan, out_dir: @opts[:out], templates_dir: @opts[:templates_dir],
@@ -55,8 +69,10 @@ module Forge
     end
 
     def build_plan
-      spec, findings, overrides = self.class.analyze(@opts)
-      Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
+      self.class.guard do
+        spec, findings, overrides = self.class.analyze(@opts)
+        Plan::Builder.build(spec, findings, overrides: overrides, provider_name: @opts[:provider])
+      end
     end
 
     private

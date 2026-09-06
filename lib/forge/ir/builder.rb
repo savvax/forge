@@ -66,16 +66,25 @@ module Forge
         paths.to_h.flat_map { |path, item| operations(item, "#{pointer}/#{escape(path)}", path, source) }
       end
 
+      # `null` у path item / операции (черновик «post:») = пустой объект.
       def operations(item, pointer, path, source)
-        shared = Array(item['parameters'])
+        item = item.to_h
         item.slice(*HTTP_METHODS).map do |method, op|
-          params = (shared + Array(op['parameters'])).uniq { |p| [p['name'], p['in']] }
-          Endpoint.new(operation_id: op['operationId'], method: method, path: path, summary: op['summary'],
-                       description: op['description'], tags: op['tags'], security: op['security'],
-                       parameters: params.map { |p| parameter(p) }, request_body: request_body(op['requestBody']),
-                       responses: responses(op['responses']), callbacks: op['callbacks'],
-                       pointer: "#{pointer}/#{method}", source: source)
+          endpoint(op.to_h, parameters(item, op.to_h), method: method, path: path, source: source,
+                                                       pointer: "#{pointer}/#{method}")
         end
+      end
+
+      def parameters(item, operation)
+        (Array(item['parameters']) + Array(operation['parameters'])).uniq { |p| [p['name'], p['in']] }
+                                                                    .map { |p| parameter(p) }
+      end
+
+      def endpoint(operation, params, **where)
+        Endpoint.new(operation_id: operation['operationId'], summary: operation['summary'],
+                     description: operation['description'], tags: operation['tags'], security: operation['security'],
+                     parameters: params, request_body: request_body(operation['requestBody']),
+                     responses: responses(operation['responses']), callbacks: operation['callbacks'], **where)
       end
 
       def parameter(param)

@@ -72,6 +72,42 @@ RSpec.describe Forge::Web::App do
     expect(client.get('/runs/../x/files/a').status).to eq(404)
   end
 
+  it 'never answers 500 to malformed form params (wrong types, null bytes, overlong names)' do
+    forms = [{ 'spec' => 'hello' }, { 'spec' => %w[a b] }, { 'spec' => { 'tempfile' => 'x', 'filename' => 'y' } },
+             { 'spec_text' => %w[a b] }, { 'spec_text' => { 'a' => 'b' } }, { 'example' => %w[examples/specs/x.yaml] },
+             { 'example' => { 'a' => 'b' } }, { 'example' => 'examples/specs/novapay.yaml', 'overrides' => 'x' },
+             { 'example' => 'examples/specs/novapay.yaml', 'overrides_example' => ['a'] }]
+    forms.each do |form|
+      res = client.post('/runs', params: form)
+      expect([200, 303]).to include(res.status), "#{form.inspect}: #{res.status} #{res.body[0, 200]}"
+    end
+    id = create_run('provider' => 'a' * 300, 'verify' => '0')
+    expect(client.get("/runs/#{id}").body).to include("#{'a' * 60}_service.rb")
+    expect(client.get("/runs/#{id}/files/%00").status).to eq(404)
+  end
+
+  it 'shows a Forge error page, not a stacktrace, for a spec that breaks the pipeline' do
+    text = "openapi: 3.0.3\ninfo: {title: X, version: '1'}\npaths:\n  /p:\n    post:\n      responses: nope\n"
+    id = create_run('example' => '', 'spec_text' => text)
+    page = client.get("/runs/#{id}").body
+    expect(page).to include('expected object, got string at #/paths/~1p/post/responses', 'exit-1')
+    expect(page).not_to include('.rb:')
+  end
+
+  it 'renders the generic error page instead of Sinatra 500 on an unexpected exception' do
+    allow(Forge::Web::Runs).to receive(:recent).and_raise(Errno::EACCES, 'tmp')
+    res = client.get('/', 'rack.errors' => StringIO.new)
+    expect(res.status).to eq(500)
+    expect(res.body).to include('unexpected error', 'Permission denied')
+    expect(res.body).not_to include('Internal Server Error')
+  end
+
+  it 'skips the rspec step with a readable log when generation produced no spec' do
+    id = create_run('example' => '', 'spec_text' => "openapi: 3.0.3\ninfo: {title: X, version: '1'}\npaths: {}\n")
+    expect(client.post("/runs/#{id}/spec").status).to eq(303)
+    expect(Forge::Web::Runs.new(id).step_output('spec')).to include('no generated spec')
+  end
+
   it 'deletes a run' do
     id = create_run('verify' => '0')
     expect(client.post("/runs/#{id}/delete").status).to eq(303)

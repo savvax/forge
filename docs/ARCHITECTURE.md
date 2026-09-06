@@ -221,6 +221,7 @@ module Forge
   class SpecError < Error; end          # exit 1
   class UnsupportedError < Error; end   # exit 1, если фатально; иначе превращается в Warning(:unsupported)
   class GenerationError < Error; end    # exit 2
+  class InternalError < GenerationError; end  # exit 2: любое неожиданное исключение конвейера (GenerateCommand.guard)
   class VerificationError < Error; end  # exit 3
 end
 ```

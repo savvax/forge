@@ -4,6 +4,7 @@ require 'date'
 require 'json'
 require 'yaml'
 require_relative 'ref_resolver'
+require_relative 'shape'
 
 module Forge
   # Файл → Hash: парсинг YAML/JSON, базовые проверки OpenAPI 3, server variables, резолв `$ref`.
@@ -15,11 +16,16 @@ module Forge
       @path = path
     end
 
+    # Порядок: форма проверяется после резолва $ref (ссылка может вести на скаляр), серверы подставляются последними.
     def load
-      spec = parse(read)
+      spec = stringify(parse(read))
       validate(spec)
+      spec = RefResolver.resolve(spec, file: @path)
+      Shape.check!(spec, file: @path)
       substitute_servers(spec)
-      RefResolver.resolve(spec, file: @path)
+      spec
+    rescue SystemStackError
+      raise error('document nested too deep', 'flatten the structure; forge walks the document recursively')
     end
 
     private
@@ -28,6 +34,8 @@ module Forge
       File.read(@path)
     rescue Errno::ENOENT
       raise SpecError.new('file not found', file: @path, hint: 'check the --spec path')
+    rescue SystemCallError => e
+      raise SpecError.new("cannot read file: #{e.message}", file: @path, hint: 'pass a readable YAML/JSON file')
     end
 
     def parse(text)
@@ -40,8 +48,17 @@ module Forge
       raise error('root must be an object', 'top level must be an OpenAPI document (mapping)') unless doc.is_a?(Hash)
 
       doc
-    rescue JSON::ParserError, Psych::SyntaxError => e
+    rescue JSON::ParserError, Psych::Exception => e
       raise error("cannot parse: #{e.message.lines.first&.strip}", 'the file must be valid YAML or JSON')
+    end
+
+    # YAML допускает ключи-числа (`200:`), null и даты; дальше по конвейеру ключи — только строки.
+    def stringify(node)
+      case node
+      when Hash then node.to_h { |k, v| [k.to_s, stringify(v)] }
+      when Array then node.map { |v| stringify(v) }
+      else node
+      end
     end
 
     def parse_yaml(text) = YAML.safe_load(text, permitted_classes: [Date, Time], aliases: true)
@@ -89,7 +106,7 @@ module Forge
     def substitute_servers(spec)
       Array(spec['servers']).each do |server|
         vars = server['variables']
-        next unless vars.is_a?(Hash) && server['url']
+        next unless vars.is_a?(Hash) && server['url'].is_a?(String)
 
         alternatives = expand(server['url'], vars)
         server['url'] = alternatives.shift

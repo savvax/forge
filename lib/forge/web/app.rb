@@ -87,7 +87,17 @@ module Forge
 
       error Forge::Error do
         @error = env['sinatra.error'].message
+        @runs = Runs.recent(10)
         status 422
+        erb :index
+      end
+
+      # Последняя сетка: вместо страницы «Internal Server Error» — форма с текстом ошибки (без стектрейса).
+      error do
+        e = env['sinatra.error']
+        @error = "unexpected error: #{e.class}: #{e.message.lines.first.to_s.strip[0, 300]}"
+        @runs = []
+        status 500
         erb :index
       end
 

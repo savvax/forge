@@ -28,7 +28,7 @@ module Forge
                                                           hint: 'check the --overrides path')
         end
 
-        hash = YAML.safe_load_file(path) || {}
+        hash = parse(path)
         unless hash.is_a?(Hash)
           raise SpecError.new('overrides must be a mapping', file: path,
                                                              hint: 'see docs/RULES.md § 9')
@@ -38,10 +38,20 @@ module Forge
         hash
       end
 
+      def parse(path)
+        YAML.safe_load_file(path) || {}
+      rescue Psych::Exception => e
+        raise SpecError.new("cannot parse: #{e.message.lines.first&.strip}", file: path,
+                                                                             hint: 'overrides.yml must be valid YAML')
+      end
+
       def validate!(hash, file)
         hash.each do |key, value|
           allowed = SCHEMA[key] || unknown!(key, SCHEMA.keys, file, '')
-          next if allowed == :any || !value.is_a?(Hash)
+          next if value.nil?
+
+          must!(value.is_a?(Hash), "overrides key '#{key}' must be a mapping", file)
+          next if allowed == :any
 
           allowed == :fields ? validate_fields!(value, file) : validate_keys!(value, allowed, file, "#{key}.")
         end
@@ -52,11 +62,22 @@ module Forge
           next unless rules.is_a?(Hash)
 
           validate_keys!(rules, FIELD_KEYS, file, "fields.#{path}.")
+          cond = rules['required_if']
+          must!(cond.nil? || cond.is_a?(Hash), "'fields.#{path}.required_if' must be a mapping {field, equals}", file)
         end
       end
 
       def validate_keys!(hash, allowed, file, prefix)
         hash.each_key { |k| unknown!(k, allowed, file, prefix) unless allowed.include?(k.to_s) }
+        return unless prefix == 'amount.'
+
+        %w[multiplier minimum_major].each do |k|
+          must!(hash[k].nil? || hash[k].is_a?(Numeric), "'amount.#{k}' must be a number", file)
+        end
+      end
+
+      def must!(condition, message, file)
+        raise SpecError.new(message, file: file, hint: 'see docs/RULES.md § 9') unless condition
       end
 
       def unknown!(key, allowed, file, prefix)

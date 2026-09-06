@@ -33,6 +33,9 @@ module Forge
     def self.exit_code = 2
   end
 
+  # Любое неожиданное исключение конвейера (баг на редкой структуре): без стектрейса, `cause` для --debug.
+  class InternalError < GenerationError; end
+
   class VerificationError < Error
     def self.exit_code = 3
   end

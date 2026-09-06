@@ -175,6 +175,29 @@ negative words `calculate, estimate, validate, preview, link, links, methods`; b
 выплаты, берутся из `credentials.<param>` (сервис, сгенерированный spec, фикстуры и INTEGRATION.md согласованы; WARN `path_params_from_credentials`).
 Корпус из 12 спек: роли и confidence не изменились.
 
+### D-28 · Ввод пользователя не роняет ни CLI, ни веб (Shape + guard)
+Контекст: фаззинг веба (170 враждебных спек/overrides/параметров формы) дал 48 падений с 500: конвейер
+доверял форме документа (`responses: nope`, `parameters: {a: 1}`, `properties: [a]`, `$ref: 5`, `info: null`),
+Psych-исключения кроме `SyntaxError` (`!ruby/object`, неизвестный alias, стек на 3000 уровнях) выходили из
+Loader и Overrides, параметры формы не того типа (`spec=hello`, массивы) и null-byte в имени файла ломали `Runs`,
+имя провайдера в 300 символов давало `ENAMETOOLONG`.
+Решение (четыре сетки, ни одной точечной заплатки в анализаторах):
+1. `Forge::Shape` — проверка контейнеров после резолва `$ref` (не валидатор OpenAPI: только то, без чего IR и
+   анализаторы падают). Нарушение → `SpecError` «expected object, got string at #/paths/~1p/post/responses».
+   `null` у ключа = ключа нет (черновики `post:`), `null` в массиве — ошибка; `x-*` не проверяются; память по
+   identity, иначе Stripe (общие цели `$ref`) обходится экспоненциально (6 минут вместо 0.5 с).
+   Ключи документа приводятся к строкам (`200:`), не-строковый `$ref` → `x-forge-unresolved`.
+2. `GenerateCommand.guard` — единственная сетка для CLI и веба: всё, что не `Forge::Error`, становится
+   `InternalError` (exit 2) с подсказкой; `cause` сохраняется для `--debug`.
+3. Loader/Overrides ловят `Psych::Exception` и `SystemStackError` («document nested too deep»), ошибки чтения
+   (каталог вместо файла) → `SpecError`. Overrides проверяют типы секций и значений (`amount.multiplier` число,
+   `required_if` — mapping).
+4. Веб: параметры формы любого типа трактуются как пустые, null-byte в имени файла → 404, общий `error`
+   рендерит форму с текстом ошибки вместо страницы Sinatra; имя провайдера ≤ 60 символов, не с цифры.
+Отклонено: чинить каждое место в анализаторах (46 точек, и фаззинг не покрывает всё) и молча выбрасывать
+битые узлы (противоречит «не угадывать молча»). Alias-бомба YAML не ограничена (20 МБ на файл, `aliases: true`
+нужен реальным спекам) — известный предел.
+
 ## Реальные спеки (T18 записывает сюда падения и странности)
 
 Прогон 4.09 (`rake real`): 7/7 спек — exit 0, снапшоты в `examples/real/reports/`. Что вскрылось и что сделано:
