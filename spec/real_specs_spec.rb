@@ -32,7 +32,7 @@ RSpec.describe 'real provider specs', :real do
                              cancel: 'cancel_an_account_transfer' } },
     'mollie' => { flags: [], exit: 0, auth: 'bearer', warns: %w[unmapped_status],
                   roles: { create: 'create-payout', status: 'get-payout', cancel: 'cancel-payout' } },
-    'dwolla' => { flags: [], exit: 0, auth: 'bearer', warns: %w[signature_not_found],
+    'dwolla' => { flags: [], exit: 0, auth: 'bearer', warns: %w[webhook_rejected no_webhook],
                   roles: { create: 'initiateTransfer', status: 'getTransfer', cancel: 'cancelTransfer' } },
     'wise_transfer' => { flags: [], exit: 0, auth: 'bearer', warns: %w[webhook_source_webhooks],
                          roles: { create: 'transferCreate', status: 'transferGet',

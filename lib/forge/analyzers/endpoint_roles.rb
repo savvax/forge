@@ -31,11 +31,14 @@ module Forge
       def assign(candidates)
         groups = best_roles(candidates).group_by { |(_endpoint, role, _score)| role }
         create = groups.key?(:create) ? pick_winner(:create, groups.delete(:create)) : nil
-        winners = groups.filter_map do |role, group|
-          related = group.select { |(endpoint, _role, _score)| related?(endpoint, role, create) }
-          [role, pick_winner(role, related, base: resource_of(create))] unless related.empty?
-        end
+        winners = groups.filter_map { |role, group| winner_for(role, group, create) }
         create ? { create: create }.merge(winners.to_h) : winners.to_h
+      end
+
+      def winner_for(role, group, create)
+        related = group.select { |(endpoint, _role, _score)| related?(endpoint, role, create) }
+        winner = related.empty? ? nil : pick_winner(role, related, base: resource_of(create))
+        [role, winner] if winner
       end
 
       # Путь create-эндпоинта без {параметров}: /v2/payouts — ресурс выплат для tie-break и related?.
@@ -65,8 +68,20 @@ module Forge
           [-score, base && ep.path.start_with?(base) ? 0 : 1, ep.path.count('/'), index]
         end
         losers.each { |(endpoint, _role, score)| conflict(endpoint, role, winner, score) }
+        return rejected(winner[0], role, winner[2]) if winner[2] < min_confidence(role)
+
         low_confidence(winner[0], role, winner[2])
         [winner[0], winner[2]]
+      end
+
+      # roles.<role>.min_confidence — ниже роль не назначается (webhook: слово в пути + POST ≠ callback).
+      def min_confidence(role) = rules.fetch(:endpoint_roles).dig('roles', role.to_s, 'min_confidence') || 0.0
+
+      def rejected(endpoint, role, score)
+        message = "#{role}: #{label(endpoint)} scored #{score} (below #{min_confidence(role)}); not used"
+        warn(:"#{role}_rejected", message, pointer: endpoint.pointer,
+                                           hint: "endpoints.#{name(endpoint)}: #{role}  (overrides.yml) to force it")
+        nil
       end
 
       def scores(endpoint)

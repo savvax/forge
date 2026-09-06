@@ -53,7 +53,7 @@ Found 100 endpoints: POST /v1/authenticate, GET /v1/deltas/fundings, GET /v1/del
   create   POST /v3/payouts                           submitPayoutV3           confidence 0.95
   status   GET /v3/payouts/{payoutId}                 getPayoutSummaryV3       confidence 0.90
   cancel   DELETE /v3/payouts/{payoutId}              withdrawPayoutV3         confidence 0.75   (outside contract → cancel_request)
-  webhook  POST /v1/webhooks                          createWebhookV1          confidence 0.50
+  webhook  POST veloWebhookNotification               veloWebhook              confidence 0.95
 Auth: OAuth2 (bearer, header: Authorization) → credentials.token
 Statuses (status): not found
 Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
@@ -93,7 +93,8 @@ Unsupported (2):
         hint: the first supported scheme is used
   UNSUPPORTED  oauth2                     security scheme 'OAuth2' (oauth2) is not supported; bearer token assumed
         hint: obtain the token out of band and put it into credentials.token
-Info (97):
+Info (99):
+  INFO         webhook_source_webhooks    webhook taken from webhooks: POST veloWebhookNotification (veloWebhook)
   INFO         outside_contract           DELETE /v3/payouts/{payoutId} (withdrawPayoutV3) — generated as `cancel_request` helper
   INFO         outside_contract           POST /v1/authenticate (veloAuth) — not used
   INFO         outside_contract           GET /v1/deltas/fundings (listFundingAuditDeltas) — not used
@@ -103,6 +104,5 @@ Info (97):
   INFO         outside_contract           POST /v1/password/reset (resetPassword) — not used
   INFO         outside_contract           GET /v1/paymentChannelRules (listPaymentChannelRulesV1) — not used
   INFO         outside_contract           GET /v1/paymentaudit/fundings (getFundingsV1) — not used
-  INFO         outside_contract           GET /v1/paymentaudit/payoutStatistics (getPayoutStatsV1) — not used
-  … and 87 more (see --format json)
+  … and 89 more (see --format json)
 Done: 28 warnings, 2 unsupported. Exit 0.

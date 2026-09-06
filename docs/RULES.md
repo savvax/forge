@@ -79,6 +79,8 @@ roles:
       signature_header_param: 0.20   # header-параметр с sign/signature/hmac/digest в имени
       method_post: 0.10
     explicit_sources_confidence: 0.95  # найден через callbacks или top-level webhooks
+    min_confidence: 0.6                # слово в пути + POST (0.5) — управление подписками (POST /v1/webhook_endpoints), не callback:
+                                       # роль не назначается, WARN webhook_rejected с подсказкой endpoints.<operationId>: webhook
   balance:
     signals:
       balance_word_in_path: 0.50     # balance, balances, account, wallet, funds

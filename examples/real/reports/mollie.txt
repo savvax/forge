@@ -84,7 +84,6 @@ Found 128 endpoints: POST /oauth2/tokens, DELETE /oauth2/tokens, GET /v2/balance
   create   POST /v2/payouts                           create-payout            confidence 0.95
   status   GET /v2/payouts/{payoutId}                 get-payout               confidence 0.90
   cancel   DELETE /v2/payouts/{payoutId}              cancel-payout            confidence 0.85   (outside contract → cancel_request)
-  webhook  POST /v2/webhooks                          create-webhook           confidence 0.50
   balance  GET /v2/balances                           list-balances            confidence 0.85   (outside contract → fetch_balance)
 Auth: apiKey (bearer, header: Authorization) → credentials.token
 Statuses (status): initiated → in_progress; completed → approved; failed, canceled → rejected; unmapped: requested, processing-at-bank
@@ -92,8 +91,7 @@ Errors: 404 (status) Not Found → reject; 404 (cancel) Not Found → reject; 40
         422 Unprocessable Entity → reject; 429 (create) Too Many Requests → retry_backoff;
         429 (status) Too Many Requests → retry_backoff;
         429 (cancel) Too Many Requests → retry_backoff
-Webhook signature: not found (callbacks are not verified)
-Webhook events: name → no known event values or status field
+Webhook signature: no webhook found
 Amount: string, major units (×100) — source: amount.value (string) → major units: 'A string containing an exact monetary amount in the given currency.'
 Fields: 19 request fields, 15 unmapped
 Warnings (35):
@@ -121,7 +119,7 @@ Warnings (35):
 Unsupported (1):
   UNSUPPORTED  http_alternative           alternative security scheme 'advancedAccessToken' (http) is ignored
         hint: the first supported scheme is used
-Info (125):
+Info (126):
   INFO         outside_contract           DELETE /v2/payouts/{payoutId} (cancel-payout) — generated as `cancel_request` helper
   INFO         outside_contract           GET /v2/balances (list-balances) — generated as `fetch_balance` helper
   INFO         outside_contract           POST /oauth2/tokens (oauth-generate-tokens) — not used
@@ -132,5 +130,5 @@ Info (125):
   INFO         outside_contract           GET /v2/balances/{balanceId}/transactions (list-balance-transactions) — not used
   INFO         outside_contract           GET /v2/settlements (list-settlements) — not used
   INFO         outside_contract           GET /v2/settlements/{settlementId} (get-settlement) — not used
-  … and 115 more (see --format json)
+  … and 116 more (see --format json)
 Done: 35 warnings, 1 unsupported. Exit 0.

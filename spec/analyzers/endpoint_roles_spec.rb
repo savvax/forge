@@ -126,6 +126,13 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       expect(finding).to have_warning(:low_confidence, hint: /endpoints\.getPayment: status/)
     end
 
+    it 'does not assign a webhook below accept (Stripe: POST /v1/webhook_endpoints is management, not a callback)' do
+      paths = post_op('/v1/payouts', 'PostPayouts').merge(post_op('/v1/webhook_endpoints', 'PostWebhookEndpoints'))
+      finding = described_class.new(ir_for(build_spec(paths: paths)), rules).call
+      expect(finding.value[:webhook]).to be_nil
+      expect(finding).to have_warning(:webhook_rejected, hint: /endpoints\.PostWebhookEndpoints: webhook/)
+    end
+
     it 'counts payment as a payout word when the spec has no stronger one' do
       finding = described_class.new(ir_for(build_spec(paths: post_op('/v1/payments', 'createPayment'))), rules).call
       expect(finding.value[:confidences][:create]).to eq(0.95)

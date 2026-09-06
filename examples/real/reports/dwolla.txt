@@ -39,15 +39,13 @@ Found 82 endpoints: POST /token, GET /, GET /accounts/{id}, POST /funding-source
   create   POST /transfers                            initiateTransfer         confidence 0.95
   status   GET /transfers/{id}                        getTransfer              confidence 0.90
   cancel   POST /transfers/{id}                       cancelTransfer           confidence 0.65   (outside contract → cancel_request)
-  webhook  POST /webhooks/{id}/retries                retryWebhook             confidence 0.50
   balance  GET /funding-sources/{id}/balance          getFundingSourceBalance  confidence 0.75   (outside contract → fetch_balance)
 Auth: clientCredentials (bearer, header: Authorization) → credentials.token
 Statuses (status): not found
 Errors: 400 (create) validation_error → reject; 400 (cancel) validation_error → reject;
         403 forbidden → alert_block; 404 (status) not_found → reject;
         404 (cancel) not_found → reject; 429 rate_limit → retry_backoff
-Webhook signature: not found (callbacks are not verified)
-Webhook events: no event field → no known event values or status field
+Webhook signature: no webhook found
 Amount: string, major units (×100) — source: amount.value (string) → major units
 Fields: 13 request fields, 9 unmapped (_links.destination: bank_account)
 Warnings (22):
@@ -63,21 +61,21 @@ Warnings (22):
         hint: endpoints.cancelTransfer: cancel
   WARN         low_confidence             balance: GET /funding-sources/{id}/balance (getFundingSourceBalance) scored 0.75
         hint: endpoints.getFundingSourceBalance: balance
-  WARN         low_confidence             webhook: POST /webhooks/{id}/retries (retryWebhook) scored 0.5
-        hint: endpoints.retryWebhook: webhook
+  WARN         webhook_rejected           webhook: POST /webhooks/{id}/retries (retryWebhook) scored 0.5 (below 0.6); not used
+        hint: endpoints.retryWebhook: webhook  (overrides.yml) to force it
   WARN         production_default         no sandbox server; default BASE_URL is production (https://api.dwolla.com)
         hint: base_url.default: <sandbox url>  (overrides.yml)
   WARN         status_field_not_found     no status field (enum or described) found in the response schema
         hint: statuses.field: <path>  (overrides.yml)
-  WARN         signature_not_found        webhook has no signature header parameter; callbacks will not be verified
-        hint: webhook.signature_header: <Header-Name>  (overrides.yml)
+  WARN         no_webhook                 no webhook endpoint, callbacks or webhooks found; process_callback will be a stub
+        hint: endpoints.<operationId>: webhook  (overrides.yml)
   … and 12 more (see --format json)
 Unsupported (2):
   UNSUPPORTED  oauth2_alternative         alternative security scheme 'clientCredentials' (oauth2) is ignored
         hint: the first supported scheme is used
   UNSUPPORTED  oauth2                     security scheme 'clientCredentials' (oauth2) is not supported; bearer token assumed
         hint: obtain the token out of band and put it into credentials.token
-Info (79):
+Info (80):
   INFO         outside_contract           POST /transfers/{id} (cancelTransfer) — generated as `cancel_request` helper
   INFO         outside_contract           GET /funding-sources/{id}/balance (getFundingSourceBalance) — generated as `fetch_balance` helper
   INFO         outside_contract           POST /token (createApplicationAccessToken) — not used
@@ -88,5 +86,5 @@ Info (79):
   INFO         outside_contract           GET /accounts/{id}/transfers (listAndSearchTransfers) — not used
   INFO         outside_contract           GET /accounts/{id}/mass-payments (listMassPayments) — not used
   INFO         outside_contract           GET /customers (listAndSearchCustomers) — not used
-  … and 69 more (see --format json)
+  … and 70 more (see --format json)
 Done: 22 warnings, 2 unsupported. Exit 0.
