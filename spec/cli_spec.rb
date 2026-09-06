@@ -15,6 +15,33 @@ RSpec.describe 'CLI' do
     end
   end
 
+  describe 'bin/forge with bad paths' do
+    it 'reports a directory as --spec or --overrides without traces' do
+      expect(run_cli('analyze', '--spec', 'examples').output).to include('error: cannot read file')
+      expect(run_cli('analyze', '--spec', 'examples/specs/novapay.yaml', '--overrides', 'examples').output)
+        .to include('error: overrides file not found')
+    end
+
+    it 'reports a missing --templates-dir and an unwritable --out as exit 2 without traces' do
+      spec = 'examples/specs/novapay.yaml'
+      res = run_cli('generate', '--spec', spec, '--out', 'tmp/cli_tpl', '--templates-dir', 'nope', '--no-verify',
+                    '--force')
+      expect(res.output).to include('templates dir not found')
+      expect(res.exit_code).to eq(2)
+      res = run_cli('generate', '--spec', spec, '--out', '/dev/null/x', '--no-verify')
+      expect(res.output).to include('error: cannot access file')
+      expect(res.output).not_to include('.rb:')
+      expect(res.exit_code).to eq(2)
+    end
+
+    it 'bin/integrate rejects unknown options with usage, not a trace' do
+      res = run_integrate('--spec', 'x', '--nope')
+      expect(res.output).to include('invalid option: --nope', 'usage: bin/integrate')
+      expect(res.output).not_to include('.rb:')
+      expect(res.exit_code).to eq(1)
+    end
+  end
+
   describe 'bin/forge analyze' do
     { 'novapay' => 'examples/specs/novapay.yaml', 'cardpay' => 'examples/specs/cardpay.yaml',
       'swiftpay' => 'examples/specs/swiftpay.json',

@@ -38,6 +38,16 @@ RSpec.describe Forge::Renderers::MockServer do
     end
     let(:auth) { { 'HTTP_X_API_KEY' => 'test-key' } }
 
+    it 'answers 4xx, never 500, to non-object bodies and non-numeric amounts' do
+      client = Rack::MockRequest.new(app)
+      ['[]', '"str"', 'not json', '5'].each do |raw|
+        expect(client.post('/payouts', auth.merge(input: raw)).status).to eq(400), raw
+      end
+      [{}, [], 'abc', true].each do |amount|
+        expect(post_json(app, '/payouts', request.merge('amount' => amount), auth).status).to eq(201), amount.inspect
+      end
+    end
+
     it 'rejects missing api key, small amounts and missing fields' do
       expect(post_json(app, '/payouts', request).status).to eq(401)
       expect(post_json(app, '/payouts', request.merge('amount' => 10), auth).status).to eq(422)

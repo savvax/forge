@@ -23,7 +23,9 @@ module Forge
       yield
     rescue Forge::Error
       raise
-    rescue StandardError, SystemStackError => e
+    rescue SystemCallError => e
+      raise GenerationError.new("cannot access file: #{e.message}", hint: 'check the paths and permissions')
+    rescue StandardError, SystemStackError, ScriptError => e
       raise InternalError.new("internal error: #{e.class}: #{e.message.lines.first.to_s.strip[0, 200]}",
                               hint: 'unexpected document structure; rerun with --debug and report the spec')
     end

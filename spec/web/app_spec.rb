@@ -102,6 +102,14 @@ RSpec.describe Forge::Web::App do
     expect(res.body).not_to include('Internal Server Error')
   end
 
+  it 'survives a corrupted meta.json on disk' do
+    id = create_run('verify' => '0')
+    File.write("tmp/web_spec/#{id}/meta.json", 'not json')
+    expect(client.get("/runs/#{id}").status).to eq(200)
+    File.write("tmp/web_spec/#{id}/meta.json", '[]')
+    expect(client.get("/runs/#{id}").status).to eq(200)
+  end
+
   it 'skips the rspec step with a readable log when generation produced no spec' do
     id = create_run('example' => '', 'spec_text' => "openapi: 3.0.3\ninfo: {title: X, version: '1'}\npaths: {}\n")
     expect(client.post("/runs/#{id}/spec").status).to eq(303)

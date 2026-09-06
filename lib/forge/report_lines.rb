@@ -64,7 +64,7 @@ module Forge
       sig = w[:signature]
       return 'Webhook signature: not found (callbacks are not verified)' unless sig[:header]
 
-      "Webhook signature: #{sig[:header]} (HMAC-#{sig[:algorithm].upcase}, #{sig[:payload].tr('_', ' ')}, " \
+      "Webhook signature: #{sig[:header]} (HMAC-#{sig[:algorithm].to_s.upcase}, #{sig[:payload].to_s.tr('_', ' ')}, " \
         "#{sig[:encoding]}) → credentials.#{sig[:secret_key]}"
     end
 

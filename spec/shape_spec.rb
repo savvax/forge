@@ -86,6 +86,40 @@ RSpec.describe Forge::Shape do
       expect(Forge::IR::Builder.build(doc).endpoints.map(&:path)).to eq(['/q', '/r'])
     end
 
+    it 'treats null responses, header schemas and security schemes as absent; `true` schema as any' do
+      text = "#{base}components: {securitySchemes: {a: }}\npaths:\n  /p:\n    post:\n      requestBody: {content: " \
+             "{application/json: {schema: {properties: {amount: true}}}}}\n      " \
+             "responses: {'200': , '201': {headers: {X-Retry: }}}\n"
+      spec = Forge::IR::Builder.build(load_text(text))
+      expect(spec.endpoints.first.responses.map(&:status)).to eq(%w[200 201])
+      expect(spec.endpoints.first.request_body.schema.properties['amount']).to be_a(Forge::IR::Schema)
+    end
+
+    it 'rejects a `false` property schema and a non-string pattern with a pointer' do
+      text = "#{base}paths:\n  /p:\n    post:\n      requestBody: {content: {application/json: {schema: " \
+             "{properties: {a: false}}}}}\n      responses: {}\n"
+      expect { load_text(text) }.to raise_error(Forge::SpecError, %r{got boolean at .*properties/a})
+      text = "#{base}paths:\n  /p:\n    post:\n      requestBody: {content: {application/json: {schema: " \
+             "{properties: {a: {pattern: 5}}}}}}\n      responses: {}\n"
+      expect { load_text(text) }.to raise_error(Forge::SpecError, /expected string, got number at .*pattern/)
+    end
+
+    it 'treats a property without a schema and `true` inside allOf as any, caps a huge maxLength' do
+      big = 10**20
+      schema = "{allOf: [true, {properties: {amount: , note: {type: string, maxLength: #{big}}}}]}"
+      body = "      requestBody: {content: {application/json: {schema: #{schema}}}}"
+      text = ["#{base}paths:", '  /p:', '    post:', body, "      responses: {}\n"].join("\n")
+      schema = Forge::IR::Builder.build(load_text(text)).endpoints.first.request_body.schema
+      expect(schema.properties['amount']).to be_a(Forge::IR::Schema)
+      expect(Forge::Fixtures::Synthesizer.example(schema.properties['note'], 'note')).to eq('note_example')
+    end
+
+    it 'marks a $ref that points into a scalar as unresolved' do
+      text = "#{base}paths:\n  /p:\n    post:\n      requestBody: {$ref: '#/info/title/x'}\n      responses: {}\n"
+      doc = load_text(text)
+      expect(doc.dig('paths', '/p', 'post', 'requestBody')).to eq('x-forge-unresolved' => '#/info/title/x')
+    end
+
     it 'stringifies non-string keys (200:, null:, true:)' do
       doc = load_text("#{base}5: x\nnull: y\npaths:\n  /p:\n    post:\n      responses: {200: {description: ok}}\n")
       expect(doc.keys).to include('5', '')
@@ -97,9 +131,16 @@ RSpec.describe Forge::Shape do
       expect(doc.dig('paths', '/p', 'post', 'requestBody')).to eq('x-forge-unresolved' => '5')
     end
 
-    it 'passes x-extensions through without shape checks' do
-      doc = load_text("#{base}components: {x-forge: 5}\npaths:\n  /p:\n    x-role: 5\n#{op}")
+    it 'passes x-extensions through without shape checks, but checks x- names inside maps' do
+      doc = load_text("#{base}components: {x-forge: 5}\npaths:\n  x-group: 5\n  /p:\n    x-role: 5\n#{op}")
       expect(doc.dig('components', 'x-forge')).to eq(5)
+      expect(Forge::IR::Builder.build(doc).endpoints.map(&:path)).to eq(['/p'])
+      text = "#{base}paths:\n  /p:\n    post:\n      responses: {'200': {headers: {x-rate: false}}}\n"
+      expect do
+        load_text(text)
+      end.to raise_error(Forge::SpecError, %r{got boolean at #/paths/~1p/post/responses/200/headers/x-rate})
+      text = "#{base}paths:\n  /p:\n    post:\n      responses: {'200': {headers: {x-rate: {schema: {}}}}}\n"
+      expect(Forge::IR::Builder.build(load_text(text)).endpoints.first.responses.first.headers.keys).to eq(['x-rate'])
     end
 
     it 'still resolves and generates the reference spec byte-identically (golden covers the rest)' do
@@ -115,6 +156,14 @@ RSpec.describe Forge::Shape do
         expect(e.cause).to be_a(NoMethodError)
         expect(e.class.exit_code).to eq(2)
       end
+    end
+
+    it 'turns a broken ERB template into InternalError, not a SyntaxError trace' do
+      FileUtils.mkdir_p('tmp/hostile_tpl')
+      File.write('tmp/hostile_tpl/service.rb.erb', '<% if %>')
+      opts = { spec: 'examples/specs/novapay.yaml', out: 'tmp/hostile_out', force: true, verify: false,
+               format: 'json', include_paths: [], templates_dir: 'tmp/hostile_tpl' }
+      expect { described_class.new(opts).run }.to raise_error(Forge::InternalError, /SyntaxError/)
     end
 
     it 'lets SpecError through untouched' do
@@ -135,7 +184,8 @@ RSpec.describe Forge::Shape do
       'section is an array' => ["endpoints: [1]\n", "overrides key 'endpoints' must be a mapping"],
       'multiplier is a string' => ["amount: {unit: minor, multiplier: '100'}\n",
                                    "'amount.multiplier' must be a number"],
-      'required_if is a string' => ["fields: {x: {required_if: nope}}\n", "'fields.x.required_if' must be a mapping"]
+      'required_if is a string' => ["fields: {x: {required_if: nope}}\n", "'fields.x.required_if' must be a mapping"],
+      'field rule is a string' => ["fields: {x: nope}\n", "'fields.x' must be a mapping"]
     }.each do |name, (text, message)|
       it "#{name} → SpecError '#{message}'" do
         expect { overrides(text) }.to raise_error(Forge::SpecError, Regexp.new(Regexp.escape(message)))

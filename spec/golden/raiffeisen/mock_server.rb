@@ -31,7 +31,7 @@ class RaiffeisenMock < Sinatra::Base
   LOCK = Mutex.new
 
   helpers do
-    def json_body = @json_body ||= (JSON.parse(request.body.tap(&:rewind).read) rescue {})
+    def json_body = @json_body ||= ((parsed = JSON.parse(request.body.tap(&:rewind).read)).is_a?(Hash) ? parsed : {} rescue {})
     def reply(status, body) = [status, { 'Content-Type' => 'application/json' }, JSON.generate(body)]
     def dig_path(hash, path) = path.reduce(hash) { |node, key| node.is_a?(Hash) ? node[key] : nil }
 
@@ -104,7 +104,8 @@ class RaiffeisenMock < Sinatra::Base
                                      'missing' => missing } }))
     end
     amount = dig_path(body, AMOUNT_PATH)
-    halt(*reply(422, error_body(422, 'validation_error'))) if MIN_AMOUNT && amount && amount.to_f < MIN_AMOUNT
+    amount = Float(amount.to_s, exception: false) unless amount.is_a?(Numeric)
+    halt(*reply(422, error_body(422, 'validation_error'))) if MIN_AMOUNT && amount && amount < MIN_AMOUNT
     key = IDEMPOTENCY_HEADER && request.env["HTTP_#{IDEMPOTENCY_HEADER.upcase.tr('-', '_')}"]
     if key && (existing = LOCK.synchronize { STATE[:idempotency][key] })
       halt(*reply(409, payout_response(fixture('create_request', 'response_200'), existing)))

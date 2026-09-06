@@ -8,6 +8,7 @@ module Forge
       # Hash из спеки (после RefResolver) → Schema. allOf сливается, oneOf/anyOf остаются списками.
       # Мемоизация по identity: RefResolver разделяет цели ссылок, без кэша большие спеки строятся экспоненциально.
       def self.from(hash)
+        hash = {} if hash == true # JSON Schema: `true` = любое значение
         return nil unless hash.is_a?(Hash)
 
         memo = (Thread.current[:forge_schema_memo] ||= {}.compare_by_identity)
@@ -19,7 +20,7 @@ module Forge
         type, nullable = split_type(hash['type'], hash['nullable'])
         new(**scalars(hash), type: type, nullable: nullable, ref_name: hash['x-forge-ref-name'],
                              properties: hash['properties']&.transform_values do |v|
-                               from(v)
+                               from(v.nil? ? {} : v) # `name:` без схемы = любое значение
                              end, items: from(hash['items']),
                              one_of: list(hash['oneOf']), any_of: list(hash['anyOf']), all_of: nil,
                              additional: hash['additionalProperties'], unresolved_ref: hash['x-forge-unresolved'],
@@ -44,7 +45,7 @@ module Forge
 
       # allOf: части сливаются слева направо (properties/required объединяются), затем собственные ключи.
       def self.merge_all_of(hash)
-        parts = hash['allOf'].map { |p| p['allOf'] ? merge_all_of(p) : p }
+        parts = hash['allOf'].map { |p| p == true ? {} : p }.map { |p| p['allOf'] ? merge_all_of(p) : p }
         merged = [*parts, hash.except('allOf')].reduce({}) { |acc, part| merge_part(acc, part) }
         merged['type'] ||= 'object'
         merged

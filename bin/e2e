@@ -175,4 +175,12 @@ end
 opts = {}
 OptionParser.new { |o| o.on('--overrides FILE') { |v| opts[:overrides] = v } }.parse!
 spec_file = ARGV.first || abort('usage: bin/e2e SPEC [--overrides FILE]')
-E2E.new(spec_file, opts[:overrides]).run
+begin
+  E2E.new(spec_file, opts[:overrides]).run
+rescue Forge::Error => e
+  abort "error: #{e.message}"
+rescue StandardError => e
+  raise if ENV['DEBUG']
+
+  abort "error: e2e failed: #{e.class}: #{e.message.lines.first&.strip} (DEBUG=1 for the stacktrace)"
+end

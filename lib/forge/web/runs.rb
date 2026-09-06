@@ -40,7 +40,16 @@ module Forge
         @dir = File.join(self.class.root, id)
       end
 
-      def meta = @meta ||= (File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : {})
+      def meta = @meta ||= read_meta
+
+      # Повреждённый meta.json (обрыв записи, чужая правка) → пустые метаданные, а не 500.
+      def read_meta
+        parsed = File.exist?(meta_path) ? JSON.parse(File.read(meta_path)) : {}
+        parsed.is_a?(Hash) ? parsed : {}
+      rescue JSON::ParserError
+        {}
+      end
+
       def provider = meta['provider'] || 'provider'
       def out_dir = File.join(@dir, 'out')
       def spec_path = meta['spec']

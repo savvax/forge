@@ -23,7 +23,7 @@ module Forge
       module_function
 
       def load(path)
-        unless File.exist?(path)
+        unless File.file?(path)
           raise SpecError.new('overrides file not found', file: path,
                                                           hint: 'check the --overrides path')
         end
@@ -59,8 +59,9 @@ module Forge
 
       def validate_fields!(fields, file)
         fields.each do |path, rules|
-          next unless rules.is_a?(Hash)
+          next if rules.nil?
 
+          must!(rules.is_a?(Hash), "'fields.#{path}' must be a mapping", file)
           validate_keys!(rules, FIELD_KEYS, file, "fields.#{path}.")
           cond = rules['required_if']
           must!(cond.nil? || cond.is_a?(Hash), "'fields.#{path}.required_if' must be a mapping {field, equals}", file)

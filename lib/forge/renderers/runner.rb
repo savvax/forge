@@ -30,6 +30,10 @@ module Forge
       end
 
       def render
+        if @templates_dir && !File.directory?(@templates_dir)
+          raise GenerationError.new("templates dir not found: #{@templates_dir}", hint: 'check --templates-dir')
+        end
+
         prepare_dir!
         files = self.class.steps.filter_map do |label, klass|
           renderer = klass.new(@plan, templates_dir: @templates_dir)

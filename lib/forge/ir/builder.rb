@@ -15,7 +15,7 @@ module Forge
       end
 
       def build
-        info = @hash.fetch('info', {})
+        info = @hash['info'] || {}
         Spec.new(title: info['title'], version: info['version'], openapi_version: @hash['openapi'],
                  description: info['description'], servers: servers, security_schemes: security_schemes,
                  default_security: @hash['security'], endpoints: endpoints, webhooks: callbacks + webhooks,
@@ -33,8 +33,9 @@ module Forge
       end
 
       def security_schemes
-        @hash.dig('components', 'securitySchemes').to_h.map do |name, s|
-          SecurityScheme.new(name: name, type: s['type'], location: s['in'], param_name: s['name'],
+        @hash.dig('components', 'securitySchemes').to_h.map do |name, scheme|
+          s = scheme.to_h
+          SecurityScheme.new(name: name, type: s['type'].to_s, location: s['in'], param_name: s['name'],
                              scheme: s['scheme'], bearer_format: s['bearerFormat'], description: s['description'])
         end
       end
@@ -62,8 +63,10 @@ module Forge
         end
       end
 
+      # `x-*` в paths — расширения (OAS), а не пути.
       def each_operation(paths, pointer, source)
-        paths.to_h.flat_map { |path, item| operations(item, "#{pointer}/#{escape(path)}", path, source) }
+        paths.to_h.reject { |path, _| path.start_with?('x-') }
+             .flat_map { |path, item| operations(item, "#{pointer}/#{escape(path)}", path, source) }
       end
 
       # `null` у path item / операции (черновик «post:») = пустой объект.
@@ -88,7 +91,7 @@ module Forge
       end
 
       def parameter(param)
-        Parameter.new(name: param['name'], location: param['in'], required: param['required'] == true,
+        Parameter.new(name: param['name'].to_s, location: param['in'].to_s, required: param['required'] == true,
                       schema: Schema.from(param['schema']), description: param['description'],
                       example: param['example'])
       end
@@ -103,11 +106,12 @@ module Forge
       end
 
       def responses(hash)
-        hash.to_h.map do |status, res|
+        hash.to_h.map do |status, response|
+          res = response.to_h
           media_type, media = pick_media(res['content'])
           Response.new(status: status.to_s, description: res['description'], media_type: media_type,
                        schema: Schema.from(media&.[]('schema')), examples: examples(media),
-                       headers: res['headers'].to_h.transform_values { |h| Schema.from(h['schema']) })
+                       headers: res['headers'].to_h.transform_values { |h| Schema.from(h.to_h['schema']) })
         end
       end
 

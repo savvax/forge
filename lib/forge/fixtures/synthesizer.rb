@@ -34,7 +34,7 @@ module Forge
         return '1.00' if schema.type == 'string' && name.to_s.match?(/amount|sum|total/) # decimal-string суммы
 
         value = "#{name}_example"
-        schema.max_length ? value[0, schema.max_length] : value
+        schema.max_length ? value[0, schema.max_length.clamp(0, 10_000)] : value
       end
 
       # Простой генератор по регулярке: `^7\d{10}$` → '79000000000', `[A-Z]{2}\d{2}` → 'AA00'.

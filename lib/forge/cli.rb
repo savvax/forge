@@ -18,8 +18,10 @@ module Forge
     option :format, default: 'text', enum: %w[text json]
     def analyze
       guarded do
-        spec, findings = GenerateCommand.analyze(options)
-        puts options[:format] == 'json' ? Report.json(spec, findings) : Report.text(spec, findings)
+        GenerateCommand.guard do
+          spec, findings = GenerateCommand.analyze(options)
+          puts options[:format] == 'json' ? Report.json(spec, findings) : Report.text(spec, findings)
+        end
       end
     end
 

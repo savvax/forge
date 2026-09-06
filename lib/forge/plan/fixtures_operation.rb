@@ -61,7 +61,7 @@ module Forge
       def clamp(requisites, match, max)
         type = match[1] == 'requisite_type' ? default_type : match[1].delete("'")
         fields = requisites[type]
-        fields[match[2]] = fields[match[2]][0, max] if fields && fields[match[2]].is_a?(String)
+        fields[match[2]] = fields[match[2]][0, max.clamp(0, 10_000)] if fields && fields[match[2]].is_a?(String)
       end
 
       def canonical_type_of(request)
@@ -108,6 +108,7 @@ module Forge
 
       def major_amount(value)
         amount = @f[:amount].value
+        value = 0 unless value.is_a?(Numeric) || value.is_a?(String) # пример суммы — объект/массив
         number = amount[:unit] == :minor ? value.to_r / amount[:multiplier] : value.to_r
         number = amount[:minimum_major] || 1 unless number.positive? # синтез без примера → минимально валидная сумма
         format('%.2f', number)

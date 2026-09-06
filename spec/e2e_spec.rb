@@ -19,6 +19,13 @@ RSpec.describe 'bin/e2e' do
     expect(out).to include('operation approved ✓')
   end
 
+  it 'prints a Forge error without a stack trace for a missing or broken spec' do
+    out, status = e2e('nope.yaml')
+    expect(status.exitstatus).to eq(1)
+    expect(out).to include('error: file not found')
+    expect(out).not_to include('.rb:')
+  end
+
   it 'fails cleanly for swiftpay: the timestamped signature scheme is UNSUPPORTED, no stack trace' do
     out, status = e2e('examples/specs/swiftpay.json')
     expect(status.exitstatus).to eq(1)

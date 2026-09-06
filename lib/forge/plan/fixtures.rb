@@ -114,9 +114,11 @@ module Forge
         fixture.merge('expected_operation_status' => 'approved')
       end
 
+      # Пример из спеки может быть скаляром там, где ждали объект: тогда путь не проставляется.
       def set_path(hash, path, value)
         *head, last = path
-        head.reduce(hash) { |node, key| node[key] ||= {} }[last] = value
+        node = head.reduce(hash) { |n, key| n.is_a?(Hash) ? (n[key] ||= {}) : (break nil) }
+        node[last] = value if node.is_a?(Hash)
         hash
       end
 
@@ -161,7 +163,7 @@ module Forge
         header = res.headers.keys.find { |h| h == @f[:errors].value[:retry_after_header] }
         return example unless header
 
-        { 'headers' => { header => res.headers[header].example || 60 }, 'body' => example }
+        { 'headers' => { header => res.headers[header]&.example || 60 }, 'body' => example }
       end
 
       def expected_status(response, default)
@@ -204,6 +206,8 @@ module Forge
       end
 
       def callback_status(payload, webhook)
+        return nil unless payload.is_a?(Hash)
+
         event = webhook[:event_field] && payload[webhook[:event_field]]
         by_event = event && @p[:event_map][event.to_s]
         by_event || @p[:status_map][dig(payload, webhook[:status_field]).to_s]

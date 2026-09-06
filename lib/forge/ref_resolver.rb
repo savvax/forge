@@ -56,7 +56,10 @@ module Forge
     def lookup(ref, _pointer)
       ref.delete_prefix('#/').split('/').reduce(@root) do |node, key|
         key = unescape(URI.decode_www_form_component(key))
-        child = node.is_a?(Array) ? node[Integer(key, exception: false) || -1] : node&.[](key)
+        child = case node
+                when Array then node[Integer(key, exception: false) || -1]
+                when Hash then node[key]
+                end
         return { 'x-forge-unresolved' => ref } if child.nil?
 
         child

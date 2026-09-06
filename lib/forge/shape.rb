@@ -4,28 +4,37 @@ module Forge
   # Форма документа после резолва $ref: контейнеры там, где их ждут IR::Builder и анализаторы.
   # Это не валидатор OpenAPI — только то, без чего конвейер упал бы с NoMethodError. Нарушение → SpecError
   # с pointer. `null` у ключа = ключа нет (черновики «post:» без тела); `null` в массиве — ошибка.
-  # Расширения `x-*` не проверяются. Правило: Hash — ключи узла ('*' — остальные), [rule] — массив, символ — тип.
+  # '*' — все ключи map-объекта (headers, properties, schemas…), где имена на `x-` — обычные имена; расширения
+  # `x-*` допустимы в объектах с фиксированными полями (они не описаны — и не проверяются) и в `paths`.
+  # Правило: Hash — ключи узла ('*' — остальные), [rule] — массив, символ — тип.
   class Shape
     METHODS = %w[get post put patch delete head options trace].freeze
     SCHEMA = { 'properties' => { '*' => :schema }, 'items' => :schema, 'not' => :schema,
                'allOf' => [:schema], 'oneOf' => [:schema], 'anyOf' => [:schema],
                'required' => :array, 'enum' => :array, 'discriminator' => { 'mapping' => :hash },
                'minimum' => :number, 'maximum' => :number, 'multipleOf' => :number,
-               'minLength' => :number, 'maxLength' => :number }.freeze
+               'minLength' => :number, 'maxLength' => :number, 'pattern' => :string,
+               'description' => :string, 'format' => :string }.freeze
     MEDIA = { 'schema' => :schema, 'examples' => :hash }.freeze
     CONTENT = { '*' => MEDIA }.freeze
-    PARAMETER = { 'schema' => :schema, 'content' => CONTENT }.freeze
+    PARAMETER = { 'schema' => :schema, 'content' => CONTENT, 'name' => :string, 'in' => :string,
+                  'description' => :string }.freeze
+    SECURITY_SCHEME = { 'type' => :string, 'scheme' => :string, 'in' => :string, 'name' => :string }.freeze
     SERVER = { 'variables' => { '*' => { 'enum' => :array } } }.freeze
     RESPONSE = { 'content' => CONTENT, 'headers' => { '*' => { 'schema' => :schema } } }.freeze
-    OPERATION = { 'parameters' => [PARAMETER], 'requestBody' => { 'content' => CONTENT },
+    OPERATION = { 'parameters' => [PARAMETER], 'requestBody' => { 'content' => CONTENT, 'description' => :string },
+                  'description' => :string, 'summary' => :string, 'operationId' => :string, 'tags' => [:string],
                   'responses' => { '*' => RESPONSE }, 'security' => [{ '*' => :array }], 'servers' => [SERVER],
                   'callbacks' => { '*' => { '*' => :path_item } } }.freeze
     PATH_ITEM = METHODS.to_h { |m| [m, OPERATION] }.merge('parameters' => [PARAMETER], 'servers' => [SERVER]).freeze
-    ROOT = { 'info' => :hash, 'servers' => [SERVER], 'security' => [{ '*' => :array }],
-             'components' => { 'schemas' => { '*' => :schema }, '*' => { '*' => :hash } },
-             'paths' => { '*' => PATH_ITEM }, 'webhooks' => { '*' => PATH_ITEM },
-             'x-webhooks' => { '*' => PATH_ITEM } }.freeze
-    TYPES = { hash: [Hash, 'object'], array: [Array, 'array'], number: [Numeric, 'number'] }.freeze
+    PATHS = { '*' => PATH_ITEM }.freeze
+    COMPONENTS = { 'schemas' => { '*' => :schema }, 'securitySchemes' => { '*' => SECURITY_SCHEME } }
+                 .merge(%w[responses parameters examples requestBodies headers links callbacks pathItems]
+                        .to_h { |k| [k, { '*' => :hash }] }).freeze
+    ROOT = { 'info' => :hash, 'servers' => [SERVER], 'security' => [{ '*' => :array }], 'components' => COMPONENTS,
+             'paths' => PATHS, 'webhooks' => { '*' => PATH_ITEM }, 'x-webhooks' => { '*' => PATH_ITEM } }.freeze
+    TYPES = { hash: [Hash, 'object'], array: [Array, 'array'], number: [Numeric, 'number'],
+              string: [String, 'string'] }.freeze
 
     def self.check!(doc, file: nil) = new(file).walk(doc, ROOT, '#')
 
@@ -40,7 +49,7 @@ module Forge
       when Array then each_item(node, rule.first, pointer)
       when Hash then each_key(node, rule, pointer)
       when :path_item then each_key(node, PATH_ITEM, pointer)
-      when :schema then each_key(node, SCHEMA, pointer) unless [true, false].include?(node)
+      when :schema then each_key(node, SCHEMA, pointer) unless node == true # `true` = любая схема
       else expect!(node, *TYPES.fetch(rule), pointer)
       end
     end
@@ -59,9 +68,16 @@ module Forge
       return if seen?(node, rules)
 
       node.each do |key, value|
-        rule = rules[key] || (rules['*'] unless key.start_with?('x-'))
+        rule = rule_for(rules, key)
         walk(value, rule, "#{pointer}/#{escape(key)}") if rule && !value.nil?
       end
+    end
+
+    # В `paths` ключи `x-*` — расширения; в остальных map-объектах — обычные имена.
+    def rule_for(rules, key)
+      return nil if rules.equal?(PATHS) && key.start_with?('x-')
+
+      rules[key] || rules['*']
     end
 
     def seen?(node, rule)
