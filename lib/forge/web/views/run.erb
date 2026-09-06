@@ -20,14 +20,14 @@
 <section class="card"><h2>Ошибка</h2><pre class="report"><%= h run.report %></pre></section>
 <% else %>
 <div class="tabs top">
-  <input type="radio" name="top" id="t-overview" checked><label for="t-overview">Обзор</label>
+  <input type="radio" name="top" id="t-overview"<%= ' checked' unless params[:tab] == 'runs' %>><label for="t-overview">Обзор</label>
   <input type="radio" name="top" id="t-service"><label for="t-service">Сервис</label>
   <input type="radio" name="top" id="t-guide"><label for="t-guide">INTEGRATION.md</label>
   <input type="radio" name="top" id="t-fixtures"><label for="t-fixtures">fixtures.json</label>
   <input type="radio" name="top" id="t-spec"><label for="t-spec">RSpec</label>
   <input type="radio" name="top" id="t-mock"><label for="t-mock">Мок</label>
   <input type="radio" name="top" id="t-report"><label for="t-report">Отчёт</label>
-  <% if run.step_output('spec') || run.step_output('e2e') %><input type="radio" name="top" id="t-runs"><label for="t-runs">Запуски</label><% end %>
+  <% if run.step_output('spec') || run.step_output('e2e') %><input type="radio" name="top" id="t-runs"<%= ' checked' if params[:tab] == 'runs' %>><label for="t-runs">Запуски</label><% end %>
 
   <div class="pane" data-for="t-overview">
   <% if ov %>

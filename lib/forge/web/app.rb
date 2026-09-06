@@ -76,7 +76,7 @@ module Forge
       %w[spec e2e].each do |step|
         post "/runs/:id/#{step}" do
           run.exec_step(step.to_sym)
-          redirect "/runs/#{run.id}##{step}"
+          redirect "/runs/#{run.id}?tab=runs##{step}" # вкладка «Запуски» скрыта CSS: без ?tab якорь #spec невидим
         end
       end
 

@@ -55,12 +55,14 @@ RSpec.describe Forge::Web::App do
     expect(res.body).not_to include('.rb:')
   end
 
-  it 'runs the generated spec and e2e on demand' do
+  it 'runs the generated spec and e2e on demand and opens the «Запуски» tab' do
     id = create_run
-    client.post("/runs/#{id}/spec")
+    expect(client.post("/runs/#{id}/spec").headers['Location']).to end_with("/runs/#{id}?tab=runs#spec")
     client.post("/runs/#{id}/e2e")
-    page = client.get("/runs/#{id}").body
-    expect(page).to include('examples, 0 failures', 'operation approved ✓')
+    page = client.get("/runs/#{id}?tab=runs").body
+    expect(page).to include('examples, 0 failures', 'operation approved ✓', 'id="t-runs" checked')
+    expect(page).not_to include('id="t-overview" checked') # иначе вкладка с выводом остаётся скрытой CSS
+    expect(client.get("/runs/#{id}").body).to include('id="t-overview" checked')
   end
 
   it 'rejects examples outside examples/ and unknown runs' do
