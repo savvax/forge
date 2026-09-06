@@ -373,7 +373,3 @@ GOV.UK Pay — Swagger 2.0, понятная ошибка. Таблица и с�
 Pay-in (депозиты) тем же пайплайном; Swagger 2.0 через конвертацию; batch-выплаты (массивы полей);
 полная JSON-Schema-валидация фикстур (`json_schemer`, сейчас — встроенная проверка типов/required/enum);
 интеграция с CI Space Payments как шаг «новый провайдер → PR с сервисом и тестами».
-
-## Лицензия
-
-MIT. Все зависимости — MIT/Apache/BSD (`bundle exec rake licenses`).
