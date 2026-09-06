@@ -403,13 +403,13 @@ Warnings (11):
         hint: endpoints.<operationId>: webhook  (overrides.yml)
   WARN         media_type_form            create request body is application/x-www-form-urlencoded; sent as form-urlencoded (nested flattened)
         hint: nested keys are encoded as parent[child]; verify
-  WARN         unmapped_field             destination (string, The ID of a bank account or a card to send the payout to. If you don't provide a destination, we use the default external account for the specified currency.) has no source
+  WARN         unmapped_field             destination (string, The ID of a bank account or a card to send the payout to. If you don't provid…) has no source
         hint: fields.destination.source: "…"  (overrides.yml)
   WARN         array_field_unsupported    expand is an array; [] is generated
         hint: fields.expand.source: "…"
-  WARN         unmapped_field             method (string, The method used to send this payout, which is `standard` or `instant`. We support `instant` for payouts to debit cards and bank accounts in certain countries. Learn more about [bank support for Instant Payouts](https://stripe.com/docs/payouts/instant-payouts-banks).) has no source
+  WARN         unmapped_field             method (string, The method used to send this payout, which is `standard` or `instant`. We sup…) has no source
         hint: fields.method.source: "…"  (overrides.yml)
-  WARN         unmapped_field             source_type (string, The balance type of your Stripe balance to draw this payout from. Balances for different payment sources are kept separately. You can find the amounts with the Balances API. One of `bank_account`, `card`, or `fpx`.) has no source
+  WARN         unmapped_field             source_type (string, The balance type of your Stripe balance to draw this payout from. Balances fo…) has no source
         hint: fields.source_type.source: "…"  (overrides.yml)
   … and 1 more (see --format json)
 Unsupported (1):

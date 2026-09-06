@@ -57,6 +57,8 @@ module Provider
       return failure(:unprocessable_entity, 'expiry_invalid') unless expiry.to_s.match?(/\A(0[1-9]|1[0-2])\/\d{2}\z/)
 
       success
+    rescue StandardError => e # кривой реквизит или override-выражение → отклонить операцию, а не уронить воркер
+      failure(:unprocessable_entity, 'requisite_invalid', message: e.message)
     end
 
     def create_request(operation, request_method = 'create')

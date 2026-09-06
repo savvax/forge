@@ -281,14 +281,14 @@
         "path": [
           "balanceAccountId"
         ],
-        "source_expr": null,
+        "source_expr": "credentials.fetch('balanceAccountId')",
         "required": false,
         "required_if": null,
         "transform": null,
         "schema": {
           "type": "string"
         },
-        "confidence": 0.0,
+        "confidence": 0.95,
         "requisite_type": null
       },
       {
@@ -331,267 +331,21 @@
         "requisite_type": null
       },
       {
-        "provider_field": "city",
+        "provider_field": "accountHolder",
         "path": [
           "counterparty",
           "bankAccount",
-          "accountHolder",
-          "address",
-          "city"
+          "accountHolder"
         ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "country",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "address",
-          "country"
-        ],
-        "source_expr": null,
+        "source_expr": "operation.payout_requisite.dig('bank_account', 'holder')",
         "required": true,
         "required_if": null,
         "transform": null,
         "schema": {
-          "type": "string"
+          "type": "object"
         },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "line1",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "address",
-          "line1"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "line2",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "address",
-          "line2"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "postalCode",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "address",
-          "postalCode"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "stateOrProvince",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "address",
-          "stateOrProvince"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "dateOfBirth",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "dateOfBirth"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "email",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "email"
-        ],
-        "source_expr": "operation.customer&.dig('email')",
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.95,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "firstName",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "firstName"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "fullName",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "fullName"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "lastName",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "lastName"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "reference",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "reference"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "type",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "type"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string",
-          "enum": [
-            "individual",
-            "organization",
-            "unknown"
-          ]
-        },
-        "confidence": 0.0,
-        "requisite_type": null
-      },
-      {
-        "provider_field": "url",
-        "path": [
-          "counterparty",
-          "bankAccount",
-          "accountHolder",
-          "url"
-        ],
-        "source_expr": null,
-        "required": false,
-        "required_if": null,
-        "transform": null,
-        "schema": {
-          "type": "string"
-        },
-        "confidence": 0.0,
-        "requisite_type": null
+        "confidence": 0.9,
+        "requisite_type": "bank_account"
       },
       {
         "provider_field": "accountNumber",
@@ -1320,7 +1074,8 @@
       "bank_account",
       "card"
     ],
-    "requisite_container": "counterparty.bankAccount.accountIdentification",
+    "requisite_container": "counterparty",
+    "requisite_type_values": {},
     "headers": [
       {
         "provider_field": "Idempotency-Key",
@@ -1343,41 +1098,6 @@
     {
       "level": "warn",
       "code": "role_conflict",
-      "message": "POST /transfers/approve (post-transfers-approve) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
-      "pointer": "#/paths/~1transfers~1approve/post",
-      "hint": "endpoints.post-transfers-approve: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfers/cancel (post-transfers-cancel) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
-      "pointer": "#/paths/~1transfers~1cancel/post",
-      "hint": "endpoints.post-transfers-cancel: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfers/{transferId}/returns (post-transfers-transferId-returns) also looks like create (0.85); POST /transfers (post-transfers) wins (0.95)",
-      "pointer": "#/paths/~1transfers~1{transferId}~1returns/post",
-      "hint": "endpoints.post-transfers-transferId-returns: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /grants (post-grants) also looks like create (0.7); POST /transfers (post-transfers) wins (0.95)",
-      "pointer": "#/paths/~1grants/post",
-      "hint": "endpoints.post-grants: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /cashouts (post-cashouts) also looks like create (0.7); POST /transfers (post-transfers) wins (0.95)",
-      "pointer": "#/paths/~1cashouts/post",
-      "hint": "endpoints.post-cashouts: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
       "message": "GET /transfers (get-transfers) also looks like status (0.7); GET /transfers/{id} (get-transfers-id) wins (0.9)",
       "pointer": "#/paths/~1transfers/get",
       "hint": "endpoints.get-transfers: status"
@@ -1395,6 +1115,27 @@
       "message": "GET /transactions/{id} (get-transactions-id) also looks like status (0.65); GET /transfers/{id} (get-transfers-id) wins (0.9)",
       "pointer": "#/paths/~1transactions~1{id}/get",
       "hint": "endpoints.get-transactions-id: status"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/approve (post-transfers-approve) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1approve/post",
+      "hint": "endpoints.post-transfers-approve: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/cancel (post-transfers-cancel) also looks like create (0.95); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1cancel/post",
+      "hint": "endpoints.post-transfers-cancel: create"
+    },
+    {
+      "level": "warn",
+      "code": "role_conflict",
+      "message": "POST /transfers/{transferId}/returns (post-transfers-transferId-returns) also looks like create (0.6); POST /transfers (post-transfers) wins (0.95)",
+      "pointer": "#/paths/~1transfers~1{transferId}~1returns/post",
+      "hint": "endpoints.post-transfers-transferId-returns: create"
     },
     {
       "level": "info",
@@ -1908,116 +1649,25 @@
       "hint": "endpoints.<operationId>: webhook  (overrides.yml)"
     },
     {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "balanceAccountId (string, The unique identifier of the source [balance account](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id).\n\nIf you want to make a transfer using a **virtual** **bankAccount** assigned to the balance account, you must specify the [payment instrument ID](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/paymentInstruments#responses-200-id) of the **virtual** **bankAccount**. If you only specify a balance account ID, Adyen uses the default **physical** **bankAccount** payment instrument assigned to the balance account.) has no source",
+      "level": "info",
+      "code": "credential_field",
+      "message": "balanceAccountId → credentials.balanceAccountId",
       "pointer": null,
-      "hint": "fields.balanceAccountId.source: \"…\"  (overrides.yml)"
+      "hint": "fill it in credentials"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "category (string, The category of the transfer.\n\nPossible values:\n\n - **bank**: A transfer involving a [transfer instrument](https://docs.adyen.com/api-explorer/legalentity/latest/post/transferInstruments#responses-200-id) or a bank account.\n\n- **card**: A transfer involving a third-party card.\n\n- **internal**: A transfer between [balance accounts](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id) within your platform.\n\n- **issuedCard**: A transfer initiated by an Adyen-issued card.\n\n- **platformPayment**: Funds movements related to payments that are acquired for your users.\n\n- **topUp**: An incoming transfer initiated by your user to top up their balance account.) has no source",
+      "message": "category (string, The category of the transfer.) has no source",
       "pointer": null,
       "hint": "fields.category.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "counterparty.balanceAccountId (string, The unique identifier of the counterparty [balance account](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/balanceAccounts#responses-200-id).) has no source",
+      "message": "counterparty.balanceAccountId (string, The unique identifier of the counterparty [balance account](https://docs.adye…) has no source",
       "pointer": null,
       "hint": "fields.counterparty.balanceAccountId.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.city (string, The name of the city.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.city.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.country (string, The two-character ISO 3166-1 alpha-2 country code. For example, **US**, **NL**, or **GB**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.country.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.line1 (string, The first line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.line1.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.line2 (string, The second line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.line2.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.postalCode (string, The postal code.\nMaximum length:\n* 5 digits for an address in the US.\n* 10 characters for an address in all other countries.\n\nSupported characters: **[a-z] [A-Z] [0-9]** and Space.\n\n> Required for addresses in the US.\n) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.postalCode.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.address.stateOrProvince (string,    The two-letter ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n\n   > Required for the US and Canada.\n) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.address.stateOrProvince.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.dateOfBirth (string, The date of birth of the individual in [ISO-8601](https://www.w3.org/TR/NOTE-datetime) format. For example, **YYYY-MM-DD**.\n\nAllowed only when `type` is **individual**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.dateOfBirth.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.firstName (string, The first name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.firstName.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.fullName (string, The full name of the entity that owns the bank account or card.\n\nSupported characters: [a-z] [A-Z] [0-9] , . ; : - — / \\ + & ! ? @ ( ) \" ' and space.\n\nRequired when `category` is **bank**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.fullName.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.lastName (string, The last name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.lastName.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.reference (string, A unique reference to identify the party or counterparty involved in the transfer. For example, your client's unique wallet or payee ID.\n\nRequired when you include `cardIdentification.storedPaymentMethodId`.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.reference.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.type (string, The type of entity that owns the bank account or card.\n\nPossible values: **individual**, **organization**, or **unknown**.\n\nRequired when `category` is **card**. In this case, the value must be **individual**.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.type.source: \"…\"  (overrides.yml)"
-    },
-    {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountHolder.url (string, The URL of the organization or individual. Maximum length: 255 characters.) has no source",
-      "pointer": null,
-      "hint": "fields.counterparty.bankAccount.accountHolder.url.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
@@ -2029,7 +1679,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "counterparty.bankAccount.accountIdentification.bsbCode (string, The 6-digit [Bank State Branch (BSB) code](https://en.wikipedia.org/wiki/Bank_state_branch), without separators or whitespace.) has no source",
+      "message": "counterparty.bankAccount.accountIdentification.bsbCode (string, The 6-digit [Bank State Branch (BSB) code](https://en.wikipedia.org/wiki/Bank…) has no source",
       "pointer": null,
       "hint": "fields.counterparty.bankAccount.accountIdentification.bsbCode.source: \"…\"  (overrides.yml)"
     },
@@ -2043,7 +1693,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "counterparty.bankAccount.storedPaymentMethodId (string, The unique token that identifies the stored bank account details of the counterparty for a payout.) has no source",
+      "message": "counterparty.bankAccount.storedPaymentMethodId (string, The unique token that identifies the stored bank account details of the count…) has no source",
       "pointer": null,
       "hint": "fields.counterparty.bankAccount.storedPaymentMethodId.source: \"…\"  (overrides.yml)"
     },
@@ -2057,28 +1707,28 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "counterparty.transferInstrumentId (string, The unique identifier of the counterparty [transfer instrument](https://docs.adyen.com/api-explorer/legalentity/latest/post/transferInstruments#responses-200-id).) has no source",
+      "message": "counterparty.transferInstrumentId (string, The unique identifier of the counterparty [transfer instrument](https://docs.…) has no source",
       "pointer": null,
       "hint": "fields.counterparty.transferInstrumentId.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "executionDate.date (string, The date when the transfer will be processed. This date must be:\n* Within 30 days of the current date.\n* In the [ISO 8601 format](https://www.iso.org/iso-8601-date-and-time-format.html) **YYYY-MM-DD**. For example: 2025-01-31) has no source",
+      "message": "executionDate.date (string, The date when the transfer will be processed. This date must be:) has no source",
       "pointer": null,
       "hint": "fields.executionDate.date.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "executionDate.timezone (string, The timezone that applies to the execution date. Use a timezone identifier from the [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).\n\nExample: **America/Los_Angeles**.\n Default value: **Europe/Amsterdam**.) has no source",
+      "message": "executionDate.timezone (string, The timezone that applies to the execution date. Use a timezone identifier fr…) has no source",
       "pointer": null,
       "hint": "fields.executionDate.timezone.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "paymentInstrumentId (string, The unique identifier of the source [payment instrument](https://docs.adyen.com/api-explorer/balanceplatform/latest/post/paymentInstruments#responses-200-id).\n\nIf you want to make a transfer using a **virtual** **bankAccount**, you must specify the payment instrument ID of the **virtual** **bankAccount**. If you only specify a balance account ID, Adyen uses the default **physical** **bankAccount** payment instrument assigned to the balance account.) has no source",
+      "message": "paymentInstrumentId (string, The unique identifier of the source [payment instrument](https://docs.adyen.c…) has no source",
       "pointer": null,
       "hint": "fields.paymentInstrumentId.source: \"…\"  (overrides.yml)"
     },
@@ -2092,112 +1742,112 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "priority (string, The priority for the bank transfer. This sets the speed at which the transfer is sent and the fees that you have to pay. Required for transfers with `category` **bank**.\n\nPossible values:\n\n* **regular**: For normal, low-value transactions.\n\n* **fast**: A faster way to transfer funds, but the fees are higher. Recommended for high-priority, low-value transactions.\n\n* **wire**: The fastest way to transfer funds, but this has the highest fees. Recommended for high-priority, high-value transactions.\n\n* **instant**: For instant funds transfers within the United States and in [SEPA locations](https://www.ecb.europa.eu/paym/integration/retail/sepa/html/index.en.html).\n\n* **crossBorder**: For high-value transfers to a recipient in a different country.\n\n* **internal**: For transfers to an Adyen-issued business bank account (by bank account number/IBAN).) has no source",
+      "message": "priority (string, The priority for the bank transfer. This sets the speed at which the transfer…) has no source",
       "pointer": null,
       "hint": "fields.priority.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "referenceForBeneficiary (string,  A reference that is sent to the recipient. This reference is also sent in all webhooks related to the transfer, so you can use it to track statuses for both parties involved in the funds movement.\n\n Supported characters: **a-z**, **A-Z**, **0-9**. The maximum length depends on the `category`.\n\n- **internal**: 80 characters\n\n- **bank**: 35 characters when transferring to an IBAN, 15 characters for others.) has no source",
+      "message": "referenceForBeneficiary (string, A reference that is sent to the recipient. This reference is also sent in all…) has no source",
       "pointer": null,
       "hint": "fields.referenceForBeneficiary.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "review.numberOfApprovalsRequired (integer, Specifies the number of [approvals](https://docs.adyen.com/api-explorer/transfers/latest/post/transfers/approve) required to process the transfer.) has no source",
+      "message": "review.numberOfApprovalsRequired (integer, Specifies the number of [approvals](https://docs.adyen.com/api-explorer/trans…) has no source",
       "pointer": null,
       "hint": "fields.review.numberOfApprovalsRequired.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "review.scaOnApproval (boolean, Specifies whether you will initiate Strong Customer Authentication (SCA) in thePOST [/transfers/approve](https://docs.adyen.com/api-explorer/transfers/latest/post/transfers/approve) request.\n\nOnly applies to transfers made with an Adyen [business account](https://docs.adyen.com/platforms/business-accounts).) has no source",
+      "message": "review.scaOnApproval (boolean, Specifies whether you will initiate Strong Customer Authentication (SCA) in t…) has no source",
       "pointer": null,
       "hint": "fields.review.scaOnApproval.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "type (string, The type of transfer.\n\nPossible values:\n\n - **bankTransfer**: for push transfers to a transfer instrument or a bank account. The `category` must be **bank**.\n- **internalTransfer**: for push transfers between balance accounts. The `category` must be **internal**.\n- **internalDirectDebit**: for pull transfers (direct debits) between balance accounts. The `category` must be **internal**. \n\n) has no source",
+      "message": "type (string, The type of transfer.) has no source",
       "pointer": null,
       "hint": "fields.type.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.city (string, The name of the city.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "message": "ultimateParty.address.city (string, The name of the city.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.city.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.country (string, The two-character ISO 3166-1 alpha-2 country code. For example, **US**, **NL**, or **GB**.) has no source",
+      "message": "ultimateParty.address.country (string, The two-character ISO 3166-1 alpha-2 country code. For example, **US**, **NL*…) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.country.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.line1 (string, The first line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "message": "ultimateParty.address.line1 (string, The first line of the street address.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.line1.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.line2 (string, The second line of the street address.\n\nSupported characters: **[a-z] [A-Z] [0-9] . - — / # , ’ ° ( ) : ; [ ] & \\ |** and Space.\n\n> Required when the `category` is **card**.\n) has no source",
+      "message": "ultimateParty.address.line2 (string, The second line of the street address.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.line2.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.postalCode (string, The postal code.\nMaximum length:\n* 5 digits for an address in the US.\n* 10 characters for an address in all other countries.\n\nSupported characters: **[a-z] [A-Z] [0-9]** and Space.\n\n> Required for addresses in the US.\n) has no source",
+      "message": "ultimateParty.address.postalCode (string, The postal code.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.postalCode.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.address.stateOrProvince (string,    The two-letter ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n\n   > Required for the US and Canada.\n) has no source",
+      "message": "ultimateParty.address.stateOrProvince (string, The two-letter ISO 3166-2 state or province code. For example, **CA** in the …) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.address.stateOrProvince.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.dateOfBirth (string, The date of birth of the individual in [ISO-8601](https://www.w3.org/TR/NOTE-datetime) format. For example, **YYYY-MM-DD**.\n\nAllowed only when `type` is **individual**.) has no source",
+      "message": "ultimateParty.dateOfBirth (string, The date of birth of the individual in [ISO-8601](https://www.w3.org/TR/NOTE-…) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.dateOfBirth.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.firstName (string, The first name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "message": "ultimateParty.firstName (string, The first name of the individual.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.firstName.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fullName (string, The full name of the entity that owns the bank account or card.\n\nSupported characters: [a-z] [A-Z] [0-9] , . ; : - — / \\ + & ! ? @ ( ) \" ' and space.\n\nRequired when `category` is **bank**.) has no source",
+      "message": "ultimateParty.fullName (string, The full name of the entity that owns the bank account or card.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fullName.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryMonth (string, The expiry month of the card.\n\nFormat: two digits. Add a leading zero for single-digit months. For example:\n* 03 = March\n* 11 = November) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryMonth (string, The expiry month of the card.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.expiryMonth.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryYear (string, The expiry year of the card.\n\nFormat: four digits. For example: 2020) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.expiryYear (string, The expiry year of the card.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.expiryYear.source: \"…\"  (overrides.yml)"
     },
@@ -2211,28 +1861,28 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.number (string, The card number without any separators.\n\nFor security, the response only includes the last four digits of the card number.) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.number (string, The card number without any separators.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.number.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.startMonth (string, The month when the card was issued. Applies only to some UK debit cards.\n\nFormat: two digits. Add a leading zero for single-digit months. For example:\n* 03 = March\n* 11 = November) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.startMonth (string, The month when the card was issued. Applies only to some UK debit cards.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.startMonth.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.startYear (string, The year when the card was issued. Applies only to some UK debit cards.\n\nFormat: four digits. For example: 2020) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.startYear (string, The year when the card was issued. Applies only to some UK debit cards.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.startYear.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.cardIdentification.storedPaymentMethodId (string, The unique [token](/payouts/payout-service/pay-out-to-cards/manage-card-information#save-card-details) created to identify the counterparty.\n\n) has no source",
+      "message": "ultimateParty.fundingInstrument.cardIdentification.storedPaymentMethodId (string, The unique [token](/payouts/payout-service/pay-out-to-cards/manage-card-infor…) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.cardIdentification.storedPaymentMethodId.source: \"…\"  (overrides.yml)"
     },
@@ -2246,35 +1896,35 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.reference (string, Your internal reference that identifies this funding instrument. Required if `sourceOfFunds` is **DEPOSIT_ACCOUNT**.) has no source",
+      "message": "ultimateParty.fundingInstrument.reference (string, Your internal reference that identifies this funding instrument. Required if …) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.reference.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.fundingInstrument.sourceOfFunds (string, Indicates where the funds used for the transfer originated. Possible values are:\n- **DEBIT** for card-to-card transfers.\n- **DEPOSIT_ACCOUNT** for wallet-to-card transfers.) has no source",
+      "message": "ultimateParty.fundingInstrument.sourceOfFunds (string, Indicates where the funds used for the transfer originated. Possible values are:) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.fundingInstrument.sourceOfFunds.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.lastName (string, The last name of the individual.\n\nSupported characters: [a-z] [A-Z] - . / — and space.\n\nThis parameter is:\n- Allowed only when `type` is **individual**.\n- Required when `category` is **card**.) has no source",
+      "message": "ultimateParty.lastName (string, The last name of the individual.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.lastName.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.reference (string, A unique reference to identify the party or counterparty involved in the transfer. For example, your client's unique wallet or payee ID.\n\nRequired when you include `cardIdentification.storedPaymentMethodId`.) has no source",
+      "message": "ultimateParty.reference (string, A unique reference to identify the party or counterparty involved in the tran…) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.reference.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "ultimateParty.type (string, The type of entity that owns the bank account or card.\n\nPossible values: **individual**, **organization**, or **unknown**.\n\nRequired when `category` is **card**. In this case, the value must be **individual**.) has no source",
+      "message": "ultimateParty.type (string, The type of entity that owns the bank account or card.) has no source",
       "pointer": null,
       "hint": "fields.ultimateParty.type.source: \"…\"  (overrides.yml)"
     },

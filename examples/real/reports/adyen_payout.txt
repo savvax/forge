@@ -9,17 +9,7 @@ Errors: 400 validation_error → reject; 401 invalid_credentials → alert_block
 Webhook signature: no webhook found
 Amount: integer, minor units (×100) — source: amount.value (integer) → minor units: 'The numeric value of the amount, in [minor units](https://docs.adyen.com/development-resources/currency-codes#minor-units).'
 Fields: 49 request fields, 37 unmapped (card: card)
-Warnings (45):
-  WARN         role_conflict              POST /confirmThirdParty (post-confirmThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
-        hint: endpoints.post-confirmThirdParty: create
-  WARN         role_conflict              POST /declineThirdParty (post-declineThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
-        hint: endpoints.post-declineThirdParty: create
-  WARN         role_conflict              POST /storeDetail (post-storeDetail) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
-        hint: endpoints.post-storeDetail: create
-  WARN         role_conflict              POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
-        hint: endpoints.post-storeDetailAndSubmitThirdParty: create
-  WARN         role_conflict              POST /submitThirdParty (post-submitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)
-        hint: endpoints.post-submitThirdParty: create
+Warnings (40):
   WARN         status_field_not_found     no status field (enum or described) found in the response schema
         hint: statuses.field: <path>  (overrides.yml)
   WARN         response_id_not_found      no id field found in the response schema; `id` assumed
@@ -28,10 +18,19 @@ Warnings (45):
         hint: endpoints.<operationId>: webhook  (overrides.yml)
   WARN         unmapped_field             billingAddress.city (string, The name of the city. Maximum length: 3000 characters.) has no source
         hint: fields.billingAddress.city.source: "…"  (overrides.yml)
-  WARN         unmapped_field             billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.
-> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source
+  WARN         unmapped_field             billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.) has no source
         hint: fields.billingAddress.country.source: "…"  (overrides.yml)
-  … and 35 more (see --format json)
+  WARN         unmapped_field             billingAddress.houseNumberOrName (string, The number or name of the house. Maximum length: 3000 characters.) has no source
+        hint: fields.billingAddress.houseNumberOrName.source: "…"  (overrides.yml)
+  WARN         unmapped_field             billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten charac…) has no source
+        hint: fields.billingAddress.postalCode.source: "…"  (overrides.yml)
+  WARN         unmapped_field             billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in t…) has no source
+        hint: fields.billingAddress.stateOrProvince.source: "…"  (overrides.yml)
+  WARN         unmapped_field             billingAddress.street (string, The name of the street. Maximum length: 3000 characters.) has no source
+        hint: fields.billingAddress.street.source: "…"  (overrides.yml)
+  WARN         unmapped_field             card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/pay…) has no source
+        hint: fields.card.cvc.source: "…"  (overrides.yml)
+  … and 30 more (see --format json)
 Unsupported (1):
   UNSUPPORTED  apiKey_alternative         alternative security scheme 'ApiKeyAuth' (apiKey) is ignored
         hint: the first supported scheme is used
@@ -44,4 +43,4 @@ Info (7):
   INFO         no_cancel_endpoint         no cancel endpoint; cancel_request not generated
   INFO         credential_field           merchantAccount → credentials.merchantAccount
         hint: fill it in credentials
-Done: 45 warnings, 1 unsupported. Exit 0.
+Done: 40 warnings, 1 unsupported. Exit 0.

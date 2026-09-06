@@ -239,23 +239,10 @@
     ],
     "requisite_types": [],
     "requisite_container": null,
+    "requisite_type_values": {},
     "headers": []
   },
   "warnings": [
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transferrecipient (transferrecipient_create) also looks like create (0.7); POST /transfer (transfer_initiate) wins (0.95)",
-      "pointer": "#/paths/~1transferrecipient/post",
-      "hint": "endpoints.transferrecipient_create: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /transfer/bulk (transfer_bulk) also looks like create (0.55); POST /transfer (transfer_initiate) wins (0.95)",
-      "pointer": "#/paths/~1transfer~1bulk/post",
-      "hint": "endpoints.transfer_bulk: create"
-    },
     {
       "level": "warn",
       "code": "role_conflict",

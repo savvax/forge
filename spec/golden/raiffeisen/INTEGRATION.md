@@ -77,11 +77,10 @@
 
 | Решение | Источник | Уровень | Как переопределить |
 |---------|----------|---------|--------------------|
-| POST /payout/v1/payouts/draft (post-payout-v1-payouts-draft) also looks like create (0.55); POST /payout/v1/payouts (post-payout-v1-payouts) wins (0.95) | role_conflict at `#/paths/~1payout~1v1~1payouts~1draft/post` | WARN | `endpoints.post-payout-v1-payouts-draft: create` |
 | no security requirement on the create endpoint or at the root | auth_not_found at `#/security` | WARN | `auth.type: api_key\|bearer\|basic (overrides.yml)` |
 | status 'WAITING_CONFIRMATION' (waiting_confirmation) of status.value is unknown | unmapped_status | WARN | `statuses.WAITING_CONFIRMATION: in_progress\|approved\|rejected  (overrides.yml)` |
 | webhook has no signature header parameter; callbacks will not be verified | signature_not_found | WARN | `webhook.signature_header: <Header-Name>  (overrides.yml)` |
-| incomeTypeCode (string, Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/cons_doc_LAW_353568/527cf8edd2262cb7068cafd44ed596d9a05dd237/)) has no source | unmapped_field | WARN | `fields.incomeTypeCode.source: "…"  (overrides.yml)` |
+| incomeTypeCode (string, Код вида дохода<br/>[Значения описаны тут](http://www.consultant.ru/document/…) has no source | unmapped_field | WARN | `fields.incomeTypeCode.source: "…"  (overrides.yml)` |
 
 ## Проверка
 

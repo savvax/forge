@@ -75,9 +75,14 @@ module Forge
       counts = warnings.group_by(&:level).transform_values(&:size)
       files = generation ? "#{generation[:outputs].size} files, " : ''
       code = generation&.fetch(:exit_code, 0) || 0
-      strict = code.zero? ? '' : ' (--strict: warnings present, output still generated)'
       totals = "#{counts.fetch(:warn, 0)} warnings, #{counts.fetch(:unsupported, 0)} unsupported"
-      "Done: #{files}#{totals}. Exit #{code}.#{strict}"
+      "Done: #{files}#{totals}. Exit #{code}.#{done_suffix(generation, code)}"
+    end
+
+    def done_suffix(generation, code)
+      return ' (generated spec failed, see the error above)' if generation&.dig(:verify).to_s.start_with?('FAILED')
+
+      code.zero? ? '' : ' (--strict: warnings present, output still generated)'
     end
 
     # Data/Symbol/Endpoint/Schema → JSON-дружественные структуры.

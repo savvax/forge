@@ -24,7 +24,8 @@ module Forge
       # 'payout.completed' → 'completed', 'transfer.on_hold' → 'on_hold' (срезаем префиксы-слова выплат).
       def self.event_status(event, rules)
         tokens = Rules.normalize(event).split('_')
-        prefixes = rules.fetch(:endpoint_roles)['payout_words'] + %w[event]
+        dict = rules.fetch(:endpoint_roles)
+        prefixes = dict['payout_words'] + dict.fetch('weak_payout_words', []) + %w[event]
         tokens.shift while tokens.size > 1 && prefixes.include?(tokens.first)
         tokens.join('_')
       end

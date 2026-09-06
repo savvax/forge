@@ -80,8 +80,8 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
     it 'penalises negative words' do
       finding = described_class.new(ir_for(build_spec(paths: post_op('/v2/transfer-orders', 'createTransferOrder'))),
                                     rules).call
-      expect(finding.value[:confidences][:create]).to be < 0.8
-      expect(finding).to have_warning(:low_confidence)
+      expect(finding.value[:create]).to be_nil # 0.95 − 0.5 < warn threshold
+      expect(finding).to have_warning(:no_create_endpoint)
     end
 
     it 'filters by include_paths' do
@@ -124,6 +124,20 @@ RSpec.describe Forge::Analyzers::EndpointRoles do
       finding = described_class.new(ir_for(build_spec(paths: paths)), rules).call
       expect(finding.value[:confidences][:status]).to be < 0.8
       expect(finding).to have_warning(:low_confidence, hint: /endpoints\.getPayment: status/)
+    end
+
+    it 'counts payment as a payout word when the spec has no stronger one' do
+      finding = described_class.new(ir_for(build_spec(paths: post_op('/v1/payments', 'createPayment'))), rules).call
+      expect(finding.value[:confidences][:create]).to eq(0.95)
+    end
+
+    it 'rejects a create candidate off the payout resource (Square: /v2/payments next to /v2/payouts)' do
+      get_payout = { 'operationId' => 'GetPayout', 'parameters' => [path_param('payout_id')],
+                     'responses' => { '200' => { 'description' => 'ok' } } }
+      paths = post_op('/v2/payments', 'CreatePayment').merge('/v2/payouts/{payout_id}' => { 'get' => get_payout })
+      finding = described_class.new(ir_for(build_spec(paths: paths)), rules).call
+      expect(finding.value[:create]).to be_nil
+      expect(finding.value[:status].operation_id).to eq('GetPayout')
     end
 
     it 'treats sandbox simulation and inward payment endpoints as negative' do

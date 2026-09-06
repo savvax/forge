@@ -74,6 +74,7 @@
     "request": [],
     "requisite_types": [],
     "requisite_container": null,
+    "requisite_type_values": {},
     "headers": []
   },
   "warnings": [

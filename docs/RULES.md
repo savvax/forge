@@ -32,11 +32,13 @@ warn: 0.5
 ```yaml
 # Слова ищутся в path (сегменты), operationId, summary, tags — после нормализации.
 payout_words: [payout, payouts, withdraw, withdrawal, withdrawals, transfer, transfers, disburse,
-               disbursement, disbursements, payment, payments, send, remittance, outbound]
+               disbursement, disbursements, send, remittance, outbound]
+weak_payout_words: [payment, payments]   # слово выплаты, только если в спеке нет путей с сильным словом;
+                                         # иначе create-кандидат на пути без сильного слова получает −0.5
 negative_words: [order, orders, inventory, subscription, subscriptions, booking, bookings, invoice,
                  invoices, terminal, loyalty, climate, test_helpers, refund, refunds, recipient,
                  recipients, otp, export, bulk, search, resend, finalize,
-                 simulate, simulation, inward, incoming, payin, deposit, deposits]   # каждое совпадение: −0.4
+                 simulate, simulation, inward, incoming, payin, deposit, deposits]   # каждое совпадение: −0.5
 
 roles:
   create:

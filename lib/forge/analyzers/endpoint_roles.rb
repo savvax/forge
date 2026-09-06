@@ -46,10 +46,18 @@ module Forge
 
       def scores(endpoint)
         dict = rules.fetch(:endpoint_roles)
-        facts = Facts.new(endpoint, dict)
+        facts = Facts.new(endpoint, dict, weak_ok: weak_ok?)
         dict['roles'].filter_map do |role, cfg|
-          [role.to_sym, facts.score(cfg['signals'])] if facts.requires?(cfg['requires'])
+          [role.to_sym, facts.score(cfg['signals'], role.to_sym)] if facts.requires?(cfg['requires'])
         end
+      end
+
+      # Слабые слова (payment) — слова выплаты, только если ни один путь не содержит сильного (payout, transfer…).
+      def weak_ok?
+        return @weak_ok if defined?(@weak_ok)
+
+        dict = rules.fetch(:endpoint_roles)
+        @weak_ok = endpoints.none? { |e| Facts.new(e, dict).strong_payout_path? }
       end
 
       def explicit_webhook
@@ -135,10 +143,13 @@ module Forge
 
         attr_reader :endpoint
 
-        def initialize(endpoint, dict)
+        def initialize(endpoint, dict, weak_ok: true)
           @endpoint = endpoint
           @dict = dict
+          @weak_ok = weak_ok
         end
+
+        def strong_payout_path? = tokens(bare_path).intersect?(@dict['payout_words'])
 
         def requires?(req)
           return true unless req
@@ -146,11 +157,15 @@ module Forge
           Array(req['all']).all? { |f| fact?(f) } && (req['any'].nil? || req['any'].any? { |f| fact?(f) })
         end
 
-        def score(signals)
+        def score(signals, role = nil)
           raw = signals.sum { |name, weight| fact?(name) ? weight : 0.0 }
-          penalty = (tokens(bare_path) & @dict['negative_words']).size * @dict['negative_penalty']
-          (raw - penalty).clamp(0.0, 1.0).round(2)
+          penalty = (tokens(bare_path) & @dict['negative_words']).size
+          penalty += 1 if role == :create && off_resource? # спека называет ресурс выплат, а create живёт не на нём
+          (raw - (penalty * @dict['negative_penalty'])).clamp(0.0, 1.0).round(2)
         end
+
+        # В спеке есть пути с сильным словом выплаты, а этот путь без него (/v2/payments, /v2/bank-accounts у Square).
+        def off_resource? = !@weak_ok && !strong_payout_path?
 
         def method = endpoint.method
         def path_param? = endpoint.path.include?('{')
@@ -185,9 +200,11 @@ module Forge
         # Список слов: `payout_words` на верхнем уровне словаря, остальные — в `words`.
         def word?(list, *texts)
           words = @dict.fetch("#{list}_words") { @dict['words'].fetch(list) }
+          words += weak_words if list == 'payout' && @weak_ok
           texts.compact.any? { |t| tokens(t).intersect?(words) }
         end
 
+        def weak_words = @dict.fetch('weak_payout_words', [])
         def bare_path = endpoint.path.gsub(/\{[^}]*\}/, '')
         def tokens(text) = Rules.normalize(text).split(%r{[_/]}).reject(&:empty?)
       end

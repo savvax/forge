@@ -59,11 +59,7 @@ Errors: 401 (create) invalid_credentials → alert_block;
 Webhook signature: no webhook found
 Amount: string, minor units (×100) — source: amount (string) → minor units: 'Amount to transfer in kobo if currency is NGN and pesewas if currency is GHS.'
 Fields: 6 request fields, 1 unmapped
-Warnings (10):
-  WARN         role_conflict              POST /transferrecipient (transferrecipient_create) also looks like create (0.7); POST /transfer (transfer_initiate) wins (0.95)
-        hint: endpoints.transferrecipient_create: create
-  WARN         role_conflict              POST /transfer/bulk (transfer_bulk) also looks like create (0.55); POST /transfer (transfer_initiate) wins (0.95)
-        hint: endpoints.transfer_bulk: create
+Warnings (8):
   WARN         role_conflict              GET /transfer/verify/{reference} (transfer_verify) also looks like status (0.9); GET /transfer/{code} (transfer_fetch) wins (0.9)
         hint: endpoints.transfer_verify: status
   WARN         role_conflict              GET /transferrecipient/{code} (transferrecipient_fetch) also looks like status (0.65); GET /transfer/{code} (transfer_fetch) wins (0.9)
@@ -92,4 +88,4 @@ Info (17):
   INFO         outside_contract           POST /transfer/finalize_transfer (transfer_finalize) — not used
   INFO         outside_contract           POST /transfer/bulk (transfer_bulk) — not used
   … and 7 more (see --format json)
-Done: 10 warnings, 0 unsupported. Exit 0.
+Done: 8 warnings, 0 unsupported. Exit 0.

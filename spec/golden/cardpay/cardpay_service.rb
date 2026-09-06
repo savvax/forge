@@ -51,6 +51,8 @@ module Provider
       return failure(:unprocessable_entity, 'pan_invalid') if requisite_type_for(operation, request_method) == 'card' && !pan.to_s.match?(/\A\d{13,19}\z/)
 
       success
+    rescue StandardError => e # кривой реквизит или override-выражение → отклонить операцию, а не уронить воркер
+      failure(:unprocessable_entity, 'requisite_invalid', message: e.message)
     end
 
     def create_request(operation, request_method = 'create')

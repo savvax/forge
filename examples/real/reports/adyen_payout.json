@@ -341,7 +341,7 @@
           "card",
           "number"
         ],
-        "source_expr": "operation.payout_requisite.dig('card', 'number')",
+        "source_expr": "operation.payout_requisite.dig('card', 'card_number')",
         "required": false,
         "required_if": null,
         "transform": null,
@@ -592,7 +592,7 @@
           "card",
           "number"
         ],
-        "source_expr": "operation.payout_requisite.dig('card', 'number')",
+        "source_expr": "operation.payout_requisite.dig('card', 'card_number')",
         "required": false,
         "required_if": null,
         "transform": null,
@@ -707,14 +707,14 @@
         "path": [
           "merchantAccount"
         ],
-        "source_expr": null,
+        "source_expr": "credentials.fetch('merchantAccount')",
         "required": true,
         "required_if": null,
         "transform": null,
         "schema": {
           "type": "string"
         },
-        "confidence": 0.0,
+        "confidence": 0.95,
         "requisite_type": null
       },
       {
@@ -943,44 +943,10 @@
       "card"
     ],
     "requisite_container": "card",
+    "requisite_type_values": {},
     "headers": []
   },
   "warnings": [
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /confirmThirdParty (post-confirmThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
-      "pointer": "#/paths/~1confirmThirdParty/post",
-      "hint": "endpoints.post-confirmThirdParty: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /declineThirdParty (post-declineThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
-      "pointer": "#/paths/~1declineThirdParty/post",
-      "hint": "endpoints.post-declineThirdParty: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /storeDetail (post-storeDetail) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
-      "pointer": "#/paths/~1storeDetail/post",
-      "hint": "endpoints.post-storeDetail: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /storeDetailAndSubmitThirdParty (post-storeDetailAndSubmitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
-      "pointer": "#/paths/~1storeDetailAndSubmitThirdParty/post",
-      "hint": "endpoints.post-storeDetailAndSubmitThirdParty: create"
-    },
-    {
-      "level": "warn",
-      "code": "role_conflict",
-      "message": "POST /submitThirdParty (post-submitThirdParty) also looks like create (0.7); POST /payout (post-payout) wins (0.95)",
-      "pointer": "#/paths/~1submitThirdParty/post",
-      "hint": "endpoints.post-submitThirdParty: create"
-    },
     {
       "level": "info",
       "code": "outside_contract",
@@ -1061,7 +1027,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.\n> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source",
+      "message": "billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.) has no source",
       "pointer": null,
       "hint": "fields.billingAddress.country.source: \"…\"  (overrides.yml)"
     },
@@ -1075,28 +1041,28 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten characters for an address in all other countries.) has no source",
+      "message": "billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten charac…) has no source",
       "pointer": null,
       "hint": "fields.billingAddress.postalCode.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n> Required for the US and Canada.) has no source",
+      "message": "billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in t…) has no source",
       "pointer": null,
       "hint": "fields.billingAddress.stateOrProvince.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "billingAddress.street (string, The name of the street. Maximum length: 3000 characters.\n> The house number should not be included in this field; it should be separately provided via `houseNumberOrName`.) has no source",
+      "message": "billingAddress.street (string, The name of the street. Maximum length: 3000 characters.) has no source",
       "pointer": null,
       "hint": "fields.billingAddress.street.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid) (1-20 characters). Depending on the card brand, it is known also as:\n* CVV2/CVC2 – length: 3 digits\n* CID – length: 4 digits\n> If you are using [Client-Side Encryption](https://docs.adyen.com/classic-integration/cse-integration-ecommerce), the CVC code is present in the encrypted data. You must never post the card details to the server.\n> This field must be always present in a [one-click payment request](https://docs.adyen.com/classic-integration/recurring-payments).\n> When this value is returned in a response, it is always empty because it is not stored.) has no source",
+      "message": "card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/pay…) has no source",
       "pointer": null,
       "hint": "fields.card.cvc.source: \"…\"  (overrides.yml)"
     },
@@ -1124,7 +1090,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fraudOffset (integer, An integer value that is added to the normal fraud score. The value can be either positive or negative.) has no source",
+      "message": "fraudOffset (integer, An integer value that is added to the normal fraud score. The value can be ei…) has no source",
       "pointer": null,
       "hint": "fields.fraudOffset.source: \"…\"  (overrides.yml)"
     },
@@ -1138,7 +1104,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fundSource.billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.\n> If you don't know the country or are not collecting the country from the shopper, provide `country` as `ZZ`.) has no source",
+      "message": "fundSource.billingAddress.country (string, The two-character ISO-3166-1 alpha-2 country code. For example, **US**.) has no source",
       "pointer": null,
       "hint": "fields.fundSource.billingAddress.country.source: \"…\"  (overrides.yml)"
     },
@@ -1152,28 +1118,28 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fundSource.billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten characters for an address in all other countries.) has no source",
+      "message": "fundSource.billingAddress.postalCode (string, A maximum of five digits for an address in the US, or a maximum of ten charac…) has no source",
       "pointer": null,
       "hint": "fields.fundSource.billingAddress.postalCode.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fundSource.billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in the US or **ON** in Canada.\n> Required for the US and Canada.) has no source",
+      "message": "fundSource.billingAddress.stateOrProvince (string, The two-character ISO 3166-2 state or province code. For example, **CA** in t…) has no source",
       "pointer": null,
       "hint": "fields.fundSource.billingAddress.stateOrProvince.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fundSource.billingAddress.street (string, The name of the street. Maximum length: 3000 characters.\n> The house number should not be included in this field; it should be separately provided via `houseNumberOrName`.) has no source",
+      "message": "fundSource.billingAddress.street (string, The name of the street. Maximum length: 3000 characters.) has no source",
       "pointer": null,
       "hint": "fields.fundSource.billingAddress.street.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "fundSource.card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid) (1-20 characters). Depending on the card brand, it is known also as:\n* CVV2/CVC2 – length: 3 digits\n* CID – length: 4 digits\n> If you are using [Client-Side Encryption](https://docs.adyen.com/classic-integration/cse-integration-ecommerce), the CVC code is present in the encrypted data. You must never post the card details to the server.\n> This field must be always present in a [one-click payment request](https://docs.adyen.com/classic-integration/recurring-payments).\n> When this value is returned in a response, it is always empty because it is not stored.) has no source",
+      "message": "fundSource.card.cvc (string, The [card verification code](https://docs.adyen.com/payments-fundamentals/pay…) has no source",
       "pointer": null,
       "hint": "fields.fundSource.card.cvc.source: \"…\"  (overrides.yml)"
     },
@@ -1227,16 +1193,16 @@
       "hint": "fields.fundSource.telephoneNumber.source: \"…\"  (overrides.yml)"
     },
     {
-      "level": "warn",
-      "code": "unmapped_field",
-      "message": "merchantAccount (string, The merchant account identifier, with which you want to process the transaction.) has no source",
+      "level": "info",
+      "code": "credential_field",
+      "message": "merchantAccount → credentials.merchantAccount",
       "pointer": null,
-      "hint": "fields.merchantAccount.source: \"…\"  (overrides.yml)"
+      "hint": "fill it in credentials"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "recurring.contract (string, The type of recurring contract to be used.\nPossible values:\n* `ONECLICK` – Payment details can be used to initiate a one-click payment, where the shopper enters the [card security code (CVC/CVV)](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-security-code-cvc-cvv-cid).\n* `RECURRING` – Payment details can be used without the card security code to initiate [card-not-present transactions](https://docs.adyen.com/payments-fundamentals/payment-glossary#card-not-present-cnp).\n* `ONECLICK,RECURRING` – Payment details can be used regardless of whether the shopper is on your site or not.\n* `PAYOUT` – Payment details can be used to [make a payout](https://docs.adyen.com/online-payments/online-payouts).\n* `EXTERNAL` - Use this when you store payment details and send the raw card number or network token directly in your API request.\n) has no source",
+      "message": "recurring.contract (string, The type of recurring contract to be used.) has no source",
       "pointer": null,
       "hint": "fields.recurring.contract.source: \"…\"  (overrides.yml)"
     },
@@ -1250,7 +1216,7 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "recurring.recurringExpiry (string, Date after which no further authorisations shall be performed. Only for 3D Secure 2.) has no source",
+      "message": "recurring.recurringExpiry (string, Date after which no further authorisations shall be performed. Only for 3D Se…) has no source",
       "pointer": null,
       "hint": "fields.recurring.recurringExpiry.source: \"…\"  (overrides.yml)"
     },
@@ -1271,21 +1237,21 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "selectedRecurringDetailReference (string, The `recurringDetailReference` you want to use for this payment. The value `LATEST` can be used to select the most recently stored recurring detail.) has no source",
+      "message": "selectedRecurringDetailReference (string, The `recurringDetailReference` you want to use for this payment. The value `L…) has no source",
       "pointer": null,
       "hint": "fields.selectedRecurringDetailReference.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "shopperEmail (string, The shopper's email address. We recommend that you provide this data, as it is used in velocity fraud checks. > Required for Visa and JCB transactions that require 3D Secure 2 authentication if you did not include the `telephoneNumber`.) has no source",
+      "message": "shopperEmail (string, The shopper's email address. We recommend that you provide this data, as it i…) has no source",
       "pointer": null,
       "hint": "fields.shopperEmail.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "shopperInteraction (string, Specifies the sales channel, through which the shopper gives their card details, and whether the shopper is a returning customer.\nFor the web service API, Adyen assumes Ecommerce shopper interaction by default.\n\nThis field has the following possible values:\n* `Ecommerce` - Online transactions where the cardholder is present (online). For better authorisation rates, we recommend sending the card security code (CSC) along with the request.\n* `ContAuth` - Card on file and/or subscription transactions, where the cardholder is known to the merchant (returning customer). If the shopper is present (online), you can supply also the CSC to improve authorisation (one-click payment).\n* `Moto` - Mail-order and telephone-order transactions where the shopper is in contact with the merchant via email or telephone.\n* `POS` - Point-of-sale transactions where the shopper is physically present to make a payment using a secure payment terminal.) has no source",
+      "message": "shopperInteraction (string, Specifies the sales channel, through which the shopper gives their card detai…) has no source",
       "pointer": null,
       "hint": "fields.shopperInteraction.source: \"…\"  (overrides.yml)"
     },
@@ -1306,14 +1272,14 @@
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "shopperReference (string, Required for recurring payments. \nYour reference to uniquely identify this shopper, for example user ID or account ID. The value is case-sensitive and must be at least three characters.\n> Your reference must not include personally identifiable information (PII) such as name or email address.) has no source",
+      "message": "shopperReference (string, Required for recurring payments.) has no source",
       "pointer": null,
       "hint": "fields.shopperReference.source: \"…\"  (overrides.yml)"
     },
     {
       "level": "warn",
       "code": "unmapped_field",
-      "message": "telephoneNumber (string, The shopper's telephone number.\n The phone number must include a plus sign (+) and a country code (1-3 digits), followed by the number (4-15 digits). If the value you provide does not follow the guidelines, we do not submit it for authentication.\n> Required for Visa and JCB transactions that require 3D Secure 2 authentication, if you did not include the `shopperEmail`.) has no source",
+      "message": "telephoneNumber (string, The shopper's telephone number.) has no source",
       "pointer": null,
       "hint": "fields.telephoneNumber.source: \"…\"  (overrides.yml)"
     }

@@ -30,6 +30,12 @@ RSpec.describe Forge::Report do
     expect(json['warnings'].map { |w| w['level'] }.tally).to eq('warn' => 5, 'info' => 4)
   end
 
+  it 'explains exit 3 by the failed generated spec, not by --strict' do
+    spec, findings = analyze('examples/specs/novapay.yaml')
+    generation = { steps: [], verify: 'FAILED (see error below)', outputs: [], exit_code: 3 }
+    expect(described_class.text(spec, findings, generation: generation)).to include('Exit 3. (generated spec failed')
+  end
+
   it 'folds long warning lists' do
     spec, findings = analyze('examples/specs/novapay.yaml')
     extra = Array.new(15) { |i| Forge::Warning.new(level: :warn, code: :x, message: "m#{i}", pointer: nil, hint: nil) }

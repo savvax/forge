@@ -31,7 +31,7 @@ module Forge
 
       # Публичные для FieldWalker: предупреждения с накоплением в этом анализаторе.
       def warn_unmapped(path, prop)
-        detail = [prop.type, prop.description].compact.join(', ')
+        detail = [prop.type, brief(prop.description)].compact.join(', ')
         warn(:unmapped_field, "#{path.join('.')} (#{detail}) has no source",
              hint: "fields.#{path.join('.')}.source: \"…\"  (overrides.yml)")
       end
@@ -63,6 +63,16 @@ module Forge
 
       def info_credential(path)
         info(:credential_field, "#{path.join('.')} → credentials.#{path.last}", hint: 'fill it in credentials')
+      end
+
+      # Первая строка description, не длиннее 80 символов: многострочные описания реальных спек ломали формат отчёта.
+      def brief(text)
+        return nil if text.nil?
+
+        line = text.lines.first.to_s.strip
+        return line if line.size <= 80
+
+        "#{line[0, 77]}…"
       end
 
       private

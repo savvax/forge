@@ -46,6 +46,8 @@ module Provider
       return failure(:unprocessable_entity, 'iban_invalid') if requisite_type_for(operation, request_method) == 'bank_account' && !iban.to_s.match?(/\A[A-Z]{2}\d{2}[A-Z0-9]{11,30}\z/)
 
       success
+    rescue StandardError => e # кривой реквизит или override-выражение → отклонить операцию, а не уронить воркер
+      failure(:unprocessable_entity, 'requisite_invalid', message: e.message)
     end
 
     def create_request(operation, request_method = 'create')

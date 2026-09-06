@@ -56,6 +56,8 @@ module Provider
       return failure(:unprocessable_entity, 'phone_invalid') unless phone.to_s.match?(/\A7\d{10}\z/)
 
       success
+    rescue StandardError => e # кривой реквизит или override-выражение → отклонить операцию, а не уронить воркер
+      failure(:unprocessable_entity, 'requisite_invalid', message: e.message)
     end
 
     def create_request(operation, request_method = 'create')

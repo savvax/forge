@@ -40,7 +40,11 @@ RSpec.describe Forge::Renderers::Service do
     path = write(plan_for('examples/specs/novapay.yaml'), 'load_novapay_service.rb')
     load File.expand_path(path)
     record = Provider::Record.new(name: 'novapay', credentials: { 'api_key' => 'k' })
-    expect(Provider::NovapayService.new(provider: record)).to be_a(Provider::BaseService)
+    service = Provider::NovapayService.new(provider: record)
+    expect(service).to be_a(Provider::BaseService)
+    broken = Provider::Operation.new(id: 'op', amount: 5000.0, currency: 'RUB', payout_requisite: { 'sbp' => nil })
+    # nil['phone'] внутри проверок → failure, а не исключение
+    expect(service.check_conditions(broken, 'sbp').code).to eq('requisite_invalid')
   end
 
   context 'with a minimal plan (bearer, major string, no webhook/status/cancel)' do
