@@ -21,6 +21,16 @@ RSpec.describe Forge::Renderers do
       end
     end
 
+    it 'is exhaustive: summary, flow, settings, method examples, amount, requisites, checks, webhook, files' do
+      ['Кратко', 'Как платформа работает с сервисом', 'Сумма и валюта', 'Приём webhook', 'Файлы'].each do |h|
+        expect(doc).to include("## #{h.tr('\\', '')}")
+      end
+      expect(doc).to include('### create_payout — POST /payouts', '### get_status — GET /payouts/{payout_id}',
+                             '"amount": 1500000', '"event": "payout.completed"', '| amount | ≥ 1000 | amount_too_low |',
+                             '| sbp | `phone` (да), `bank_code` (если type=sbp)', '| `credentials.callback_secret` |',
+                             '**treat as success**', '| `mock_server.rb` |')
+    end
+
     it 'has the assumptions section with 3 WARN rows and lists INFO-free' do
       section = doc[/## Допущения.*?## Проверка/m]
       expect(section.scan('| WARN |').size).to eq(3)

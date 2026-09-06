@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 require_relative 'base'
+require_relative 'integration_doc_details'
+require_relative 'integration_doc_sections'
 
 module Forge
   module Renderers
     # INTEGRATION.md по templates/integration.md.erb (docs/OUTPUT_FORMAT.md § 3).
     class IntegrationDoc < Base
+      include IntegrationDocDetails
+      include IntegrationDocSections
+
       AUTH_NAMES = { 'api_key' => 'API Key', 'bearer' => 'Bearer token', 'basic' => 'Basic auth',
                      'oauth2' => 'OAuth2 client_credentials', 'none' => 'не найдена' }.freeze
       ACTIONS = { 'reject' => 'reject', 'alert_block' => 'alert ops, block provider', 'retry' => 'retry later',
@@ -13,6 +18,22 @@ module Forge
                   'treat_as_success' => 'treat as success (idempotent replay)' }.freeze
       METHOD_ROWS = { create: ['create_payout', 'Создание выплаты'], status: %w[get_status Статус],
                       cancel: %w[cancel Отмена], balance: %w[balance Баланс] }.freeze
+      ACTION_SEMANTICS = [
+        '- **reject** — операция отклоняется: `failure(<http>, "provider.<code>")`, платформа не повторяет запрос.',
+        '- **retry later** / **retry with backoff** — временная ошибка: `failure` с `retry_after` из `Retry-After`, ' \
+        'если провайдер его прислал; платформа повторяет позже.',
+        '- **alert ops, block provider** — неверные учётные данные: `provider.invalid_credentials`, провайдер ' \
+        'блокируется до вмешательства.',
+        '- **treat as success** — идемпотентный повтор (тот же `Idempotency-Key`): ответ читается как успешный.',
+        '- Сеть, таймаут, 5xx → `provider.unavailable`; 429 → `provider.rate_limit`.'
+      ].freeze
+      FILES = [['%s_service.rb', 'сервис `Provider::%s` по контракту'],
+               ['%s_service_spec.rb', 'RSpec сервиса на WebMock и фикстурах (доказательство работы)'],
+               ['generated_spec_helper.rb', 'вспомогательный код для spec (учётные данные, подпись)'],
+               ['INTEGRATION.md', 'этот гайд'],
+               ['fixtures.json', 'примеры запросов, ответов и webhook с ожидаемыми статусами'],
+               ['mock_server.rb', 'Sinatra-мок провайдера из той же спеки (демо и e2e)'],
+               ['report.txt', 'что распознано, с какой уверенностью, WARN / UNSUPPORTED / INFO с подсказками']].freeze
 
       def template_name = 'integration.md.erb'
       def filename = 'INTEGRATION.md'
