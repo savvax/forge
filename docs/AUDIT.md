@@ -2,8 +2,7 @@
 
 Документ для независимого проверяющего (человека или агента): что требовалось, что реализовано, где это
 лежит, как проверить каждое утверждение командой и какие отклонения от документов приняты осознанно.
-Актуально на тег `v1.0.0` (5.09.2026). Первоисточники: `docs/TASK.md`, `docs/QA_SESSION_1.md`,
-`docs/CRITERIA.md`, `CLAUDE.md`, `NOTES.md` (решения D-01…D-30).
+Актуально на 7.09.2026. Первоисточники: условие задачи (`docs/TASK.md`) и письменные ответы организаторов.
 
 ## 1. Требования
 
@@ -18,7 +17,7 @@
 | R5 | CLI `./integrate --spec … --provider … --lang ruby` с прогресс-выводом («Parsing spec… Found N endpoints… Auth… Webhook signature… Generating… Output:») | `bin/integrate`, `lib/forge/report.rb`, `spec/cli_spec.rb`, `spec/snapshots/*_analyze.txt` |
 | R6 | Доп. эндпоинты (balance, cancel, list) — «найдено, вне контракта», как необязательные хелперы | `INFO outside_contract` в отчёте, `cancel_request`/`fetch_balance` в отдельном классе `<P>Extras` (`<p>_extras.rb`, D-15) |
 
-### 1.2 Уточнения организаторов (`docs/QA_SESSION_1.md`, приоритет над догадками)
+### 1.2 Уточнения организаторов (сессия вопросов и ответов, приоритет над догадками)
 
 | # | Требование | Реализация |
 |---|---|---|
@@ -32,7 +31,7 @@
 | Q8 | Реальный `Provider::BaseService` не выдают — своя заглушка | `lib/provider/*` (код из `docs/CONTRACT.md` § 5), `spec/provider/` |
 | Q9 | Веб-интерфейс не нужен; документация может быть на русском | CLI + README/INTEGRATION.md на русском |
 
-### 1.3 Жёсткие ограничения (`CLAUDE.md`, нарушение = дисквалификация)
+### 1.3 Жёсткие ограничения (нарушение = дисквалификация)
 
 | # | Ограничение | Как обеспечено |
 |---|---|---|
@@ -41,14 +40,14 @@
 | C3 | Никаких нейросетей/LLM, никаких сетевых вызовов при анализе и генерации; детерминизм | Правила и словари `rules/*.yml`; `rake determinism` (два прогона → одинаковые sha256, 21 файл); единственный сетевой код — `rake real:fetch` (скачивание спек для тестов) и мок |
 | C4 | Знание о провайдере не живёт в `lib/` | `rake guard:vendor` (grep `novapay|cardpay|swiftpay|stripe|adyen|paystack|paypal` по `lib/`) входит в `rake check` |
 
-### 1.4 Стандарты кода (`CLAUDE.md`)
+### 1.4 Стандарты кода
 
 `# frozen_string_literal: true`; Ruby 3.3; без метапрограммирования; файлы < 200 строк, методы < 20; ошибки
 `Forge::Error` → `SpecError` (exit 1), `UnsupportedError` (1), `GenerationError` (2), `VerificationError` (3),
 `--strict` (4); сообщение `"<что> at <pointer> in <file>\n  hint: <что делать>"`; SimpleCov line ≥ 90 %,
 branch ≥ 75 %, по файлу ≥ 70 %; rubocop 0; golden байт-в-байт; коммит после каждой зелёной задачи.
 
-### 1.5 Критерии оценки (`docs/CRITERIA.md`) → где смотреть
+### 1.5 Критерии оценки → где смотреть
 
 См. таблицу «Критерий → где смотреть» в `README.md`.
 
