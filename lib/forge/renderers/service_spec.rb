@@ -48,6 +48,12 @@ module Forge
       def error_code(status) = plan.error_map[status] && "provider.#{plan.error_map[status][:internal_code]}"
       def min? = plan.validations.any? { |v| v[:rule] == :min }
 
+      # Плоская форма карты платформы (QA 2): все канонические реквизиты карты на верхнем уровне payout_requisite.
+      def flat_card
+        defaults = Rules.load.fetch(:field_aliases)['requisite_defaults']['card']
+        "{ #{defaults.map { |k, v| "'#{k}' => #{v.inspect}" }.join(', ')} }"
+      end
+
       # Не сравниваются: поля с override source, поля из operation.idempotency_key (UUID) и «синтезированные»
       # примеры (в спеке не было example — значение фикстуры выдумано, сервис подставит своё из operation).
       def overridden_paths
