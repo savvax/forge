@@ -245,6 +245,11 @@ namespace :fuzz do
   task(:mock) { ruby '-Ilib', 'spec/fuzz/mock.rb' }
 end
 
+namespace :demo do
+  desc 'Записать docs/demo.gif и docs/demo.mp4 по docs/demo.tape (нужен vhs)'
+  task(:gif) { sh 'vhs docs/demo.tape' }
+end
+
 desc 'Фаззинг: web + mutate + mock (падение или 5xx = красный)'
 task fuzz: %w[fuzz:web fuzz:mutate fuzz:mock]
 

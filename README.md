@@ -17,6 +17,25 @@
 >
 > Ранее: **M2 Generate закрыт** — `bin/forge generate` для NovaPay даёт сервис, spec (14 примеров, зелёный), `INTEGRATION.md`, `fixtures.json`, `report.txt`; golden и determinism зелёные. Дальше — M3 Universal (CardPay/SwiftPay golden, реальные спеки).
 
+## Демо за 90 секунд
+
+![forge: analyze → generate → rspec → e2e → overrides → битая спека → Stripe](docs/demo.gif)
+
+Что происходит в записи (фаза за фазой):
+
+1. **Анализ** — `bin/forge analyze --spec examples/specs/novapay.yaml`: 5 эндпоинтов с ролями и confidence,
+   auth, маппинг статусов, действия по ошибкам, webhook с подписью, единицы суммы; 3 WARN с подсказками для `overrides.yml`.
+2. **Генерация командой из ТЗ** — `bin/integrate --spec provider_api.yaml --provider novapay --lang ruby`:
+   прогресс-вывод, 7 файлов в `output/novapay/`, `ruby -c` и rspec сгенерированного кода прямо в процессе.
+3. **Результат** — список файлов и начало `INTEGRATION.md`: авторизация, что заполнить вручную, методы.
+4. **Сгенерированный RSpec** — 15 примеров на WebMock и фикстурах: доказательство, что сервис работает.
+5. **e2e** — `bin/e2e`: мок-сервер из той же спеки, `create_request → fetch_status → подписанный webhook → approved`.
+6. **Overrides** — CardPay с `examples/overrides/cardpay.yml` и `--strict`: все WARN закрыты, exit 0.
+7. **Битая спека** — циклический `$ref`: ошибка с JSON-pointer и подсказкой, exit 1, без стектрейса.
+8. **Реальная спека** — Stripe (6 МБ, 594 эндпоинта) с `--include-paths`: те же правила, никакой привязки к провайдеру.
+
+Видео без сжатия — `docs/demo.mp4`; перезаписать: `rake demo:gif` (нужен [vhs](https://github.com/charmbracelet/vhs)).
+
 ## Быстрый старт
 
 Без Docker (Ruby ≥ 3.3):
